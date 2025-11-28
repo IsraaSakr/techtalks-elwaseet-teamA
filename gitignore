@@ -1,0 +1,156 @@
+# elwaseet - Combined .gitignore for Spring Boot + React
+
+# ==================== JAVA / SPRING BOOT ====================
+
+# Compiled class files
+*.class
+*.jar
+*.war
+*.ear
+target/
+build/
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+
+# Gradle
+.gradle/
+gradle/
+gradlew
+gradlew.bat
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# VS Code
+.vscode/
+
+# Spring Boot
+spring-boot-starter-parent/
+application-*.properties
+application-*.yml
+!application.properties.example
+!application.yml.example
+
+# Logs
+*.log
+logs/
+spring.log
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+*~
+
+# ==================== REACT / NODE.JS ====================
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Production build
+build/
+dist/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
+
+# Testing
+coverage/
+.nyc_output/
+
+# Misc
+.DS_Store
+Thumbs.db
+
+# ==================== DATABASE ====================
+
+# PostgreSQL
+*.sql
+*.db
+*.sqlite
+*.sqlite3
+
+# Database dumps
+*.dump
+*.backup
+
+# ==================== SECURITY (NEVER COMMIT) ====================
+
+# API Keys & Secrets
+*.key
+*.pem
+*.p12
+*.jks
+secrets/
+credentials/
+
+# JWT secrets
+jwt.secret
+application-secrets.properties
+
+# SendGrid / Email
+sendgrid.key
+
+# AWS credentials
+.aws/
+
+# ==================== IDE & OS ====================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# ==================== DOCUMENTATION ====================
+
+# Ignore generated docs (keep source docs)
+docs/generated/
+site/
+
+# ==================== TEAM WORKFLOW ====================
+
+# Personal notes (use for personal TODO lists)
+TODO.personal.md
+NOTES.personal.md
+
+# ==================== WHAT TO KEEP ====================
+# These files SHOULD be committed:
+# - README.md
+# - .gitignore (this file)
+# - pom.xml
+# - package.json
+# - src/ (all source code)
+# - docs/ (project documentation)
+# - .env.example (template, not actual secrets)
+# - application.properties.example (template)
