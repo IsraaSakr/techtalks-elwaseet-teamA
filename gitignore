@@ -39,10 +39,12 @@ bin/
 
 # Spring Boot
 spring-boot-starter-parent/
+application.properties
+application.yml
 application-*.properties
 application-*.yml
-!application.properties.example
-!application.yml.example
+!application-example.properties
+!application-example.yml
 
 # Logs
 *.log
