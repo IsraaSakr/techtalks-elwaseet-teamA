@@ -1,6 +1,6 @@
 # elwaseet - Complete API Endpoints Reference
 
-**Quick reference for all 75+ endpoints in the platform**
+**Quick reference for all endpoints in the platform**
 
 ---
 
