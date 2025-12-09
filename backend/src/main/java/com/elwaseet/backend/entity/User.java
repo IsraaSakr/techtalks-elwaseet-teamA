@@ -83,7 +83,7 @@ public class User {
 
     @NotNull(message = "Account type is required")
     @Enumerated(EnumType.STRING)
-    @Column(name = "account_type", nullable = false, columnDefinition = "account_type")
+    @Column(name = "account_type", nullable = false)
     private AccountType accountType;
 
     @Size(max = 500, message = "Profile photo URL must not exceed 500 characters")

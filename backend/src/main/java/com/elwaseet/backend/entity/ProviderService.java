@@ -81,7 +81,7 @@ public class ProviderService {
      * Photos showcasing this specific service
      */
     @OneToMany(
-        mappedBy = "service", 
+        mappedBy = "providerService", 
         cascade = CascadeType.ALL, 
         fetch = FetchType.LAZY, 
         orphanRemoval = true
