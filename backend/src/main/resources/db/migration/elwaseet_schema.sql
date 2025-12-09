@@ -186,6 +186,20 @@ CREATE INDEX idx_provider_verified ON provider_profiles(is_verified);
 CREATE INDEX idx_provider_rating ON provider_profiles(average_rating DESC);
 
 -- -----------------------------------------------------
+-- Table: PORTFOLIO_PHOTOS
+-- -----------------------------------------------------
+CREATE TABLE portfolio_photos (
+    photo_id BIGSERIAL PRIMARY KEY,
+    profile_id BIGINT NOT NULL REFERENCES provider_profiles(profile_id) ON DELETE CASCADE,
+    photo_url VARCHAR(500) NOT NULL,
+    upload_order INT DEFAULT 0,
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_portfolio_photo_profile_id ON portfolio_photos(profile_id);
+CREATE INDEX idx_portfolio_photo_order ON portfolio_photos(profile_id, upload_order);
+
+-- -----------------------------------------------------
 -- Table: SERVICE_CATEGORIES
 -- -----------------------------------------------------
 CREATE TABLE service_categories (

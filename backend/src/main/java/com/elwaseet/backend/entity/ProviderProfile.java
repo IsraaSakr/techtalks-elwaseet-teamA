@@ -104,6 +104,17 @@ public class ProviderProfile {
     )
     private List<ProviderService> services = new ArrayList<>();
 
+    @OneToMany(
+    mappedBy = "providerProfile", 
+    cascade = CascadeType.ALL, 
+    fetch = FetchType.LAZY, 
+    orphanRemoval = true
+    )
+    private List<PortfolioPhoto> portfolioPhotos = new ArrayList<>();
+
+    public List<PortfolioPhoto> getPortfolioPhotos() {
+        return portfolioPhotos;
+    }
     /*
      * ============================================================================
      * LIFECYCLE CALLBACKS
