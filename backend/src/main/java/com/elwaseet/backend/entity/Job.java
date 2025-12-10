@@ -78,9 +78,9 @@ public class Job {
     private BigDecimal budgetMax;
 
     @NotBlank(message = "Location is required")
-    @Size(max = 255, message = "Location must not exceed 255 characters")
-    @Column(name = "location", nullable = false, length = 255)
-    private String location;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "location", nullable = false, length = 20)
+    private Location location;
 
     @NotNull(message = "Urgency level is required")
     @Enumerated(EnumType.STRING)
@@ -185,7 +185,7 @@ public class Job {
 
     public Job(User customer, String title, String description, 
                BigDecimal budgetMin, BigDecimal budgetMax, 
-               String location, Urgency urgency) {
+               Location location, Urgency urgency) {
         this.customer = customer;
         this.title = title;
         this.description = description;
@@ -245,11 +245,11 @@ public class Job {
         this.budgetMax = budgetMax;
     }
 
-    public String getLocation() {
+    public Location getLocation() {
         return location;
     }
 
-    public void setLocation(String location) {
+    public void setLocation(Location location) {
         this.location = location;
     }
 

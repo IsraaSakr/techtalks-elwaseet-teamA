@@ -76,10 +76,10 @@ public class User {
     @Column(name = "phone", nullable = false, length = 20)
     private String phone;
 
-    @NotBlank(message = "Location is required")
-    @Size(max = 255, message = "Location must not exceed 255 characters")
-    @Column(name = "location", nullable = false, length = 255)
-    private String location;
+    @NotNull(message = "Location is required")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "location", nullable = false, length = 20)
+    private Location location;
 
     @NotNull(message = "Account type is required")
     @Enumerated(EnumType.STRING)
@@ -214,7 +214,7 @@ public class User {
     }
 
     public User(String email, String passwordHash, String name, String phone, 
-                String location, AccountType accountType) {
+                Location location, AccountType accountType) {
         this.email = email;
         this.passwordHash = passwordHash;
         this.name = name;
@@ -269,11 +269,11 @@ public class User {
         this.phone = phone;
     }
 
-    public String getLocation() {
+    public Location getLocation() {
         return location;
     }
 
-    public void setLocation(String location) {
+    public void setLocation(Location location) {
         this.location = location;
     }
 

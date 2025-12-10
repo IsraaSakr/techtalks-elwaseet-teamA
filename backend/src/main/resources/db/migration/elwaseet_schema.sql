@@ -534,6 +534,25 @@ CREATE INDEX idx_email_queue_status ON email_queue(status);
 CREATE INDEX idx_email_queue_recipient_user ON email_queue(recipient_user_id);
 CREATE INDEX idx_email_queue_created_at ON email_queue(created_at);
 
+
+-- Create enum type
+CREATE TYPE location_type AS ENUM (
+    'BEIRUT', 
+    'MOUNT_LEBANON', 
+    'NORTH_LEBANON', 
+    'SOUTH_LEBANON', 
+    'BEKAA', 
+    'NABATIEH'
+);
+
+-- Change users table
+ALTER TABLE users 
+    ALTER COLUMN location TYPE location_type USING location::location_type;
+
+-- Change jobs table  
+ALTER TABLE jobs
+    ALTER COLUMN location TYPE location_type USING location::location_type;
+    
 -- =====================================================
 -- TRIGGERS FOR UPDATED_AT
 -- =====================================================
