@@ -13,21 +13,19 @@ import java.util.List;
  */
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor  // This already creates the 4-argument constructor
 public class ErrorResponse {
 
-    private int status; // HTTP status code
-    private String message; // Main error message
-    private LocalDateTime timestamp; // When the error occurred
-    private List<String> errors; // Optional: list of detailed validation errors
+    private int status;
+    private String message;
+    private LocalDateTime timestamp;
+    private List<String> errors;
 
-    /**
-     * Constructor for single-error responses.
-     */
+    // Custom constructor for single-error responses (3 arguments)
     public ErrorResponse(int status, String message, LocalDateTime timestamp) {
         this.status = status;
         this.message = message;
         this.timestamp = timestamp;
-        this.errors = null;
+        this.errors = null;  // No validation errors
     }
 }
