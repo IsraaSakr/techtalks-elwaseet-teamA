@@ -1,4 +1,4 @@
-package com.elwaseet.backend.controllers;
+package com.elwaseet.backend.controller;
 
 import com.elwaseet.backend.dto.ErrorResponse;
 import com.elwaseet.backend.exception.ResourceNotFoundException;

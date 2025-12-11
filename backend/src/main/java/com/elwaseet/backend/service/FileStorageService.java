@@ -1,4 +1,4 @@
-package com.elwaseet.backend.services;
+package com.elwaseet.backend.service;
 
 import org.springframework.web.multipart.MultipartFile;
 

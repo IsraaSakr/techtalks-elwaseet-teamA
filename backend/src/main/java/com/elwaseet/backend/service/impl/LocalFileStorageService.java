@@ -1,7 +1,8 @@
-package com.elwaseet.backend.services.impl;
+package com.elwaseet.backend.service.impl;
 
 import com.elwaseet.backend.exception.ValidationException;
-import com.elwaseet.backend.services.FileStorageService;
+import com.elwaseet.backend.service.FileStorageService;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.annotation.Primary;
