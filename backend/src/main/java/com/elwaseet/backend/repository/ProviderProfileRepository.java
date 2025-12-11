@@ -9,7 +9,7 @@ import java.util.Optional;
 @Repository
 public interface ProviderProfileRepository extends JpaRepository<ProviderProfile, Long> {
     
-    Optional<ProviderProfile> findByUserId(Long userId);
+    Optional<ProviderProfile> findByUser_UserId(Long userId);
     
-    boolean existsByUserId(Long userId);
+    boolean existsByUser_UserId(Long userId);
 }
