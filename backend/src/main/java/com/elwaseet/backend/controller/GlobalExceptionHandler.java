@@ -3,6 +3,8 @@ package com.elwaseet.backend.controller;
 import com.elwaseet.backend.dto.ErrorResponse;
 import com.elwaseet.backend.exception.ResourceNotFoundException;
 import com.elwaseet.backend.exception.ValidationException;
+import com.elwaseet.backend.exception.BadRequestException;
+import com.elwaseet.backend.exception.ConflictException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -115,4 +117,33 @@ public class GlobalExceptionHandler {
 
                 return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
+        // -------------------------------------------------------------------------
+        // 400 - Bad Request
+        // -------------------------------------------------------------------------
+        @ExceptionHandler(BadRequestException.class)
+        public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException ex) {
+
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                LocalDateTime.now());
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
+
+        // -------------------------------------------------------------------------
+        // 409 - Conflict
+        // -------------------------------------------------------------------------
+        @ExceptionHandler(ConflictException.class)
+        public ResponseEntity<ErrorResponse> handleConflict(ConflictException ex) {
+
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                ex.getMessage(),
+                LocalDateTime.now());
+
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+        }
+
 }

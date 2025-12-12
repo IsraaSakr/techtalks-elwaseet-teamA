@@ -25,8 +25,10 @@ public class ServiceCategoryInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         if (repository.count() == 0) {
             List<ServiceCategory> categories = createCategories();
-            repository.saveAll(categories);
-            System.out.println("✅ Service categories seeded successfully! Total: " + categories.size());
+            if (categories != null && !categories.isEmpty()) {
+                repository.saveAll(categories);
+                System.out.println("✅ Service categories seeded successfully! Total: " + categories.size());
+            }
         } else {
             System.out.println("ℹ️  Service categories already exist. Skipping seeding.");
         }

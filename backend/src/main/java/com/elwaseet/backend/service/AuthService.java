@@ -1,0 +1,85 @@
+package com.elwaseet.backend.service;
+
+import com.elwaseet.backend.dto.RegisterDto;
+import com.elwaseet.backend.dto.ResendOtpRequest;
+import com.elwaseet.backend.dto.VerifyDto;
+import com.elwaseet.backend.entity.OtpCode;
+import com.elwaseet.backend.entity.User;
+import com.elwaseet.backend.exception.ConflictException;
+import com.elwaseet.backend.exception.ResourceNotFoundException;
+import com.elwaseet.backend.repository.AuthRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class AuthService {
+
+    private final AuthRepository authRepo;
+    private final OtpService otpService;
+    private final PasswordEncoder passwordEncoder;
+
+    public void register(RegisterDto registerDto) {
+
+        System.out.println("AUTH SERVICE REGISTER HIT ✅");
+
+        // 1. Normalize and check if email already exists
+        String email = registerDto.getEmail().trim().toLowerCase();
+        if (authRepo.existsByEmail(email)) {
+            throw new ConflictException("Email is already in use");
+        }
+
+        // 2. Create User entity (AccountType is already enum from DTO)
+        User user = new User(
+                email,
+                passwordEncoder.encode(registerDto.getPassword()),
+                registerDto.getName(),
+                registerDto.getPhone(),
+                registerDto.getLocation(),
+                registerDto.getAccountType());
+
+        // 3. Ensure email is not verified yet
+        user.setIsEmailVerified(false);
+
+        // 4. Save to repository
+        User savedUser = authRepo.save(user);
+
+        System.out.println("ABOUT TO CALL OTP SERVICE ✅");
+
+        // 5. Generate and Send OTP
+        otpService.generateAndSaveOtp(savedUser);
+    }
+
+    public void verifyAccount(VerifyDto verifyDto) {
+        
+        // Normalize email
+        String email = verifyDto.getEmail().trim().toLowerCase();
+        
+        User user = authRepo.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        // Validate OTP against this user
+        OtpCode otpCode = otpService.validateOtp(verifyDto.getCode(), user);
+
+        // Mark OTP as used
+        otpService.markAsUsed(otpCode);
+
+        // Mark user as verified
+        user.setIsEmailVerified(true);
+        authRepo.save(user);
+    }
+
+    public void resendOtp(ResendOtpRequest request) {
+        
+        // Normalize email
+        String email = request.getEmail().trim().toLowerCase();
+        
+        User user = authRepo.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        // Invalidate old OTPs and generate new one
+        otpService.invalidateOtps(user);
+        otpService.generateAndSaveOtp(user);
+    }
+}
