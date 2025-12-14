@@ -16,6 +16,7 @@ import com.elwaseet.backend.dto.LoginResponse;
 import com.elwaseet.backend.config.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,10 +31,20 @@ public class AuthService {
 
         System.out.println("AUTH SERVICE REGISTER HIT ✅");
 
-        // 1. Normalize and check if email already exists
+        // 1. Check if email exists and handle unverified accounts
         String email = registerDto.getEmail().trim().toLowerCase();
-        if (authRepo.existsByEmail(email)) {
-            throw new ConflictException("Email is already in use");
+
+        // Check if email exists
+        Optional<User> existingUser = authRepo.findByEmail(email);
+
+        if (existingUser.isPresent()) {
+            User existingUserEntity = existingUser.get();
+            if (existingUserEntity.getIsEmailVerified()) {
+                throw new ConflictException("Email is already in use");
+            } else {
+                // Delete old unverified account and create new one
+                authRepo.delete(existingUserEntity);
+            }
         }
 
         // 2. Create User entity (AccountType is already enum from DTO)
