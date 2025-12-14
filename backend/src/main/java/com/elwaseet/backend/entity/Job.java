@@ -8,8 +8,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
+
+
 @Entity
 @Table(name = "jobs")
+
 public class Job {
 
     /**
