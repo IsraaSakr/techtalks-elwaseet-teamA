@@ -2,6 +2,7 @@ package com.elwaseet.backend.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -61,6 +62,7 @@ public class User {
     @Column(name = "email", nullable = false, unique = true, length = 255)
     private String email;
 
+    @JsonIgnore
     @NotBlank(message = "Password hash is required")
     @Size(max = 255, message = "Password hash must not exceed 255 characters")
     @Column(name = "password_hash", nullable = false, length = 255)
@@ -118,54 +120,67 @@ public class User {
      */
 
     /** One user can have multiple OTP login attempts */
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OtpCode> otpCodes = new ArrayList<>();
 
     /** Provider profile — applies only if user is a HYBRID_PROVIDER */
+    @JsonIgnore
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private ProviderProfile providerProfile;
 
     /** Customer who posted many jobs */
+    @JsonIgnore
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
     private List<Job> jobsPosted = new ArrayList<>();
 
     /** Provider who applied to many jobs */
+    @JsonIgnore
     @OneToMany(mappedBy = "provider", fetch = FetchType.LAZY)
     private List<Application> applicationsSubmitted = new ArrayList<>();
 
     /** All transactions where this user was the customer */
+    @JsonIgnore
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
     private List<Transaction> customerTransactions = new ArrayList<>();
 
     /** All transactions where this user was the provider */
+    @JsonIgnore
     @OneToMany(mappedBy = "provider", fetch = FetchType.LAZY)
     private List<Transaction> providerTransactions = new ArrayList<>();
 
     /** Disputes opened by the user */
+    @JsonIgnore
     @OneToMany(mappedBy = "openedBy", fetch = FetchType.LAZY)
     private List<Dispute> disputesOpened = new ArrayList<>();
 
     /** Dispute appeals submitted by the user */
+    @JsonIgnore
     @OneToMany(mappedBy = "appealedBy", fetch = FetchType.LAZY)
     private List<DisputeAppeal> appealsSubmitted = new ArrayList<>();
 
     /** Photos uploaded by the user inside disputes */
+    @JsonIgnore
     @OneToMany(mappedBy = "uploadedBy", fetch = FetchType.LAZY)
     private List<DisputeEvidencePhoto> disputeEvidencePhotos = new ArrayList<>();
 
     /** Reviews the user wrote for others */
+    @JsonIgnore
     @OneToMany(mappedBy = "reviewer", fetch = FetchType.LAZY)
     private List<Review> reviewsWritten = new ArrayList<>();
 
     /** Reviews the user received from others */
+    @JsonIgnore
     @OneToMany(mappedBy = "reviewee", fetch = FetchType.LAZY)
     private List<Review> reviewsReceived = new ArrayList<>();
 
     /** Review reports filed by this user */
+    @JsonIgnore
     @OneToMany(mappedBy = "reportedBy", fetch = FetchType.LAZY)
     private List<ReviewReport> reportsSubmitted = new ArrayList<>();
 
     /** System emails queued for this user */
+    @JsonIgnore
     @OneToMany(mappedBy = "recipientUser", fetch = FetchType.LAZY)
     private List<EmailQueue> receivedEmails = new ArrayList<>();
 
@@ -473,18 +488,22 @@ public class User {
         return providerProfile != null;
     }
 
+    @JsonIgnore
     public int getTotalJobsPosted() {
         return jobsPosted != null ? jobsPosted.size() : 0;
     }
 
+    @JsonIgnore
     public int getTotalApplicationsSubmitted() {
         return applicationsSubmitted != null ? applicationsSubmitted.size() : 0;
     }
 
+    @JsonIgnore
     public int getTotalReviewsWritten() {
         return reviewsWritten != null ? reviewsWritten.size() : 0;
     }
 
+    @JsonIgnore
     public int getTotalReviewsReceived() {
         return reviewsReceived != null ? reviewsReceived.size() : 0;
     }

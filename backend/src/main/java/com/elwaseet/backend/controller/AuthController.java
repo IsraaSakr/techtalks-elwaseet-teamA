@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.elwaseet.backend.dto.LoginRequest;
+import com.elwaseet.backend.dto.LoginResponse;
+import com.elwaseet.backend.entity.User;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("/auth")
@@ -35,5 +40,16 @@ public class AuthController {
     public ResponseEntity<String> resendOtp(@Valid @RequestBody ResendOtpRequest request) {
         authService.resendOtp(request);
         return ResponseEntity.ok("New OTP Sent");
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        return ResponseEntity.ok(authService.login(request));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<User> me(@AuthenticationPrincipal User user) {
+        // Spring automatically injects the authenticated user
+        return ResponseEntity.ok(user);
     }
 }

@@ -11,6 +11,11 @@ import com.elwaseet.backend.repository.AuthRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.elwaseet.backend.dto.LoginRequest;
+import com.elwaseet.backend.dto.LoginResponse;
+import com.elwaseet.backend.config.JwtUtil;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +24,7 @@ public class AuthService {
     private final AuthRepository authRepo;
     private final OtpService otpService;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     public void register(RegisterDto registerDto) {
 
@@ -81,5 +87,27 @@ public class AuthService {
         // Invalidate old OTPs and generate new one
         otpService.invalidateOtps(user);
         otpService.generateAndSaveOtp(user);
+    }
+
+    public LoginResponse login(LoginRequest request) {
+        String email = request.getEmail().trim().toLowerCase();
+        
+        User user = authRepo.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        
+        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+        }
+        
+        if (!user.getIsEmailVerified()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Email not verified");
+        }
+        
+        // Record login time
+        user.recordLogin();
+        authRepo.save(user);
+        
+        String token = jwtUtil.generateToken(user);
+        return new LoginResponse(token, user);
     }
 }
