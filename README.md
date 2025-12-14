@@ -505,12 +505,12 @@ http://localhost:8080/api
 | Name          | Role                         | Responsibilities | GitHub              |
 |---------------|------------------------------|------------------|---------------------|
 | Israa Sakr    | Team Leader & Full-Stack Dev |                  | [@IsraaSakr]        |
-| Mazen Naji    | Developer                    |                  | [@Mazennaji]        |
-| Jonathan      | Developer                    |                  | [@JohnBZ24]         |
-| Rubby         | Developer                    |                  | [@Mariam-El-Jarkas] |
-| Nizar         | Developer                    |                  | [@Anynomous-A]      |
-| Samah Chehade | Developer                    |                  | [@Samah-Chehade]    |
-| Nour Haffar   | Developer                    |                  | [@Nourhaffar]       |
+| Nour Haffar   | Frontend Developer           |                  | [@Nourhaffar]       |
+| Mazen Naji    | Backend Developer            |                  | [@Mazennaji]        |
+| Jonathan      | Backend Developer            |                  | [@JohnBZ24]         |
+| Rubby         | Backend Developer            |                  | [@Mariam-El-Jarkas] |
+| Nizar         | Backend Developer            |                  | [@Anynomous-A]      |
+| Samah Chehade | Backend Developer            |                  | [@Samah-Chehade]    |
 
 **Note:** Specific role assignments (Backend, Frontend, Full-Stack) will be decided collaboratively during our first sprint planning meeting based on individual preferences and skills.
 
