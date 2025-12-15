@@ -1,6 +1,7 @@
 package com.elwaseet.backend.dto;
 
 import com.elwaseet.backend.entity.Job;
+import com.elwaseet.backend.entity.Location;
 
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Size;
@@ -20,6 +21,8 @@ public class UpdateJobRequest {
     private BigDecimal budgetMax;
 
     private Job.Urgency urgency;
+
+    private Location location;
 
     /*
      * =============================
@@ -65,5 +68,13 @@ public class UpdateJobRequest {
 
     public void setUrgency(Job.Urgency urgency) {
         this.urgency = urgency;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 }
