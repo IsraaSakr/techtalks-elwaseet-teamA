@@ -20,17 +20,17 @@ public class BackendApplication {
 		SpringApplication.run(BackendApplication.class, args);
 	}
 
-	// Commented out - only uncomment when testing email
-	/*
-	@Bean
-	CommandLineRunner testEmail(
-			EmailService emailService,
-			@Value("${resend.test.to}") String testTo) {
-		return args -> {
-			String id = emailService.sendTestEmail(testTo);
-			System.out.println("Email sent. ID: " + id);
-		};
-	}
-	*/
+	// // Commented out - only uncomment when testing email
+
+	// @Bean
+	// CommandLineRunner testEmail(
+	// 		EmailService emailService,
+	// 		@Value("${resend.test.to}") String testTo) {
+	// 	return args -> {
+	// 		String id = emailService.sendTestEmail(testTo);
+	// 		System.out.println("Email sent. ID: " + id);
+	// 	};
+	// }
+	
 
 }
