@@ -77,7 +77,7 @@ public class Job {
     @Column(name = "budget_max", nullable = false, precision = 10, scale = 2)
     private BigDecimal budgetMax;
 
-    @NotBlank(message = "Location is required")
+    @NotNull(message = "Location is required")
     @Enumerated(EnumType.STRING)
     @Column(name = "location", nullable = false, length = 20)
     private Location location;
