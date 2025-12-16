@@ -5,8 +5,10 @@ import com.elwaseet.backend.dto.UpdateJobRequest;
 import com.elwaseet.backend.entity.User;
 import com.elwaseet.backend.service.JobService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -106,5 +108,12 @@ public class JobController {
         );
         
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()") 
+    public ResponseEntity<JobResponseDTO> getJobById(@PathVariable @Positive Long id) {
+        JobResponseDTO job = jobService.getJobById(id);
+        return ResponseEntity.ok(job);
     }
 }

@@ -13,7 +13,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -185,5 +184,16 @@ public class JobService {
         // 8️⃣ Save and return
         Job updatedJob = jobRepository.save(job);
         return JobResponseDTO.fromEntity(updatedJob);
+    }
+
+    @Transactional
+    public JobResponseDTO getJobById(Long id) {
+        if (id == null) {
+        throw new BadRequestException("Job ID cannot be null");
+        }
+        Job job = jobRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Job not found"));
+        
+        return JobResponseDTO.fromEntity(job);
     }
 }

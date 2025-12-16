@@ -14,17 +14,16 @@ public class JobResponseDTO {
     private Long jobId;
     private String title;
     private String description;
-
     private BigDecimal budgetMin;
     private BigDecimal budgetMax;
-
     private Job.Urgency urgency;
     private Job.JobStatus status;
     private Location location;
-
     private LocalDateTime postedAt;
-    
     private List<String> photoUrls;
+    private CustomerDto customer;
+    private String category; 
+    private Integer applicationCount;
 
     /*
      * =============================
@@ -112,6 +111,21 @@ public class JobResponseDTO {
         this.photoUrls = photoUrls;
     }
 
+    public CustomerDto getCustomer() { 
+        return customer; }
+    public void setCustomer(CustomerDto customer) { 
+        this.customer = customer; }
+
+    public String getCategory() { 
+        return category; }
+    public void setCategory(String category) { 
+        this.category = category; }
+
+    public Integer getApplicationCount() { 
+        return applicationCount; }
+    public void setApplicationCount(Integer applicationCount) { 
+        this.applicationCount = applicationCount; }
+
     /*
      * =============================
      * Mapper
@@ -131,10 +145,19 @@ public class JobResponseDTO {
         dto.setPostedAt(job.getPostedAt());
         
         // Map JobPhoto entities to photo URLs
-        List<String> urls = job.getPhotos().stream()
-                .map(JobPhoto::getPhotoUrl)
-                .collect(Collectors.toList());
+        List<String> urls = job.getPhotos().stream().map(JobPhoto::getPhotoUrl).collect(Collectors.toList());
         dto.setPhotoUrls(urls);
+        
+        dto.setCategory(job.getCategories().isEmpty() ? null : 
+        job.getCategories().iterator().next().getCategoryName());
+        dto.setApplicationCount(job.getApplications().size());
+    
+        // Customer mapping
+        CustomerDto customerDto = new CustomerDto();
+        customerDto.setId(job.getCustomer().getUserId());
+        customerDto.setName(job.getCustomer().getName());
+        customerDto.setLocation(job.getCustomer().getLocation().name());
+        dto.setCustomer(customerDto);
         
         return dto;
     }
