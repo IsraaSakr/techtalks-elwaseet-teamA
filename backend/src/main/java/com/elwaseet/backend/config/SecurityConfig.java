@@ -34,6 +34,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/categories/**").permitAll()  // Keep public for now
                 .requestMatchers("/api/jobs/browse").permitAll()    // Public job browsing
                 .requestMatchers("/test/**").permitAll()           // Testing endpoints
+                .requestMatchers("/api/providers/**").permitAll() // Public provider profiles
                 .requestMatchers("/error").permitAll()
                 .anyRequest().authenticated()  // Require auth for everything else
             )

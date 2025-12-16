@@ -4,13 +4,14 @@ import com.elwaseet.backend.dto.*;
 import com.elwaseet.backend.entity.*;
 import com.elwaseet.backend.exception.ResourceNotFoundException;
 import com.elwaseet.backend.exception.UnauthorizedException;
+import com.elwaseet.backend.exception.ValidationException;
 import com.elwaseet.backend.repository.*;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +27,9 @@ import java.util.List;
  * </ul>
  *
  * <p>All write operations are transactional to ensure data consistency.
+ * 
+ * <p>REFACTORED: Now uses existing LocalFileStorageService instead of custom FileStorageServiceImpl
+ * for consistency across the application.
  */
 @Service
 @RequiredArgsConstructor
@@ -35,6 +39,8 @@ public class ProviderProfileService {
     private final ProviderServiceRepository providerServiceRepository;
     private final PortfolioPhotoRepository portfolioPhotoRepository;
     private final UserRepository userRepository;
+    
+    // REFACTORED: Use existing LocalFileStorageService instead of custom implementation
     private final FileStorageService fileStorageService;
 
     /** Maximum number of portfolio photos allowed per provider. */
@@ -51,7 +57,10 @@ public class ProviderProfileService {
      * @throws UnauthorizedException     if the user is not a provider
      */
     @Transactional
-    public ProviderProfileResponseDTO updateProfile(Long userId, UpdateProfileRequest request) {
+    public ProviderProfileResponseDTO updateProfile(@Nullable Long userId, UpdateProfileRequest request) {
+        if (userId == null) {
+            return null;
+        }
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
@@ -69,6 +78,9 @@ public class ProviderProfileService {
         if (request.getAvailabilityDescription() != null)
             profile.setAvailabilityDescription(request.getAvailabilityDescription());
 
+        if (profile == null) {
+            return null;
+        }
         ProviderProfile savedProfile = providerProfileRepository.save(profile);
         return convertToResponseDTO(user, savedProfile);
     }
@@ -95,50 +107,52 @@ public class ProviderProfileService {
 
     /**
      * Uploads one or more portfolio photos for a provider.
-     * Validates file types, enforces a maximum number of photos, and assigns upload order.
+     * Uses the existing LocalFileStorageService for consistent file handling across the application.
      *
      * @param userId ID of the provider
      * @param photos list of photos to upload
      * @return updated provider profile response DTO
-     * @throws IOException if file storage fails
+     * @throws ValidationException if file validation fails or photo limit exceeded
      */
     @Transactional
-    public ProviderProfileResponseDTO uploadPortfolioPhotos(Long userId, List<MultipartFile> photos) throws IOException {
+    public ProviderProfileResponseDTO uploadPortfolioPhotos(Long userId, List<MultipartFile> photos) {
         ProviderProfile profile = getProviderProfileByUserId(userId);
 
+        // Check current photo count and validate limits
         int currentPhotoCount = portfolioPhotoRepository.countByProviderProfile_ProfileId(profile.getProfileId());
         int totalPhotosAfterUpload = currentPhotoCount + photos.size();
 
         if (totalPhotosAfterUpload > MAX_PORTFOLIO_PHOTOS) {
-            throw new IllegalArgumentException(
+            throw new ValidationException(
                     String.format("Maximum %d portfolio photos allowed. You currently have %d and tried to upload %d more.",
                             MAX_PORTFOLIO_PHOTOS, currentPhotoCount, photos.size())
             );
         }
 
         if (photos == null || photos.isEmpty()) {
-            throw new IllegalArgumentException("At least one photo is required");
+            throw new ValidationException("At least one photo is required");
         }
+
+        // REFACTORED: Use LocalFileStorageService's validation method instead of custom validation
+        fileStorageService.validateFiles(photos, photos.size());
 
         List<PortfolioPhoto> uploadedPhotos = new ArrayList<>();
         int uploadOrder = currentPhotoCount + 1;
 
+        // REFACTORED: Use LocalFileStorageService for consistent file handling
         for (MultipartFile photo : photos) {
             if (photo == null || photo.isEmpty()) continue;
 
-            String contentType = photo.getContentType();
-            if (contentType == null || !contentType.startsWith("image/")) {
-                throw new IllegalArgumentException("Only image files are allowed. Invalid file: " + photo.getOriginalFilename());
-            }
-
+            // Use the existing service to save files to "portfolio" folder
             String photoUrl = fileStorageService.saveFile(photo, "portfolio");
+            
             PortfolioPhoto portfolioPhoto = new PortfolioPhoto(profile, photoUrl);
             portfolioPhoto.setUploadOrder(uploadOrder++);
             uploadedPhotos.add(portfolioPhotoRepository.save(portfolioPhoto));
         }
 
         if (uploadedPhotos.isEmpty()) {
-            throw new IllegalArgumentException("No valid photos were uploaded");
+            throw new ValidationException("No valid photos were uploaded");
         }
 
         return convertToResponseDTO(profile.getUser(), profile);
@@ -153,8 +167,12 @@ public class ProviderProfileService {
      * @throws UnauthorizedException     if the service does not belong to the provider
      */
     @Transactional
-    public void deleteService(Long userId, Long serviceId) {
+    public void deleteService(Long userId, @Nullable Long serviceId) {
         ProviderProfile profile = getProviderProfileByUserId(userId);
+
+        if (serviceId == null) {
+            return;
+        }
 
         ProviderService service = providerServiceRepository.findById(serviceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Service not found with id: " + serviceId));
@@ -169,13 +187,13 @@ public class ProviderProfileService {
 
     /**
      * Deletes a portfolio photo from a provider's profile and filesystem.
+     * Uses the existing LocalFileStorageService for consistent file deletion.
      *
      * @param userId   ID of the provider
      * @param photoUrl URL of the photo to delete
-     * @throws IOException if file deletion fails
      */
     @Transactional
-    public void deletePortfolioPhoto(Long userId, String photoUrl) throws IOException {
+    public void deletePortfolioPhoto(Long userId, String photoUrl) {
         ProviderProfile profile = getProviderProfileByUserId(userId);
 
         PortfolioPhoto portfolioPhoto = portfolioPhotoRepository.findByPhotoUrl(photoUrl)
@@ -185,6 +203,7 @@ public class ProviderProfileService {
             throw new UnauthorizedException("Photo does not belong to this provider");
         }
 
+        // REFACTORED: Use LocalFileStorageService for consistent file deletion
         fileStorageService.deleteFile(photoUrl);
         portfolioPhotoRepository.delete(portfolioPhoto);
         reorderPortfolioPhotos(profile);
@@ -196,7 +215,10 @@ public class ProviderProfileService {
      * @param profileId ID of the provider profile
      * @return provider profile response DTO
      */
-    public ProviderProfileResponseDTO getPublicProfile(Long profileId) {
+    public ProviderProfileResponseDTO getPublicProfile(@Nullable Long profileId) {
+        if (profileId == null) {
+            return null;
+        }
         ProviderProfile profile = providerProfileRepository.findById(profileId)
                 .orElseThrow(() -> new ResourceNotFoundException("Provider profile not found with id: " + profileId));
 
@@ -215,7 +237,10 @@ public class ProviderProfileService {
      * @throws ResourceNotFoundException if user or profile not found
      * @throws UnauthorizedException     if user is not a provider
      */
-    private ProviderProfile getProviderProfileByUserId(Long userId) {
+    private ProviderProfile getProviderProfileByUserId(@Nullable Long userId) {
+        if (userId == null) {
+            return null;
+        }
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 

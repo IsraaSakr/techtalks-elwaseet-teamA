@@ -5,7 +5,6 @@ import com.elwaseet.backend.dto.UpdateProfileRequest;
 import com.elwaseet.backend.dto.ProviderProfileResponseDTO;
 import com.elwaseet.backend.dto.ServiceDTO;
 import com.elwaseet.backend.service.ProviderProfileService;
-import com.elwaseet.backend.service.FileStorageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -22,6 +20,9 @@ import java.util.List;
  * 
  * This includes updating profile details, managing offered services,
  * and handling portfolio image uploads and deletions.
+ * 
+ * REFACTORED: Now uses the updated ProviderProfileService that leverages 
+ * LocalFileStorageService for consistent file handling.
  */
 @RestController
 @RequestMapping("/api/users/me")
@@ -31,13 +32,9 @@ public class ProviderProfileController {
 
     /** 
      * Service layer handling provider profile business logic.
+     * Now uses LocalFileStorageService for consistency.
      */
     private final ProviderProfileService providerProfileService;
-
-    /**
-     * Service responsible for file storage operations (e.g., portfolio images).
-     */
-    private final FileStorageService fileStorageService;
 
     /**
      * Updates the provider's profile information.
@@ -77,16 +74,16 @@ public class ProviderProfileController {
 
     /**
      * Uploads portfolio images for the provider.
+     * Now uses LocalFileStorageService for consistent file handling and validation.
      *
      * @param userId ID of the authenticated user
      * @param photos list of image files to be added to the portfolio
      * @return updated provider profile including portfolio images
-     * @throws IOException if file storage fails
      */
     @PostMapping("/portfolio")
     public ResponseEntity<ProviderProfileResponseDTO> uploadPortfolioPhotos(
             @RequestParam Long userId,
-            @RequestParam("photos") List<MultipartFile> photos) throws IOException {
+            @RequestParam("photos") List<MultipartFile> photos) {
 
         ProviderProfileResponseDTO response =
                 providerProfileService.uploadPortfolioPhotos(userId, photos);
@@ -112,16 +109,16 @@ public class ProviderProfileController {
 
     /**
      * Deletes a specific portfolio image by its URL.
+     * Now uses LocalFileStorageService for consistent file deletion.
      *
      * @param userId   ID of the authenticated user
      * @param photoUrl URL of the portfolio image to delete
      * @return HTTP 204 if deletion is successful
-     * @throws IOException if file deletion fails
      */
     @DeleteMapping("/portfolio")
     public ResponseEntity<Void> deletePortfolioPhoto(
             @RequestParam Long userId,
-            @RequestParam String photoUrl) throws IOException {
+            @RequestParam String photoUrl) {
 
         providerProfileService.deletePortfolioPhoto(userId, photoUrl);
         return ResponseEntity.noContent().build();
