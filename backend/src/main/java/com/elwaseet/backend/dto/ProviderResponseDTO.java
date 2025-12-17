@@ -1,6 +1,6 @@
 package com.elwaseet.backend.dto;
 
-
+import java.math.BigDecimal;
 import com.elwaseet.backend.entity.ProviderProfile;
 import lombok.Data;
 
@@ -12,10 +12,10 @@ public class ProviderResponseDTO {
     private String serviceAreas;
     private String availabilityDescription;
     private Boolean isVerified;
-    private Double averageRating;
+    private BigDecimal averageRating;
     private Integer totalReviews;
     private Integer totalJobsCompleted;
-    private Double totalEarned;
+    private BigDecimal totalEarned;
 
     public static ProviderResponseDTO fromEntity(ProviderProfile provider) {
         ProviderResponseDTO dto = new ProviderResponseDTO();
@@ -32,13 +32,13 @@ public class ProviderResponseDTO {
         dto.setIsVerified(provider.getIsVerified());
 
         if (provider.getAverageRating() != null) {
-            dto.setAverageRating(provider.getAverageRating().doubleValue());
+            dto.setAverageRating(provider.getAverageRating());
         }
         dto.setTotalReviews(provider.getTotalReviews());
         dto.setTotalJobsCompleted(provider.getTotalJobsCompleted());
 
         if (provider.getTotalEarned() != null) {
-            dto.setTotalEarned(provider.getTotalEarned().doubleValue());
+            dto.setTotalEarned(provider.getTotalEarned());
         }
 
         return dto;

@@ -1,28 +1,27 @@
-package com.elwaseet.backend.service.impl;
-
+package com.elwaseet.backend.service;
 
 import com.elwaseet.backend.dto.JobRequestDTO;
 import com.elwaseet.backend.dto.JobResponseDTO;
 import com.elwaseet.backend.entity.Job;
-import com.elwaseet.backend.entity.Location;
+import com.elwaseet.backend.entity.JobPhoto;
+import com.elwaseet.backend.entity.ServiceCategory;
 import com.elwaseet.backend.repository.JobRepository;
-import com.elwaseet.backend.repository.UserRepository;
-import com.elwaseet.backend.storage.IFileStorageService;
+import com.elwaseet.backend.repository.UserRepository; 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.elwaseet.backend.entity.User; 
-
+import com.elwaseet.backend.repository.ServiceCategoryRepository;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class JobService {
     private final JobRepository jobs;
-    private final IFileStorageService storage;
+    private final FileStorageService storage;
     private final UserRepository users;
+    private final ServiceCategoryRepository categoryRepository;
 
     public JobResponseDTO createJob(JobRequestDTO dto, MultipartFile[] photos, String customerEmail) {
         // Validation
@@ -31,23 +30,29 @@ public class JobService {
         if (photos != null && photos.length > 5)
             throw new IllegalArgumentException("Max 5 photos allowed");
 
-        Location locationEnum = Location.valueOf(dto.getLocation().toUpperCase().replace(" ", "_"));
         User customer = users.findByEmail(customerEmail)
-    .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+            .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+
+        Long categoryId = dto.getCategoryId();
+        if (categoryId == null) {
+            throw new IllegalArgumentException("Category ID cannot be null");
+        }
+
+        ServiceCategory category = categoryRepository.findById(categoryId)
+            .orElseThrow(() -> new IllegalArgumentException("Category not found"));
 
         // Save job first
-Job job = new Job(
-    customer,
-    dto.getTitle(),
-    dto.getDescription(),
-    BigDecimal.valueOf(dto.getBudgetMin()),   // convert Double → BigDecimal
-    BigDecimal.valueOf(dto.getBudgetMax()),
-    locationEnum,
-        // depends on how your Location entity/VO is defined
-    Job.Urgency.valueOf(dto.getUrgency())     // convert String → enum
-);
-job.setStatus(Job.JobStatus.OPEN);
-
+        Job job = new Job(
+            customer,
+            dto.getTitle(),
+            dto.getDescription(),
+            BigDecimal.valueOf(dto.getBudgetMin()),   // convert Double → BigDecimal
+            BigDecimal.valueOf(dto.getBudgetMax()),
+            dto.getLocation(),
+            dto.getUrgency()     
+        );
+        job.setStatus(Job.JobStatus.OPEN);
+        job.getCategories().add(category);
 
         job = jobs.save(job);
 
@@ -60,7 +65,15 @@ job.setStatus(Job.JobStatus.OPEN);
                 String type = photo.getContentType();
                 if (type == null || !List.of("image/jpeg","image/png","image/webp").contains(type))
                     throw new IllegalArgumentException("Invalid file type");
-                photoUrls.add(storage.saveJobPhoto(job.getJobId(), photo));
+                String photoUrl = storage.saveFile(photo, "jobs");
+                photoUrls.add(photoUrl);
+            }
+
+            for (String photoUrl : photoUrls) {
+                JobPhoto jobPhoto = new JobPhoto();
+                jobPhoto.setJob(job);
+                jobPhoto.setPhotoUrl(photoUrl);
+                job.getPhotos().add(jobPhoto);
             }
         }
 

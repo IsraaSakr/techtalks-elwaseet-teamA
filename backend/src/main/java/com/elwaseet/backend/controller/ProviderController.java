@@ -1,8 +1,12 @@
 package com.elwaseet.backend.controller;
 
 import com.elwaseet.backend.dto.ProviderResponseDTO;
+import com.elwaseet.backend.entity.Location;
 import com.elwaseet.backend.service.ProviderProfileService;
 import lombok.RequiredArgsConstructor;
+
+import java.math.BigDecimal;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -16,7 +20,7 @@ import org.springframework.lang.NonNull;
 
 
 @RestController
-@RequestMapping("/providers")
+@RequestMapping("/api/providers")
 @RequiredArgsConstructor
 public class ProviderController {
 
@@ -25,8 +29,8 @@ public class ProviderController {
 @GetMapping
 public Page<ProviderResponseDTO> browseProviders(
         @RequestParam(required = false) Long category,
-        @RequestParam(required = false) String location,
-        @RequestParam(required = false) Double minRating,
+        @RequestParam(required = false) Location location,
+        @RequestParam(required = false) BigDecimal minRating,
         @RequestParam(required = false) Boolean verified,
         @PageableDefault(size = 10, sort = "averageRating", direction = Sort.Direction.DESC) @NonNull Pageable pageable
 ) {

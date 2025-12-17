@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.elwaseet.backend.entity.Job;
+import com.elwaseet.backend.entity.Location;
 import jakarta.validation.constraints.*;
 @Data
 @NoArgsConstructor
@@ -21,6 +23,6 @@ public class JobRequestDTO {
     @NotNull @DecimalMin("0.0") private Double budgetMin;
     @NotNull @DecimalMin("0.0") private Double budgetMax;
 
-    @NotBlank private String location;
-    @NotBlank private String urgency;
+    @NotNull private Location location;
+    @NotNull private Job.Urgency urgency; 
 }

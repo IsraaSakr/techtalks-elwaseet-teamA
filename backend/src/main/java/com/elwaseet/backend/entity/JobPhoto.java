@@ -63,7 +63,7 @@ public class JobPhoto {
      * ============================================================================
      */
 
-    protected JobPhoto() {
+    public JobPhoto() {
     }
 
     public JobPhoto(Job job, String photoUrl) {
