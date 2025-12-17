@@ -2,14 +2,16 @@ package com.elwaseet.backend.repository;
 
 import com.elwaseet.backend.entity.ProviderProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface ProviderProfileRepository extends JpaRepository<ProviderProfile, Long> {
-    
+public interface ProviderProfileRepository
+        extends JpaRepository<ProviderProfile, Long>, JpaSpecificationExecutor<ProviderProfile> {
+
     Optional<ProviderProfile> findByUser_UserId(Long userId);
-    
+
     boolean existsByUser_UserId(Long userId);
 }

@@ -1,14 +1,18 @@
 package com.elwaseet.backend.dto;
 
+import lombok.*;             
+import java.util.List;  
 import com.elwaseet.backend.entity.Job;
 import com.elwaseet.backend.entity.JobPhoto;
 import com.elwaseet.backend.entity.Location;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.stream.Collectors;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class JobResponseDTO {
 
     private Long jobId;

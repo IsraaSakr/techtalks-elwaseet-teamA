@@ -8,8 +8,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
+
+
 @Entity
 @Table(name = "jobs")
+
 public class Job {
 
     /**
@@ -420,5 +423,9 @@ public class Job {
                 ", status=" + status +
                 ", postedAt=" + postedAt +
                 '}';
+    }
+
+    public void setCategory(ServiceCategory category) {
+        throw new UnsupportedOperationException("Unimplemented method 'setCategory'");
     }
 }
