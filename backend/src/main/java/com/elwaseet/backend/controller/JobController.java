@@ -2,6 +2,7 @@ package com.elwaseet.backend.controller;
 
 import com.elwaseet.backend.dto.JobResponseDTO;
 import com.elwaseet.backend.dto.UpdateJobRequest;
+import com.elwaseet.backend.entity.Job;
 import com.elwaseet.backend.entity.User;
 import com.elwaseet.backend.service.JobService;
 import jakarta.validation.Valid;
@@ -14,8 +15,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.elwaseet.backend.dto.JobRequestDTO;
 import org.springframework.http.MediaType;
-
 import java.util.List;
+import com.elwaseet.backend.entity.Location;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import java.math.BigDecimal;
+import org.springframework.data.domain.Sort;
 
 @RestController
 @RequestMapping("/api/jobs")
@@ -128,5 +134,38 @@ public class JobController {
 
         // Pass the authenticated user's email/username to the service
         return jobService.createJob(dto, photos, authenticatedUser.getEmail());
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<JobResponseDTO>> browseJobs(
+            @RequestParam(required = false) Long category,
+            @RequestParam(required = false) Location location,
+            @RequestParam(required = false) BigDecimal minBudget,
+            @RequestParam(required = false) BigDecimal maxBudget,
+            @RequestParam(required = false) Job.Urgency urgency,
+            @RequestParam(required = false) Job.JobStatus status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "postedAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir
+    ) {
+        // Enforce max page size
+        if (size > 50) size = 50;
+
+        // Create pageable with default sorting
+        Sort.Direction direction = sortDir.equalsIgnoreCase("asc") ? 
+            Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+
+        Page<JobResponseDTO> jobs = jobService.browseJobs(
+                category,
+                location,
+                minBudget,
+                maxBudget,
+                urgency,
+                status,
+                pageable
+        );
+        return ResponseEntity.ok(jobs);
     }
 }

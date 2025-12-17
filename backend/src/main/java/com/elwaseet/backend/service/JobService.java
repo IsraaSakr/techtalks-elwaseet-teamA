@@ -21,6 +21,12 @@ import com.elwaseet.backend.repository.ServiceCategoryRepository;
 import java.util.ArrayList;
 import java.math.BigDecimal;
 import java.util.List;
+import org.springframework.data.jpa.domain.Specification;
+import com.elwaseet.backend.entity.Location;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
+import com.elwaseet.backend.specification.JobSpecifications;
 
 @Service
 @RequiredArgsConstructor
@@ -29,8 +35,6 @@ public class JobService {
     private final JobRepository jobRepository;
     private final JobPhotoRepository jobPhotoRepository;
     private final FileStorageService fileStorageService;
-    private final JobRepository jobs;
-    private final FileStorageService storage;
     private final UserRepository users;
     private final ServiceCategoryRepository categoryRepository;
     /**
@@ -238,7 +242,7 @@ public class JobService {
         job.setStatus(Job.JobStatus.OPEN);
         job.getCategories().add(category);
 
-        job = jobs.save(job);
+        job = jobRepository.save(job);
 
         // Save photos
         List<String> photoUrls = new ArrayList<>();
@@ -249,7 +253,7 @@ public class JobService {
                 String type = photo.getContentType();
                 if (type == null || !List.of("image/jpeg","image/png","image/webp").contains(type))
                     throw new IllegalArgumentException("Invalid file type");
-                String photoUrl = storage.saveFile(photo, "jobs");
+                String photoUrl = fileStorageService.saveFile(photo, "jobs");
                 photoUrls.add(photoUrl);
             }
 
@@ -273,6 +277,29 @@ public class JobService {
                 .status(job.getStatus())
                 .photoUrls(photoUrls)
                 .build();
+    }
+
+    @Transactional
+    public Page<JobResponseDTO> browseJobs(
+            Long category,
+            Location location,
+            BigDecimal minBudget,
+            BigDecimal maxBudget,
+            Job.Urgency urgency,
+            Job.JobStatus status,
+            @NonNull Pageable pageable
+    ) {
+        Specification<Job> spec = Specification
+            .where(JobSpecifications.hasCategory(category))
+            .and(JobSpecifications.inLocation(location))
+            .and(JobSpecifications.budgetMin(minBudget))
+            .and(JobSpecifications.budgetMax(maxBudget))
+            .and(JobSpecifications.urgencyIs(urgency))
+            .and(JobSpecifications.statusIs(status))
+            .and(JobSpecifications.onlyOpenByDefault(status));
+
+        return jobRepository.findAll(spec, pageable)
+                        .map(JobResponseDTO::fromEntity);
     }
 }
 
