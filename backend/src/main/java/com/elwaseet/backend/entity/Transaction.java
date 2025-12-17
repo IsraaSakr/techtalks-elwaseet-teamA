@@ -48,6 +48,7 @@ public class Transaction {
         IN_PROGRESS,
         COMPLETED,
         CONFIRMED,
+        PAID,
         DISPUTED,
         RESOLVED
     }
