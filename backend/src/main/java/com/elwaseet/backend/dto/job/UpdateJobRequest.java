@@ -1,8 +1,7 @@
-package com.elwaseet.backend.dto;
+package com.elwaseet.backend.dto.job;
 
 import com.elwaseet.backend.entity.Job;
 import com.elwaseet.backend.entity.Location;
-
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;

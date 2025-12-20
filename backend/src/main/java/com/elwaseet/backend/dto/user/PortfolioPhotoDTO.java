@@ -1,4 +1,4 @@
-package com.elwaseet.backend.dto;
+package com.elwaseet.backend.dto.user;
 
 import lombok.Data;
 import java.time.LocalDateTime;

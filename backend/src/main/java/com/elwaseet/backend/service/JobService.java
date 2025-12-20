@@ -1,7 +1,8 @@
 package com.elwaseet.backend.service;
 
-import com.elwaseet.backend.dto.JobResponseDTO;
-import com.elwaseet.backend.dto.UpdateJobRequest;
+import com.elwaseet.backend.dto.job.JobRequestDTO;
+import com.elwaseet.backend.dto.job.JobResponseDTO;
+import com.elwaseet.backend.dto.job.UpdateJobRequest;
 import com.elwaseet.backend.entity.Job;
 import com.elwaseet.backend.entity.JobPhoto;
 import com.elwaseet.backend.exception.BadRequestException;
@@ -13,7 +14,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import com.elwaseet.backend.dto.JobRequestDTO;
+
 import com.elwaseet.backend.entity.ServiceCategory;
 import com.elwaseet.backend.repository.UserRepository; 
 import com.elwaseet.backend.entity.User; 

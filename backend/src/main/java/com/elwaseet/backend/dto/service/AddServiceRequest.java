@@ -1,4 +1,4 @@
-package com.elwaseet.backend.dto;
+package com.elwaseet.backend.dto.service;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;

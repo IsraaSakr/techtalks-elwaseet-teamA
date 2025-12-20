@@ -1,7 +1,6 @@
-package com.elwaseet.backend.dto;
+package com.elwaseet.backend.dto.common;
 
 import lombok.Data;
-
 import java.util.Map;
 
 /* EmailRequest

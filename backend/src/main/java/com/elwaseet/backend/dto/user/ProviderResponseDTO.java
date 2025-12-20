@@ -1,4 +1,4 @@
-package com.elwaseet.backend.dto;
+package com.elwaseet.backend.dto.user;
 
 import java.math.BigDecimal;
 import com.elwaseet.backend.entity.ProviderProfile;

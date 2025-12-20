@@ -1,10 +1,11 @@
-package com.elwaseet.backend.dto;
+package com.elwaseet.backend.dto.user;
 
 import lombok.Data;
 import java.math.BigDecimal;
 import java.util.List;
 
 import com.elwaseet.backend.entity.User;
+import com.elwaseet.backend.dto.service.ServiceDTO;
 import com.elwaseet.backend.entity.ProviderProfile;
 
 /**

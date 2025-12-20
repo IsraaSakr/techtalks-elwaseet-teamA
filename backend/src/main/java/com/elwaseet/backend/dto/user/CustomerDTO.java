@@ -1,11 +1,11 @@
-package com.elwaseet.backend.dto;
+package com.elwaseet.backend.dto.user;
 
-public class CustomerDto {
+public class CustomerDTO {
     private Long id;
     private String name;
     private String location;
     // Default constructor
-    public CustomerDto() {
+    public CustomerDTO() {
 
     }
     

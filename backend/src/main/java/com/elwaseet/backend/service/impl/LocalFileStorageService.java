@@ -23,7 +23,8 @@ public class LocalFileStorageService implements FileStorageService {
     private static final Set<String> ALLOWED_TYPES = Set.of(
             "image/jpeg",
             "image/png",
-            "image/webp");
+            "image/webp",
+            "image/jpg");
 
     // -------------------------------------------------------------------------
     // ✅ Save SINGLE file with optional prefix
@@ -102,9 +103,18 @@ public class LocalFileStorageService implements FileStorageService {
             throw new ValidationException("File exceeds maximum size of 5MB");
         }
 
-        if (!ALLOWED_TYPES.contains(file.getContentType())) {
-            throw new ValidationException("Only JPEG, PNG, and WEBP images are allowed");
+        String contentType = file.getContentType();
+        String extension = getExtension(file.getOriginalFilename()).toLowerCase();
+
+        Set<String> allowedExtensions = Set.of(".jpg", ".jpeg", ".png", ".webp");
+
+        if ((contentType != null && ALLOWED_TYPES.contains(contentType)) ||
+            allowedExtensions.contains(extension)) {
+            return;
         }
+
+        throw new ValidationException("Only JPEG, PNG, and WEBP images are allowed");
+
     }
 
     // -------------------------------------------------------------------------

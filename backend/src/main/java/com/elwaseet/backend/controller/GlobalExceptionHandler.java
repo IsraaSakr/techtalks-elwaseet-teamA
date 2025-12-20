@@ -1,8 +1,8 @@
 package com.elwaseet.backend.controller;
 
-import com.elwaseet.backend.dto.ErrorResponse;
 import com.elwaseet.backend.exception.ResourceNotFoundException;
 import com.elwaseet.backend.exception.ValidationException;
+import com.elwaseet.backend.dto.common.ErrorResponse;
 import com.elwaseet.backend.exception.BadRequestException;
 import com.elwaseet.backend.exception.ConflictException;
 

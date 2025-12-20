@@ -1,4 +1,4 @@
-package com.elwaseet.backend.dto;
+package com.elwaseet.backend.dto.job;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
