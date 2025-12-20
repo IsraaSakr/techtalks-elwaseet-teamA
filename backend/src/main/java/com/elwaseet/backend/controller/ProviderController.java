@@ -1,6 +1,6 @@
 package com.elwaseet.backend.controller;
 
-import com.elwaseet.backend.dto.ProviderResponseDTO;
+import com.elwaseet.backend.dto.user.ProviderResponseDTO;
 import com.elwaseet.backend.entity.Location;
 import com.elwaseet.backend.service.ProviderProfileService;
 import lombok.RequiredArgsConstructor;

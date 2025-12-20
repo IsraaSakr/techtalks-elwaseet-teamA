@@ -1,6 +1,6 @@
 package com.elwaseet.backend.controller;
 
-import com.elwaseet.backend.dto.ProviderProfileResponseDTO;
+import com.elwaseet.backend.dto.user.ProviderProfileResponseDTO;
 import com.elwaseet.backend.service.ProviderProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

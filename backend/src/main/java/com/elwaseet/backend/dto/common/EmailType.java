@@ -1,4 +1,4 @@
-package com.elwaseet.backend.dto;
+package com.elwaseet.backend.dto.common;
 
 /*EmailType
  * Enumeration representing the various categories of emails that the system

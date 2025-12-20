@@ -1,8 +1,10 @@
 package com.elwaseet.backend.controller;
 
-import com.elwaseet.backend.dto.RegisterDto;
-import com.elwaseet.backend.dto.ResendOtpRequest;
-import com.elwaseet.backend.dto.VerifyDto;
+import com.elwaseet.backend.dto.auth.LoginRequest;
+import com.elwaseet.backend.dto.auth.LoginResponse;
+import com.elwaseet.backend.dto.auth.RegisterDTO;
+import com.elwaseet.backend.dto.auth.ResendOtpRequest;
+import com.elwaseet.backend.dto.auth.VerifyDTO;
 import com.elwaseet.backend.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,8 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.elwaseet.backend.dto.LoginRequest;
-import com.elwaseet.backend.dto.LoginResponse;
+
 import com.elwaseet.backend.entity.User;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,13 +26,13 @@ public class AuthController {
     private final AuthService authService;
     
     @PostMapping("/register")
-    public ResponseEntity<String> register(@Valid @RequestBody RegisterDto registerDto) {
-        authService.register(registerDto);
+    public ResponseEntity<String> register(@Valid @RequestBody RegisterDTO registerDTO) {
+        authService.register(registerDTO);
         return ResponseEntity.ok("User registered successfully");
     }
     
     @PostMapping("/verify-otp")
-    public ResponseEntity<String> verifyOtp(@Valid @RequestBody VerifyDto request) {
+    public ResponseEntity<String> verifyOtp(@Valid @RequestBody VerifyDTO request) {
         authService.verifyAccount(request);
         return ResponseEntity.ok("Email verified successfully");
     }

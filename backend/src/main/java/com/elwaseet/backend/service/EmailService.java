@@ -6,6 +6,9 @@ import com.resend.services.emails.model.CreateEmailOptions;
 import com.resend.services.emails.model.CreateEmailResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.math.BigDecimal;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -97,5 +100,78 @@ public class EmailService {
             </body>
             </html>
             """.formatted(otp);
+    }
+
+    @Async
+    public void sendApplicationNotification(String customerEmail, String jobTitle, String providerName, BigDecimal quote) {
+        String htmlContent = buildApplicationNotificationHtml(jobTitle, providerName, quote);
+        
+        CreateEmailOptions request = CreateEmailOptions.builder()
+                .from(from)
+                .to(customerEmail)
+                .subject("New Application for Your Job: " + jobTitle)
+                .html(htmlContent)
+                .build();
+
+        try {
+            CreateEmailResponse response = resend.emails().send(request);
+            log.info("Application notification email sent successfully to {} with ID: {}", customerEmail, response.getId());
+        } catch (ResendException e) {
+            log.error("Failed to send application notification email to {}: {}", customerEmail, e.getMessage());
+            // Don't throw exception - email is best-effort
+        }
+    }
+
+    private String buildApplicationNotificationHtml(String jobTitle, String providerName, BigDecimal quote) {
+        return """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                    .header { background-color: #2196F3; color: white; padding: 20px; text-align: center; }
+                    .content { background-color: #f9f9f9; padding: 30px; border-radius: 5px; margin-top: 20px; }
+                    .job-details { background-color: white; padding: 20px; border-radius: 5px; margin: 15px 0; 
+                                border-left: 4px solid #2196F3; }
+                    .quote { font-size: 24px; font-weight: bold; color: #4CAF50; }
+                    .button { background-color: #2196F3; color: white; padding: 12px 24px; 
+                            text-decoration: none; border-radius: 5px; display: inline-block; margin: 15px 0; }
+                    .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+                    .highlight { background-color: #e3f2fd; padding: 10px; border-radius: 5px; margin: 10px 0; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>Elwaseet</h1>
+                        <p>📋 New Job Application Received</p>
+                    </div>
+                    <div class="content">
+                        <h2>Great news! You have a new application</h2>
+                        <div class="job-details">
+                            <p><strong>Job Title:</strong> %s</p>
+                            <p><strong>Provider:</strong> %s</p>
+                            <p><strong>Quoted Price:</strong> <span class="quote">$%s</span></p>
+                        </div>
+                        <div class="highlight">
+                            <p>💡 <strong>Next Steps:</strong></p>
+                            <p>• Review the provider's profile and application details</p>
+                            <p>• Compare with other applications you may receive</p>
+                            <p>• Accept the best provider for your job</p>
+                        </div>
+                        <p>Click below to view all applications and make your choice:</p>
+                        <center>
+                            <a href="#" class="button">View All Applications</a>
+                        </center>
+                    </div>
+                    <div class="footer">
+                        <p>© 2025 Elwaseet. All rights reserved.</p>
+                        <p>This is an automated message, please do not reply.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """.formatted(jobTitle, providerName, quote);
     }
 }

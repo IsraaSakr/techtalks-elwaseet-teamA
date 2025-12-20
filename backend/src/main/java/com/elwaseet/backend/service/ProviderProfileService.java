@@ -1,6 +1,7 @@
 package com.elwaseet.backend.service;
 
-import com.elwaseet.backend.dto.*;
+import com.elwaseet.backend.dto.service.AddServiceRequest;
+import com.elwaseet.backend.dto.service.ServiceDTO;
 import com.elwaseet.backend.entity.*;
 import com.elwaseet.backend.exception.ResourceNotFoundException;
 import com.elwaseet.backend.exception.UnauthorizedException;
@@ -13,7 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
-import com.elwaseet.backend.dto.ProviderResponseDTO;
+import com.elwaseet.backend.dto.user.PortfolioPhotoDTO;
+import com.elwaseet.backend.dto.user.ProviderProfileResponseDTO;
+import com.elwaseet.backend.dto.user.ProviderResponseDTO;
+import com.elwaseet.backend.dto.user.UpdateProfileRequest;
 import com.elwaseet.backend.entity.Location;
 import com.elwaseet.backend.entity.ProviderProfile;
 import com.elwaseet.backend.repository.ProviderProfileRepository;

@@ -1,9 +1,9 @@
 package com.elwaseet.backend.controller;
 
-import com.elwaseet.backend.dto.AddServiceRequest;
-import com.elwaseet.backend.dto.UpdateProfileRequest;
-import com.elwaseet.backend.dto.ProviderProfileResponseDTO;
-import com.elwaseet.backend.dto.ServiceDTO;
+import com.elwaseet.backend.dto.service.AddServiceRequest;
+import com.elwaseet.backend.dto.service.ServiceDTO;
+import com.elwaseet.backend.dto.user.ProviderProfileResponseDTO;
+import com.elwaseet.backend.dto.user.UpdateProfileRequest;
 import com.elwaseet.backend.service.ProviderProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

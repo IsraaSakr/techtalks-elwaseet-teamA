@@ -1,7 +1,9 @@
-package com.elwaseet.backend.dto;
+package com.elwaseet.backend.dto.job;
 
 import lombok.*;             
-import java.util.List;  
+import java.util.List;
+
+import com.elwaseet.backend.dto.user.CustomerDTO;
 import com.elwaseet.backend.entity.Job;
 import com.elwaseet.backend.entity.JobPhoto;
 import com.elwaseet.backend.entity.Location;
@@ -25,7 +27,7 @@ public class JobResponseDTO {
     private Location location;
     private LocalDateTime postedAt;
     private List<String> photoUrls;
-    private CustomerDto customer;
+    private CustomerDTO customer;
     private String category; 
     private Integer applicationCount;
 
@@ -115,9 +117,9 @@ public class JobResponseDTO {
         this.photoUrls = photoUrls;
     }
 
-    public CustomerDto getCustomer() { 
+    public CustomerDTO getCustomer() { 
         return customer; }
-    public void setCustomer(CustomerDto customer) { 
+    public void setCustomer(CustomerDTO customer) { 
         this.customer = customer; }
 
     public String getCategory() { 
@@ -157,7 +159,7 @@ public class JobResponseDTO {
         dto.setApplicationCount(job.getApplications().size());
     
         // Customer mapping
-        CustomerDto customerDto = new CustomerDto();
+        CustomerDTO customerDto = new CustomerDTO();
         customerDto.setId(job.getCustomer().getUserId());
         customerDto.setName(job.getCustomer().getName());
         customerDto.setLocation(job.getCustomer().getLocation().name());

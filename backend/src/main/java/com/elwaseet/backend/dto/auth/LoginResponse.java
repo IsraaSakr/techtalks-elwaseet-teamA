@@ -1,4 +1,4 @@
-package com.elwaseet.backend.dto;
+package com.elwaseet.backend.dto.auth;
 
 import com.elwaseet.backend.entity.User;
 

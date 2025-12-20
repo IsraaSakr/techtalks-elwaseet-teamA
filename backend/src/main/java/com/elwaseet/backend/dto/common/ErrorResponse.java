@@ -1,9 +1,8 @@
-package com.elwaseet.backend.dto;
+package com.elwaseet.backend.dto.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 import java.util.List;
 

@@ -1,8 +1,10 @@
 package com.elwaseet.backend.service;
 
-import com.elwaseet.backend.dto.RegisterDto;
-import com.elwaseet.backend.dto.ResendOtpRequest;
-import com.elwaseet.backend.dto.VerifyDto;
+import com.elwaseet.backend.dto.auth.LoginRequest;
+import com.elwaseet.backend.dto.auth.LoginResponse;
+import com.elwaseet.backend.dto.auth.RegisterDTO;
+import com.elwaseet.backend.dto.auth.ResendOtpRequest;
+import com.elwaseet.backend.dto.auth.VerifyDTO;
 import com.elwaseet.backend.entity.OtpCode;
 import com.elwaseet.backend.entity.User;
 import com.elwaseet.backend.exception.ConflictException;
@@ -11,8 +13,7 @@ import com.elwaseet.backend.repository.AuthRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.elwaseet.backend.dto.LoginRequest;
-import com.elwaseet.backend.dto.LoginResponse;
+
 import com.elwaseet.backend.config.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,7 +28,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public void register(RegisterDto registerDto) {
+    public void register(RegisterDTO registerDto) {
 
         System.out.println("AUTH SERVICE REGISTER HIT ✅");
 
@@ -68,7 +69,7 @@ public class AuthService {
         otpService.generateAndSaveOtp(savedUser);
     }
 
-    public void verifyAccount(VerifyDto verifyDto) {
+    public void verifyAccount(VerifyDTO verifyDto) {
         
         // Normalize email
         String email = verifyDto.getEmail().trim().toLowerCase();

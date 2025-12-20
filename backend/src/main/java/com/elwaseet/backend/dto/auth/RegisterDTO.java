@@ -1,4 +1,4 @@
-package com.elwaseet.backend.dto;
+package com.elwaseet.backend.dto.auth;
 
 import com.elwaseet.backend.entity.Location;
 import com.elwaseet.backend.entity.User;
@@ -6,7 +6,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
-public class RegisterDto {
+public class RegisterDTO {
 
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")

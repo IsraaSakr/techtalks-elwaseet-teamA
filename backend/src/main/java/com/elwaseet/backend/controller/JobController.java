@@ -1,7 +1,8 @@
 package com.elwaseet.backend.controller;
 
-import com.elwaseet.backend.dto.JobResponseDTO;
-import com.elwaseet.backend.dto.UpdateJobRequest;
+import com.elwaseet.backend.dto.job.JobRequestDTO;
+import com.elwaseet.backend.dto.job.JobResponseDTO;
+import com.elwaseet.backend.dto.job.UpdateJobRequest;
 import com.elwaseet.backend.entity.Job;
 import com.elwaseet.backend.entity.User;
 import com.elwaseet.backend.service.JobService;
@@ -13,7 +14,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import com.elwaseet.backend.dto.JobRequestDTO;
 import org.springframework.http.MediaType;
 import java.util.List;
 import com.elwaseet.backend.entity.Location;
