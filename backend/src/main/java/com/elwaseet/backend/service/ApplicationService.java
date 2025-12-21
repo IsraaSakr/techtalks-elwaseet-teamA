@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import java.util.Optional;
 
 /**
  * Service for managing job applications
@@ -80,10 +81,30 @@ public class ApplicationService {
         if (job.getCustomer().getUserId().equals(providerId)) {
             throw new ValidationException("Cannot apply to your own job");
         }
-        
-        // STEP 4: Check provider hasn't already applied
-        if (applicationRepository.existsByJobIdAndProviderId(jobId, providerId)) {
-            throw new ConflictException("You have already applied to this job");
+
+        // STEP 4: Check if provider has an ACTIVE application (not cancelled/rejected)
+        Optional<Application> existingApplication = applicationRepository
+            .findByJobIdAndProviderId(jobId, providerId);
+
+        if (existingApplication.isPresent()) {
+            Application existing = existingApplication.get();
+            
+            // Block if there's an active PENDING application
+            if (existing.getStatus() == ApplicationStatus.PENDING) {
+                throw new ConflictException("You have already applied to this job. Please wait for the customer's response.");
+            }
+            
+            // Block if application was ACCEPTED
+            if (existing.getStatus() == ApplicationStatus.ACCEPTED) {
+                throw new ConflictException("Your application has already been accepted for this job.");
+            }
+            
+            // If REJECTED or CANCELLED - delete the old record and allow fresh reapplication
+            if (existing.getStatus() == ApplicationStatus.REJECTED || 
+                existing.getStatus() == ApplicationStatus.CANCELLED) {
+                applicationRepository.delete(existing);
+                applicationRepository.flush(); // Force delete before creating new one
+            }
         }
         
         // STEP 5: Validate quote is within budget
@@ -218,8 +239,7 @@ public class ApplicationService {
             throw new ValidationException("Can only cancel pending applications. Current status: " + application.getStatus());
         }
         
-        // Soft delete - change status instead of actual deletion
-        application.setStatus(ApplicationStatus.REJECTED);
+        application.setStatus(ApplicationStatus.CANCELLED);
         applicationRepository.save(application);
     }
 
