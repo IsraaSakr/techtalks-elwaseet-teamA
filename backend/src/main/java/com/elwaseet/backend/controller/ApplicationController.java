@@ -84,6 +84,44 @@ public class ApplicationController {
     }
 
     /**
+     * Accept an application for a job
+     * POST /api/jobs/{jobId}/accept/{providerId}
+     * 
+     * Security: Requires CUSTOMER role. The authenticated user must own the job.
+     * 
+     * Path Variables:
+     * - jobId: ID of the job
+     * - providerId: ID of the provider whose application to accept
+     * 
+     * Response:
+     * {
+     *   "applicationId": 123,
+     *   "jobId": 789,
+     *   "jobTitle": "Fix plumbing",
+     *   "providerId": 101,
+     *   "providerName": "John Doe",
+     *   "quotedPrice": 150.00,
+     *   "availability": "Available this weekend",
+     *   "message": "I have 5 years experience",
+     *   "status": "ACCEPTED",
+     *   "appliedAt": "2025-12-19T10:30:00",
+     *   "updatedAt": "2025-12-20T05:36:00"
+     * }
+     * 
+     * @param jobId ID of the job
+     * @param providerId ID of the provider whose application to accept
+     * @return ApplicationResponseDTO with updated application details
+     */
+    @PostMapping("/jobs/{jobId}/accept/{providerId}")
+    public ResponseEntity<ApplicationResponseDTO> acceptApplication(
+            @PathVariable Long jobId,
+            @PathVariable Long providerId,
+            Authentication authentication) {
+        
+        return ResponseEntity.ok(applicationService.acceptApplication(jobId, providerId));
+    }
+        
+    /**
      * Get my applications (provider view)
      * GET /api/applications/my
      * 

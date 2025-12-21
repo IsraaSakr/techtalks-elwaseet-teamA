@@ -44,6 +44,7 @@ public class Job {
     // Schema: CREATE TYPE job_status AS ENUM ('OPEN', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED');
     public enum JobStatus {
         OPEN,
+        IN_REVIEW,
         IN_PROGRESS,
         COMPLETED,
         CANCELLED

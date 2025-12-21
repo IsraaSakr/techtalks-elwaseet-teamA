@@ -4,17 +4,22 @@ import com.elwaseet.backend.dto.application.ApplicationResponseDTO;
 import com.elwaseet.backend.dto.application.ApplicationCreateDTO;
 import com.elwaseet.backend.entity.*;
 import com.elwaseet.backend.entity.Application.ApplicationStatus;
+import com.elwaseet.backend.entity.Job.JobStatus;
 import com.elwaseet.backend.exception.*;
 import com.elwaseet.backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.security.core.Authentication;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Service for managing job applications
@@ -24,6 +29,7 @@ import java.util.stream.Collectors;
  * - GET /api/jobs/{id}/applications - Get job applications 
  * - GET /api/applications/my - Get my applications
  */
+@Slf4j
 @Service
 @Transactional
 public class ApplicationService {
@@ -231,5 +237,147 @@ public class ApplicationService {
     @Transactional(readOnly = true)
     public long getPendingApplicationCount(Long jobId) {
         return applicationRepository.countByJobIdAndStatus(jobId, ApplicationStatus.PENDING);
+    }
+
+    /**
+     * Accept an application for a job
+     * 
+     * Business Rules:
+     * 1. Only job owner can accept applications (verified via authenticated user)
+     * 2. Job must be OPEN (not closed/completed)
+     * 3. Application must be PENDING (not already accepted/rejected)
+     * 4. Only ONE application can be accepted per job
+     * 
+     * Side Effects:
+     * - Accepts the specified application
+     * - Rejects all other pending applications for the same job
+     * - Updates job status to IN_REVIEW (not IN_PROGRESS - that happens when work starts)
+     * - Sets job.acceptedApplication reference
+     * - Sets job.startedAt timestamp
+     * 
+     * Security:
+     * - Gets authenticated user from SecurityContext (cannot be spoofed)
+     * - Validates user owns the job before accepting application
+     * 
+     * @param jobId ID of the job
+     * @param providerId ID of the provider whose application to accept
+     * @return ApplicationResponseDTO with updated application details
+     * @throws IllegalArgumentException if validation fails
+     * @throws IllegalStateException if user is not authenticated
+     */
+    @Transactional
+    public ApplicationResponseDTO acceptApplication(Long jobId, Long providerId) {
+
+        // STEP 1: Get authenticated user from security context
+        User authenticatedUser = getAuthenticatedUser();
+
+        // STEP 2: Find application by jobId AND providerId
+        Application application = applicationRepository
+                .findByJobIdAndProviderId(jobId, providerId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Application not found for job " + jobId + " and provider " + providerId));
+
+        Job job = application.getJob();
+
+        // STEP 3: Verify authenticated user owns the job
+        if (!job.getCustomer().getUserId().equals(authenticatedUser.getUserId())) {
+            throw new IllegalArgumentException(
+                    "Only the job owner can accept applications. You do not own job ID " + job.getJobId());
+        }
+
+        // STEP 4: Validate job is OPEN
+        if (job.getStatus() != JobStatus.OPEN) {
+            throw new IllegalArgumentException(
+                    "Cannot accept application. Job status is " + job.getStatus() +
+                            " but must be OPEN. Job ID: " + job.getJobId());
+        }
+
+        // STEP 5: Validate application is PENDING
+        if (application.getStatus() != ApplicationStatus.PENDING) {
+            throw new IllegalArgumentException(
+                    "Cannot accept application. Application status is " + application.getStatus() +
+                            " but must be PENDING. Application ID: " + application.getApplicationId());
+        }
+
+        // STEP 6: Check if job already has an accepted application
+        if (applicationRepository.findAcceptedApplicationByJobId(job.getJobId()).isPresent()) {
+            throw new IllegalArgumentException(
+                    "Job already has an accepted application. Only ONE application can be accepted per job. Job ID: " +
+                            job.getJobId());
+        }
+
+        // STEP 7: Accept this application
+        // Note: updatedAt is automatically set by @PreUpdate in Application entity
+        application.setStatus(ApplicationStatus.ACCEPTED);
+        applicationRepository.save(application);
+
+        // STEP 8: Reject all other pending applications for this job
+        List<Application> pendingApplications = applicationRepository
+                .findPendingApplicationsByJobId(job.getJobId());
+
+        for (Application pendingApp : pendingApplications) {
+            if (!pendingApp.getApplicationId().equals(application.getApplicationId())) {
+                pendingApp.setStatus(ApplicationStatus.REJECTED);
+                // updatedAt is automatically set by @PreUpdate
+                applicationRepository.save(pendingApp);
+            }
+        }
+
+        // STEP 9: Update job status to IN_REVIEW (not IN_PROGRESS!)
+        // IN_REVIEW = application accepted, waiting for escrow/work to start
+        // IN_PROGRESS = work has actually started
+        job.setStatus(JobStatus.IN_REVIEW);
+        job.setAcceptedApplication(application);
+        job.setStartedAt(LocalDateTime.now());
+        jobRepository.save(job);
+
+        // STEP 10: Send notifications (async)
+        try {
+            // Send acceptance email to the accepted provider
+            emailService.sendApplicationAcceptedEmail(
+                application.getProvider().getEmail(),
+                application.getProvider().getName(),
+                job.getTitle()
+            );
+            
+            // Send rejection emails to other providers (async - won't slow down response)
+            for (Application rejectedApp : pendingApplications) {
+                if (!rejectedApp.getApplicationId().equals(application.getApplicationId())) {
+                    emailService.sendApplicationRejectedEmail(
+                        rejectedApp.getProvider().getEmail(),
+                        rejectedApp.getProvider().getName(),
+                        job.getTitle()
+                    );
+                }
+            }
+        } catch (Exception e) {
+            // Log error but don't fail the transaction
+            // Emails are best-effort, not critical to business logic
+            log.error("Failed to send notification emails for job {}: {}", job.getJobId(), e.getMessage());
+        }
+
+        // Return response DTO
+        return ApplicationResponseDTO.fromEntity(application);
+    }
+
+    /**
+     * Get the currently authenticated user from Spring Security context
+     * 
+     * @return The authenticated User entity
+     * @throws IllegalStateException if no user is authenticated
+     */
+    private User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("No authenticated user found");
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (!(principal instanceof User)) {
+            throw new IllegalStateException("Invalid authentication principal");
+        }
+
+        return (User) principal;
     }
 }
