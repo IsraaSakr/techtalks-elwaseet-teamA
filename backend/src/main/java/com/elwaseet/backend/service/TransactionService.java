@@ -8,9 +8,8 @@ import com.elwaseet.backend.entity.Job;
 import com.elwaseet.backend.repository.JobRepository;
 import com.elwaseet.backend.entity.User;
 import com.elwaseet.backend.repository.UserRepository;
-
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -33,17 +32,19 @@ public class TransactionService {
     }
 
     // --- Utility ---
+    @Transactional
     private Transaction getTransaction(Long txId) {
         return transactionRepository.findById(txId)
                 .orElseThrow(() -> new IllegalArgumentException("Transaction not found: " + txId));
     }
 
+    @Transactional
     private void validateTransition(Transaction tx, TransactionStatus next) {
         transitionPolicy.assertTransition(tx.getStatus(), next);
     }
 
     // --- State Transitions ---
-
+    @Transactional
     public Transaction commit(Long jobId,Long customerId,Long providerId, BigDecimal amount) {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new IllegalArgumentException("Job not found"));
@@ -57,6 +58,7 @@ public class TransactionService {
         return transactionRepository.save(tx);
     }
 
+    @Transactional
     public Transaction startWork(Long txId, Long providerId) {
         Transaction tx = getTransaction(txId);
         validateTransition(tx, TransactionStatus.IN_PROGRESS);
@@ -68,6 +70,7 @@ public class TransactionService {
         return transactionRepository.save(tx);
     }
 
+    @Transactional
     public Transaction completeWork(Long txId, Long providerId) {
         Transaction tx = getTransaction(txId);
         validateTransition(tx, TransactionStatus.COMPLETED);
@@ -76,9 +79,11 @@ public class TransactionService {
         }
         tx.setStatus(TransactionStatus.COMPLETED);
         tx.setCompletedAt(LocalDateTime.now());
+        tx.setAutoConfirmScheduledAt(LocalDateTime.now().plusHours(24)); // Auto-confirm after 24 hours
         return transactionRepository.save(tx);
     }
 
+    @Transactional
     public Transaction confirmWork(Long txId, Long customerId) {
         Transaction tx = getTransaction(txId);
         validateTransition(tx, TransactionStatus.CONFIRMED);
@@ -90,6 +95,7 @@ public class TransactionService {
         return transactionRepository.save(tx);
     }
 
+    @Transactional
     public Transaction releasePayment(Long txId) {
         Transaction tx = getTransaction(txId);
         validateTransition(tx, TransactionStatus.PAID);
@@ -101,13 +107,22 @@ public class TransactionService {
         BigDecimal fee = tx.getAmount().multiply(BigDecimal.valueOf(0.1));
         BigDecimal net = tx.getAmount().subtract(fee);
 
-        // Balance updates (pseudo-code, wire to WalletService later)
-        tx.setProviderBalanceBefore(tx.getProviderBalanceAfter());
-        tx.setProviderBalanceAfter(tx.getProviderBalanceAfter().add(net));
+        // Get current balance from provider
+        User provider = tx.getProvider();
+        BigDecimal currentBalance = provider.getSimulatedBalance();
+
+        // Record balance changes
+        tx.setProviderBalanceBefore(currentBalance);
+        tx.setProviderBalanceAfter(currentBalance.add(net));
+
+        // Update the provider's balance
+        provider.setSimulatedBalance(currentBalance.add(net));
+        userRepository.save(provider);
 
         return transactionRepository.save(tx);
     }
 
+    @Transactional
     public Transaction openDispute(Long txId, Long customerId) {
         Transaction tx = getTransaction(txId);
         validateTransition(tx, TransactionStatus.DISPUTED);

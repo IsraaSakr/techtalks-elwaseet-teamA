@@ -36,6 +36,7 @@ public class SecurityConfig {
                 .requestMatchers("/test/**").permitAll()           // Testing endpoints
                 .requestMatchers("/api/providers/**").permitAll() // Public provider profiles
                 .requestMatchers("/error").permitAll()
+                .requestMatchers("/api/transactions/commit").permitAll() // Testing endpoints
                 .anyRequest().authenticated()  // Require auth for everything else
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class) // Add JWT filter

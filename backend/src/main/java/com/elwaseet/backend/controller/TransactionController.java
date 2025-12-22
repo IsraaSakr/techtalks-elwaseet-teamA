@@ -3,7 +3,10 @@ package com.elwaseet.backend.controller;
 import com.elwaseet.backend.dto.transaction.TransactionRequestDTO;
 import com.elwaseet.backend.dto.transaction.TransactionResponseDTO;
 import com.elwaseet.backend.entity.Transaction;
+import com.elwaseet.backend.entity.User;
 import com.elwaseet.backend.service.TransactionService;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,19 +31,25 @@ public class TransactionController {
     }
 
     @PostMapping("/{id}/start")
-    public TransactionResponseDTO startWork(@PathVariable Long id, @RequestParam Long providerId) {
+    @PreAuthorize("hasRole('HYBRID_PROVIDER')")
+    public TransactionResponseDTO startWork(@PathVariable Long id,  @AuthenticationPrincipal User user) {
+        Long providerId = user.getUserId();
         Transaction tx = transactionService.startWork(id, providerId);
         return toResponse(tx);
     }
 
     @PostMapping("/{id}/complete")
-    public TransactionResponseDTO completeWork(@PathVariable Long id, @RequestParam Long providerId) {
+    @PreAuthorize("hasRole('HYBRID_PROVIDER')")
+    public TransactionResponseDTO completeWork(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        Long providerId = user.getUserId();
         Transaction tx = transactionService.completeWork(id, providerId);
         return toResponse(tx);
     }
 
     @PostMapping("/{id}/confirm")
-    public TransactionResponseDTO confirmWork(@PathVariable Long id, @RequestParam Long customerId) {
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public TransactionResponseDTO confirmWork(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        Long customerId = user.getUserId();
         Transaction tx = transactionService.confirmWork(id, customerId);
         return toResponse(tx);
     }
@@ -52,7 +61,9 @@ public class TransactionController {
     }
 
     @PostMapping("/{id}/dispute")
-    public TransactionResponseDTO openDispute(@PathVariable Long id, @RequestParam Long customerId) {
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public TransactionResponseDTO openDispute(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        Long customerId = user.getUserId();
         Transaction tx = transactionService.openDispute(id, customerId);
         return toResponse(tx);
     }
