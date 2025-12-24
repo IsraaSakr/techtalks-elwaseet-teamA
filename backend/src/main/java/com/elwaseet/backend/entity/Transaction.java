@@ -88,7 +88,7 @@ public class Transaction {
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, columnDefinition = "transaction_status")
+    @Column(name = "status", nullable = false)
     private TransactionStatus status = TransactionStatus.COMMITTED;
 
     @Column(name = "committed_at", nullable = false, updatable = false)
@@ -232,7 +232,9 @@ public class Transaction {
     public LocalDateTime getCommittedAt() {
         return committedAt;
     }
-
+    public void setCommittedAt(LocalDateTime committedAt) {
+    this.committedAt = committedAt;
+}
     public LocalDateTime getInProgressAt() {
         return inProgressAt;
     }
