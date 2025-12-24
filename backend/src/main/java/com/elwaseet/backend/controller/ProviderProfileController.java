@@ -12,7 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
+import com.elwaseet.backend.entity.User;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import java.util.Map;
 import java.util.List;
 
 /**
@@ -44,12 +47,13 @@ public class ProviderProfileController {
      * @return updated provider profile information
      */
     @PutMapping("/profile")
+    @PreAuthorize("hasRole('HYBRID_PROVIDER')")
     public ResponseEntity<ProviderProfileResponseDTO> updateProfile(
-            @RequestParam Long userId,
+            @AuthenticationPrincipal User user,
             @Valid @RequestBody UpdateProfileRequest request) {
 
         ProviderProfileResponseDTO response =
-                providerProfileService.updateProfile(userId, request);
+                providerProfileService.updateProfile(user.getUserId(), request);
 
         return ResponseEntity.ok(response);
     }
@@ -62,12 +66,13 @@ public class ProviderProfileController {
      * @return the newly created service
      */
     @PostMapping("/services")
+    @PreAuthorize("hasRole('HYBRID_PROVIDER')")
     public ResponseEntity<ServiceDTO> addService(
-            @RequestParam Long userId,
+            @AuthenticationPrincipal User user,
             @Valid @RequestBody AddServiceRequest request) {
 
         ServiceDTO response =
-                providerProfileService.addService(userId, request);
+                providerProfileService.addService(user.getUserId(), request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -81,46 +86,56 @@ public class ProviderProfileController {
      * @return updated provider profile including portfolio images
      */
     @PostMapping("/portfolio")
+    @PreAuthorize("hasRole('HYBRID_PROVIDER')")
     public ResponseEntity<ProviderProfileResponseDTO> uploadPortfolioPhotos(
-            @RequestParam Long userId,
+            @AuthenticationPrincipal User user,
             @RequestParam("photos") List<MultipartFile> photos) {
 
         ProviderProfileResponseDTO response =
-                providerProfileService.uploadPortfolioPhotos(userId, photos);
+                providerProfileService.uploadPortfolioPhotos(user.getUserId(), photos);
 
         return ResponseEntity.ok(response);
     }
 
     /**
      * Deletes a service offered by the provider.
+     * DELETE /api/users/me/services/{serviceId}
      *
-     * @param userId ID of the authenticated user
-     * @param id     ID of the service to be deleted
+     * @param user      the authenticated provider user (from JWT)
+     * @param serviceId ID of the service to be deleted
      * @return HTTP 204 if deletion is successful
      */
-    @DeleteMapping("/services/{id}")
+    @DeleteMapping("/services/{serviceId}")
+    @PreAuthorize("hasRole('HYBRID_PROVIDER')")
     public ResponseEntity<Void> deleteService(
-            @RequestParam Long userId,
-            @PathVariable Long id) {
+            @AuthenticationPrincipal User user,
+            @PathVariable Long serviceId) {
 
-        providerProfileService.deleteService(userId, id);
+        providerProfileService.deleteService(user.getUserId(), serviceId);
         return ResponseEntity.noContent().build();
     }
 
     /**
      * Deletes a specific portfolio image by its URL.
-     * Now uses LocalFileStorageService for consistent file deletion.
+     * DELETE /api/users/me/portfolio
+     * Body: { "photoUrl": "/uploads/portfolios/..." }
      *
-     * @param userId   ID of the authenticated user
-     * @param photoUrl URL of the portfolio image to delete
+     * @param user     the authenticated provider user (from JWT)
+     * @param request  JSON containing photoUrl to delete
      * @return HTTP 204 if deletion is successful
      */
     @DeleteMapping("/portfolio")
+    @PreAuthorize("hasRole('HYBRID_PROVIDER')")
     public ResponseEntity<Void> deletePortfolioPhoto(
-            @RequestParam Long userId,
-            @RequestParam String photoUrl) {
+            @AuthenticationPrincipal User user,
+            @RequestBody Map<String, String> request) {
 
-        providerProfileService.deletePortfolioPhoto(userId, photoUrl);
+        String photoUrl = request.get("photoUrl");
+        if (photoUrl == null || photoUrl.trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        providerProfileService.deletePortfolioPhoto(user.getUserId(), photoUrl);
         return ResponseEntity.noContent().build();
     }
 }

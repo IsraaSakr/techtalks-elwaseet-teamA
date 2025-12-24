@@ -56,7 +56,7 @@ public class ReviewReport {
      * Schema enum: ('PENDING', 'REVIEWED', 'DISMISSED')
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, columnDefinition = "report_status")
+    @Column(name = "status", nullable = false)
     private ReportStatus status = ReportStatus.PENDING;
 
     /**

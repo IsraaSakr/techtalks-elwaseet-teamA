@@ -18,14 +18,13 @@ import com.elwaseet.backend.dto.user.PortfolioPhotoDTO;
 import com.elwaseet.backend.dto.user.ProviderProfileResponseDTO;
 import com.elwaseet.backend.dto.user.ProviderResponseDTO;
 import com.elwaseet.backend.dto.user.UpdateProfileRequest;
-import com.elwaseet.backend.entity.Location;
-import com.elwaseet.backend.entity.ProviderProfile;
-import com.elwaseet.backend.repository.ProviderProfileRepository;
+
 import java.math.BigDecimal;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Service class responsible for managing provider profiles, services, and portfolio photos.
@@ -45,6 +44,7 @@ import org.springframework.lang.NonNull;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProviderProfileService {
 
     private final ProviderProfileRepository providerProfileRepository;
@@ -172,37 +172,43 @@ public class ProviderProfileService {
 
     /**
      * Deletes a service from a provider's profile.
-     *
-     * @param userId    ID of the provider
-     * @param serviceId ID of the service to delete
-     * @throws ResourceNotFoundException if the service does not exist
-     * @throws UnauthorizedException     if the service does not belong to the provider
      */
     @Transactional
-    public void deleteService(Long userId, @Nullable Long serviceId) {
+    public void deleteService(Long userId, Long serviceId) {
         ProviderProfile profile = getProviderProfileByUserId(userId);
-
-        if (serviceId == null) {
-            return;
-        }
-
+        
         ProviderService service = providerServiceRepository.findById(serviceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Service not found with id: " + serviceId));
-
+        
+        // Verify ownership
         if (!service.getProviderProfile().getProfileId().equals(profile.getProfileId())) {
             throw new UnauthorizedException("Service does not belong to this provider");
         }
+        
+        // Delete service photos from file system if any
+        if (service.getPhotos() != null && !service.getPhotos().isEmpty()) {
+            for (ServicePhoto photo : service.getPhotos()) {
+                try {
+                    fileStorageService.deleteFile(photo.getPhotoUrl());
+                    log.info("Deleted service photo file: {}", photo.getPhotoUrl());
+                } catch (Exception e) {
+                    log.warn("Failed to delete service photo file: {}", photo.getPhotoUrl(), e);
+                    // Continue deleting other photos even if one fails
+                }
+            }
+        }
 
-        profile.getServices().remove(service);
-        providerProfileRepository.save(profile);
+        // Remove from categories (clears join table entries)
+        service.getCategories().clear();
+        
+        // Delete the service (cascade should handle photos in database)
+        providerServiceRepository.delete(service);
+        
+        log.info("Service deleted successfully. Service ID: {}, Provider ID: {}", serviceId, userId);
     }
 
     /**
      * Deletes a portfolio photo from a provider's profile and filesystem.
-     * Uses the existing LocalFileStorageService for consistent file deletion.
-     *
-     * @param userId   ID of the provider
-     * @param photoUrl URL of the photo to delete
      */
     @Transactional
     public void deletePortfolioPhoto(Long userId, String photoUrl) {
@@ -215,7 +221,6 @@ public class ProviderProfileService {
             throw new UnauthorizedException("Photo does not belong to this provider");
         }
 
-        // REFACTORED: Use LocalFileStorageService for consistent file deletion
         fileStorageService.deleteFile(photoUrl);
         portfolioPhotoRepository.delete(portfolioPhoto);
         reorderPortfolioPhotos(profile);
