@@ -4,7 +4,10 @@ import com.elwaseet.backend.dto.transaction.TransactionRequestDTO;
 import com.elwaseet.backend.dto.transaction.TransactionResponseDTO;
 import com.elwaseet.backend.entity.Transaction;
 import com.elwaseet.backend.entity.User;
+import com.elwaseet.backend.exception.UnauthorizedException;
 import com.elwaseet.backend.service.TransactionService;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -54,12 +57,6 @@ public class TransactionController {
         return toResponse(tx);
     }
 
-    @PostMapping("/{id}/release")
-    public TransactionResponseDTO releasePayment(@PathVariable Long id) {
-        Transaction tx = transactionService.releasePayment(id);
-        return toResponse(tx);
-    }
-
     @PostMapping("/{id}/dispute")
     @PreAuthorize("hasRole('CUSTOMER')")
     public TransactionResponseDTO openDispute(@PathVariable Long id, @AuthenticationPrincipal User user) {
@@ -81,5 +78,49 @@ public class TransactionController {
         dto.setDisputedAt(tx.getDisputedAt());
         dto.setResolvedAt(tx.getResolvedAt());
         return dto;
+    }
+
+        /**
+     * Get transaction details (both customer and provider can view)
+     * GET /api/transactions/{id}
+     */
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'HYBRID_PROVIDER')")
+    public ResponseEntity<TransactionResponseDTO> getTransactionDetails(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User user) {
+        
+        Transaction transaction = transactionService.getTransactionById(id);
+        
+        // SECURITY: Verify user is either customer or provider of this transaction
+        boolean isCustomer = transaction.getCustomer().getUserId().equals(user.getUserId());
+        boolean isProvider = transaction.getProvider().getUserId().equals(user.getUserId());
+        
+        if (!isCustomer && !isProvider) {
+            throw new UnauthorizedException("You can only view your own transactions");
+        }
+        
+        return ResponseEntity.ok(toResponse(transaction));
+    }
+
+    /**
+     * Get my transaction history (paginated)
+     * GET /api/transactions/my-history?page=0&size=10
+     */
+    @GetMapping("/my-history")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'HYBRID_PROVIDER')")
+    public ResponseEntity<Page<TransactionResponseDTO>> getMyTransactions(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal User user) {
+        
+        Long userId = user.getUserId();
+        
+        Page<Transaction> transactions = transactionService.getUserTransactions(userId, page, size);
+        
+        // Convert Page<Transaction> to Page<TransactionResponseDTO>
+        Page<TransactionResponseDTO> response = transactions.map(this::toResponse);
+        
+        return ResponseEntity.ok(response);
     }
 }

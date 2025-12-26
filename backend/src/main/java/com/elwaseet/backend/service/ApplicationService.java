@@ -7,7 +7,6 @@ import com.elwaseet.backend.entity.Application.ApplicationStatus;
 import com.elwaseet.backend.entity.Job.JobStatus;
 import com.elwaseet.backend.exception.*;
 import com.elwaseet.backend.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,21 +34,32 @@ import java.util.Optional;
 @Transactional
 public class ApplicationService {
 
-    @Autowired
     private ApplicationRepository applicationRepository;
     
-    @Autowired
     private JobRepository jobRepository;
     
-    @Autowired
     private UserRepository userRepository;
     
-    @Autowired
     private FileStorageService fileStorageService;
     
-    @Autowired
     private EmailService emailService;
 
+    private final TransactionService transactionService;
+
+    public ApplicationService(
+            ApplicationRepository applicationRepository,
+            JobRepository jobRepository,
+            UserRepository userRepository,
+            FileStorageService fileStorageService,
+            EmailService emailService,
+            TransactionService transactionService) {
+        this.applicationRepository = applicationRepository;
+        this.jobRepository = jobRepository;
+        this.userRepository = userRepository;
+        this.fileStorageService = fileStorageService;
+        this.emailService = emailService;
+        this.transactionService = transactionService;
+    }
     /**
      * Create a new job application
      * 
@@ -350,6 +360,27 @@ public class ApplicationService {
         job.setAcceptedApplication(application);
         job.setStartedAt(LocalDateTime.now());
         jobRepository.save(job);
+
+        // STEP 9.5: Create escrow transaction (COMMIT state)
+        try {
+            Transaction transaction = transactionService.commit(
+                job.getJobId(),
+                job.getCustomer().getUserId(),
+                application.getProvider().getUserId(),
+                application.getQuotedPrice()  // This is the agreed amount
+            );
+            
+            log.info("Escrow transaction created: txId={}, amount=${}, job={}", 
+                    transaction.getTransactionId(), 
+                    application.getQuotedPrice(), 
+                    job.getJobId());
+                    
+        } catch (Exception e) {
+            // If transaction creation fails, we should rollback the acceptance
+            // Since we're in @Transactional, throwing exception will rollback everything
+            log.error("Failed to create transaction for job {}: {}", job.getJobId(), e.getMessage());
+            throw new IllegalStateException("Failed to create transaction: " + e.getMessage(), e);
+        }
 
         // STEP 10: Send notifications (async)
         try {

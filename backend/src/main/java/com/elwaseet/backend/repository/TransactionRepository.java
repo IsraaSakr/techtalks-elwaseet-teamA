@@ -3,7 +3,7 @@ package com.elwaseet.backend.repository;
 import com.elwaseet.backend.entity.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,4 +21,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     // Optional: query by status
     List<Transaction> findByStatus(Transaction.TransactionStatus status);
+
+    // Scheduler support (AUTO-CONFIRM)
+    List<Transaction> findByStatusAndAutoConfirmScheduledAtBefore(
+            Transaction.TransactionStatus status,
+            LocalDateTime time);
 }

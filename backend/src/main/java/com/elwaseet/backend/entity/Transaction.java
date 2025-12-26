@@ -341,8 +341,8 @@ public class Transaction {
     public void moveToCompleted() {
         this.status = TransactionStatus.COMPLETED;
         this.completedAt = LocalDateTime.now();
-        // Schedule auto-confirm for 48 hours later
-        this.autoConfirmScheduledAt = this.completedAt.plusHours(48);
+        // Schedule auto-confirm for 24 hours later
+        this.autoConfirmScheduledAt = this.completedAt.plusHours(24);
     }
 
     public void moveToConfirmed() {
