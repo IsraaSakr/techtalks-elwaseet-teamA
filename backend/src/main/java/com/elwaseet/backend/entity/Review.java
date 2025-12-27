@@ -102,26 +102,26 @@ public class Review {
      * ============================================================================
      */
 
-    @PrePersist
-    protected void onCreate() {
-        LocalDateTime now = LocalDateTime.now();
-        if (createdAt == null) {
-            createdAt = now;
-        }
-        if (updatedAt == null) {
-            updatedAt = now;
-        }
-        if (isPublic == null) {
-            isPublic = true;
-        }
-        if (isEdited == null) {
-            isEdited = false;
-        }
-        // Set edit deadline to 24 hours after creation
-        if (editDeadline == null) {
-            editDeadline = createdAt.plusHours(24);
-        }
+@PrePersist
+protected void onCreate() {
+    LocalDateTime now = LocalDateTime.now();
+    if (createdAt == null) {
+        createdAt = now;
     }
+    if (updatedAt == null) {
+        updatedAt = now;
+    }
+    if (isPublic == null) {
+        isPublic = true;
+    }
+    if (isEdited == null) {
+        isEdited = false;
+    }
+    // Change from 24 to 48 hours as per requirements
+    if (editDeadline == null) {
+        editDeadline = createdAt.plusHours(48); // Changed from 24 to 48
+    }
+}
 
     @PreUpdate
     protected void onUpdate() {
