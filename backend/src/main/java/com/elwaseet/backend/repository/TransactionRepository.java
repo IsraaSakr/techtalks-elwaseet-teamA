@@ -3,6 +3,8 @@ package com.elwaseet.backend.repository;
 import com.elwaseet.backend.entity.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -26,4 +28,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Transaction> findByStatusAndAutoConfirmScheduledAtBefore(
             Transaction.TransactionStatus status,
             LocalDateTime time);
+
+    Optional<BigDecimal> sumCompletedTransactionAmounts();
+
 }
