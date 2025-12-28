@@ -12,7 +12,10 @@ import java.util.List;
     uniqueConstraints = @UniqueConstraint(
         name = "unique_review_per_transaction_per_reviewer",
         columnNames = {"transaction_id", "reviewer_id"}
-    )
+    ),
+    indexes = {
+        @Index(name = "idx_reviewee_public", columnList = "reviewee_id, is_public")
+    }
 )
 public class Review {
 
@@ -102,26 +105,26 @@ public class Review {
      * ============================================================================
      */
 
-@PrePersist
-protected void onCreate() {
-    LocalDateTime now = LocalDateTime.now();
-    if (createdAt == null) {
-        createdAt = now;
+    @PrePersist
+    protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        if (createdAt == null) {
+            createdAt = now;
+        }
+        if (updatedAt == null) {
+            updatedAt = now;
+        }
+        if (isPublic == null) {
+            isPublic = true;
+        }
+        if (isEdited == null) {
+            isEdited = false;
+        }
+        
+        if (editDeadline == null) {
+            editDeadline = createdAt.plusHours(48);
+        }
     }
-    if (updatedAt == null) {
-        updatedAt = now;
-    }
-    if (isPublic == null) {
-        isPublic = true;
-    }
-    if (isEdited == null) {
-        isEdited = false;
-    }
-    // Change from 24 to 48 hours as per requirements
-    if (editDeadline == null) {
-        editDeadline = createdAt.plusHours(48); // Changed from 24 to 48
-    }
-}
 
     @PreUpdate
     protected void onUpdate() {
@@ -192,9 +195,6 @@ protected void onCreate() {
 
     public void setComment(String comment) {
         this.comment = comment;
-        if (this.reviewId != null) { // If already persisted
-            this.isEdited = true;
-        }
     }
 
     public Boolean getIsPublic() {

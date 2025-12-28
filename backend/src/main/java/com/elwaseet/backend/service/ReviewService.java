@@ -15,7 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -43,13 +42,22 @@ public class ReviewService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Transaction not found with ID: " + request.getTransactionId()));
         
-        // 2. Validate transaction is CONFIRMED
-        if (transaction.getStatus() != Transaction.TransactionStatus.CONFIRMED) {
+        // 2. Validate transaction is CONFIRMED or PAID
+        if (transaction.getStatus() != Transaction.TransactionStatus.CONFIRMED && 
+            transaction.getStatus() != Transaction.TransactionStatus.PAID) {
             throw new BadRequestException(
-                    "Can only review transactions with CONFIRMED status. Current status: " + 
+                    "Can only review transactions with CONFIRMED or PAID status. Current status: " + 
                     transaction.getStatus());
         }
-        
+
+        // Check if review deadline has passed (7 days after confirmation)
+        LocalDateTime reviewDeadline = transaction.getConfirmedAt().plusDays(7);
+        if (LocalDateTime.now().isAfter(reviewDeadline)) {
+            throw new BadRequestException(
+                "Review deadline has passed. Reviews must be submitted within 7 days of transaction confirmation."
+            );
+        }
+            
         // 3. Validate user is part of transaction
         boolean isCustomer = transaction.getCustomer().getUserId().equals(currentUser.getUserId());
         boolean isProvider = transaction.getProvider().getUserId().equals(currentUser.getUserId());
@@ -83,6 +91,10 @@ public class ReviewService {
         Review review = new Review(transaction, currentUser, reviewee, request.getRating());
         review.setComment(request.getComment());
         review.setIsPublic(isPublic);
+
+        // Set review deadline based on when transaction was confirmed
+        // Users have 30 days after confirmation to post a review
+        review.setReviewDeadline(transaction.getConfirmedAt().plusDays(7));
         
         // Set edit deadline to 48 hours from now
         review.setEditDeadline(LocalDateTime.now().plusHours(48));
@@ -120,19 +132,22 @@ public class ReviewService {
         if (!review.canEdit()) {
             throw new BadRequestException("Review can only be edited within 48 hours of creation.");
         }
-        
+
+        // Validate at least one field is being updated
+        if (!request.hasRating() && !request.hasComment()) {
+            throw new BadRequestException("At least one field (rating or comment) must be provided for update.");
+        }
+
         // 4. Update fields if provided
         boolean ratingChanged = false;
-        BigDecimal oldRating = null;
-        
         if (request.hasRating()) {
-            oldRating = BigDecimal.valueOf(review.getRating());
             review.setRating(request.getRating());
             ratingChanged = true;
         }
         
         if (request.hasComment()) {
             review.setComment(request.getComment());
+            review.setIsEdited(true);
         }
         
         Review updatedReview = reviewRepository.save(review);
@@ -213,9 +228,8 @@ public class ReviewService {
         
         // 2. Check permissions: owner or admin
         boolean isOwner = review.getReviewer().getUserId().equals(currentUser.getUserId());
-        boolean isAdmin = currentUser.getAccountType() == User.AccountType.HYBRID_PROVIDER && 
-                         currentUser.getProviderProfile() != null && 
-                         currentUser.getProviderProfile().isVerified();
+        // For now, only owner can delete. Admin delete will be added in admin endpoints.
+        boolean isAdmin = false; // TODO: Add admin check when admin auth is implemented
         
         if (!isOwner && !isAdmin) {
             throw new UnauthorizedException(
