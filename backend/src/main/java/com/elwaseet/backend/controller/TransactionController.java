@@ -50,15 +50,23 @@ public class TransactionController {
     }
 
     @PostMapping("/{id}/confirm")
-    @PreAuthorize("hasRole('CUSTOMER')")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'HYBRID_PROVIDER')")
     public TransactionResponseDTO confirmWork(@PathVariable Long id, @AuthenticationPrincipal User user) {
         Long customerId = user.getUserId();
         Transaction tx = transactionService.confirmWork(id, customerId);
         return toResponse(tx);
     }
 
+    @PostMapping("{id}/release")
+    @PreAuthorize("hasAnyRole('CUSTOMER','HYBRID_PROVIDER')")
+    public TransactionResponseDTO releasePayment(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        Long customerId = user.getUserId();
+        Transaction tx = transactionService.releasePayment(id, customerId);
+        return toResponse(tx);
+    }
+
     @PostMapping("/{id}/dispute")
-    @PreAuthorize("hasRole('CUSTOMER')")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'HYBRID_PROVIDER')")
     public TransactionResponseDTO openDispute(@PathVariable Long id, @AuthenticationPrincipal User user) {
         Long customerId = user.getUserId();
         Transaction tx = transactionService.openDispute(id, customerId);

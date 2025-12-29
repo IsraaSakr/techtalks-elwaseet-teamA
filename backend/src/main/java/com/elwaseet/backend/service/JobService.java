@@ -3,6 +3,8 @@ package com.elwaseet.backend.service;
 import com.elwaseet.backend.dto.job.JobRequestDTO;
 import com.elwaseet.backend.dto.job.JobResponseDTO;
 import com.elwaseet.backend.dto.job.UpdateJobRequest;
+import com.elwaseet.backend.entity.Application;
+import com.elwaseet.backend.entity.Application.ApplicationStatus;
 import com.elwaseet.backend.entity.Job;
 import com.elwaseet.backend.entity.JobPhoto;
 import com.elwaseet.backend.exception.BadRequestException;
@@ -14,7 +16,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.elwaseet.backend.entity.ServiceCategory;
 import com.elwaseet.backend.repository.UserRepository; 
 import com.elwaseet.backend.entity.User; 
@@ -22,6 +23,9 @@ import com.elwaseet.backend.repository.ServiceCategoryRepository;
 import java.util.ArrayList;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
+import com.elwaseet.backend.repository.ApplicationRepository;
+import com.elwaseet.backend.exception.ValidationException;
 import org.springframework.data.jpa.domain.Specification;
 import com.elwaseet.backend.entity.Location;
 import org.springframework.data.domain.Page;
@@ -38,6 +42,8 @@ public class JobService {
     private final FileStorageService fileStorageService;
     private final UserRepository users;
     private final ServiceCategoryRepository categoryRepository;
+    private final ApplicationRepository applicationRepository;
+    private final EmailService emailService;
     /**
      * Update job text fields (no photos)
      */
@@ -301,6 +307,86 @@ public class JobService {
 
         return jobRepository.findAll(spec, pageable)
                         .map(JobResponseDTO::fromEntity);
+    }
+
+    /**
+     * Cancel (hard delete) a job
+     * Only OPEN jobs can be cancelled
+     * All pending applications will be rejected
+     * Providers will be notified via email
+     */
+    @Transactional
+    public void cancelJob(Long jobId, Long customerId) {
+        
+        // 1. Get job
+        Job job = jobRepository.findById(jobId)
+            .orElseThrow(() -> new ResourceNotFoundException("Job not found with ID: " + jobId));
+        
+        // 2. Verify ownership
+        if (!job.getCustomer().getUserId().equals(customerId)) {
+            throw new UnauthorizedException("You can only cancel your own jobs");
+        }
+        
+        // 3. Verify can cancel (only OPEN jobs)
+        if (job.getStatus() != Job.JobStatus.OPEN) {
+            throw new ValidationException(
+                "Can only cancel OPEN jobs. Current status: " + job.getStatus() + 
+                ". Contact support if you need to cancel an active job."
+            );
+        }
+        
+        // 4. Check if any applications accepted (extra safety check)
+        if (job.getAcceptedApplication() != null) {
+            throw new ValidationException(
+                "Cannot cancel job - application already accepted. Contact support."
+            );
+        }
+        
+        // 5. Get all pending applications BEFORE deleting job
+        List<Application> pendingApps = applicationRepository
+            .findPendingApplicationsByJobId(jobId);
+        
+        // 6. Collect application data for notifications
+        List<ApplicationEmailData> emailDataList = pendingApps.stream()
+            .map(app -> new ApplicationEmailData(
+                app.getProvider().getEmail(),
+                app.getProvider().getName()
+            ))
+            .collect(Collectors.toList());
+        
+        // 7. Update all pending applications to REJECTED
+        for (Application app : pendingApps) {
+            app.setStatus(ApplicationStatus.REJECTED);
+            applicationRepository.save(app);
+        }
+        
+        // 8. HARD DELETE the job (cascade will handle photos)
+        jobRepository.delete(job);
+        
+        // 9. Send email notifications to all providers who applied
+        for (ApplicationEmailData emailData : emailDataList) {
+            emailService.sendJobCancelledNotification(
+                emailData.email, 
+                emailData.providerName,
+                job.getTitle(),
+                job.getBudgetMin(),
+                job.getBudgetMax(),
+                job.getLocation().toString()
+            );
+        }
+    }
+
+    /**
+     * Helper class to store email data before job is deleted
+     */
+    private static class ApplicationEmailData {
+        final String email;
+        final String providerName;
+        
+        ApplicationEmailData(String email, String providerName) {
+            this.email = email;
+            this.providerName = providerName;
+        }
     }
 }
 

@@ -168,4 +168,28 @@ public class JobController {
         );
         return ResponseEntity.ok(jobs);
     }
+
+    /**
+     * Cancel (delete) a job
+     * 
+     * Rules:
+     * - Only job owner can cancel
+     * - Can only cancel OPEN jobs (no work started)
+     * - All pending applications will be rejected
+     * - Job and photos will be permanently deleted
+     * - Providers who applied will be notified
+     * 
+     * @param id Job ID to cancel
+     * @param authenticatedUser Currently authenticated user
+     * @return 204 No Content on success
+     */
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('CUSTOMER') or hasRole('HYBRID_PROVIDER')")
+    public ResponseEntity<Void> cancelJob(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User authenticatedUser) {
+        
+        jobService.cancelJob(id, authenticatedUser.getUserId());
+        return ResponseEntity.noContent().build();
+    }
 }

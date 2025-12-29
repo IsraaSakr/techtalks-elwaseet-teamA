@@ -98,6 +98,13 @@ public class TransactionService {
         }
 
         tx.moveToInProgress();
+
+        // Update job status
+        Job job = tx.getJob();
+        job.setStatus(Job.JobStatus.IN_PROGRESS);
+        job.setStartedAt(LocalDateTime.now());
+        jobRepository.save(job);
+
         return transactionRepository.save(tx);
     }
 
@@ -112,6 +119,13 @@ public class TransactionService {
         }
 
         tx.moveToCompleted(); // schedules auto-confirm internally
+
+        // Update job status
+        Job job = tx.getJob();
+        job.setStatus(Job.JobStatus.COMPLETED);
+        job.setCompletedAt(LocalDateTime.now());
+        jobRepository.save(job);
+
         return transactionRepository.save(tx);
     }
 
@@ -132,11 +146,24 @@ public class TransactionService {
         }
 
         tx.moveToConfirmed();
-        releasePaymentInternal(tx);
 
         return tx;
     }
 
+    @Transactional
+    public Transaction releasePayment(Long txId, Long customerId) {
+        Transaction tx = getTransaction(txId);
+
+        validateTransition(tx, TransactionStatus.PAID);
+
+        if (!tx.getCustomer().getUserId().equals(customerId)) {
+            throw new IllegalStateException("Only customer can release payment");
+        }
+
+        releasePaymentInternal(tx);
+        return tx;
+    }
+    
     @Transactional
     public Transaction openDispute(Long txId, Long customerId) {
         Transaction tx = getTransaction(txId);
@@ -202,6 +229,11 @@ public class TransactionService {
         // Apply balance update
         provider.setSimulatedBalance(currentBalance.add(netAmount));
         userRepository.save(provider);
+
+        // Update job status
+        Job job = tx.getJob();
+        job.setConfirmedAt(LocalDateTime.now());
+        jobRepository.save(job);
 
         transactionRepository.save(tx);
     }

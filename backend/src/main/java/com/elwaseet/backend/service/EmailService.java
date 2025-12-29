@@ -6,9 +6,7 @@ import com.resend.services.emails.model.CreateEmailOptions;
 import com.resend.services.emails.model.CreateEmailResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import java.math.BigDecimal;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -355,4 +353,112 @@ public class EmailService {
             </html>
             """.formatted(providerName, jobTitle);
     }
+
+    /**
+     * Send job cancellation notification to provider
+     */
+    @Async
+    public void sendJobCancelledNotification(
+            String providerEmail, 
+            String providerName,
+            String jobTitle,
+            BigDecimal budgetMin,
+            BigDecimal budgetMax,
+            String location) {
+        
+        String htmlContent = buildJobCancelledHtml(
+            providerName, jobTitle, budgetMin, budgetMax, location
+        );
+        
+        CreateEmailOptions request = CreateEmailOptions.builder()
+                .from(from)
+                .to(providerEmail)
+                .subject("Job Cancelled - " + jobTitle)
+                .html(htmlContent)
+                .build();
+
+        try {
+            CreateEmailResponse response = resend.emails().send(request);
+            log.info("Job cancellation email sent to {} with ID: {}", providerEmail, response.getId());
+        } catch (ResendException e) {
+            log.error("Failed to send job cancellation email to {}: {}", providerEmail, e.getMessage());
+            // Don't throw - notification failure shouldn't break the cancellation
+        }
+    }
+
+    /**
+     * Build HTML for job cancellation email
+     */
+    private String buildJobCancelledHtml(
+        String providerName,
+        String jobTitle, 
+        BigDecimal budgetMin, 
+        BigDecimal budgetMax,
+        String location) {
+    
+    return """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background-color: #FF9800; color: white; padding: 30px; text-align: center; border-radius: 5px; }
+                .content { background-color: #f9f9f9; padding: 30px; border-radius: 5px; margin-top: 20px; }
+                .job-details { background-color: white; padding: 20px; border-radius: 5px; 
+                            border-left: 4px solid #FF9800; margin: 15px 0; }
+                .encouragement { background-color: #fff3e0; padding: 20px; border-radius: 5px; margin: 20px 0; }
+                .button { background-color: #2196F3; color: white; padding: 12px 30px; 
+                        text-decoration: none; border-radius: 5px; display: inline-block; margin: 15px 0; }
+                .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #666; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>Job Cancelled</h1>
+                </div>
+                <div class="content">
+                    <p>Dear <strong>%s</strong>,</p>
+                    
+                    <p>We wanted to let you know that the following job has been cancelled by the customer:</p>
+                    
+                    <div class="job-details">
+                        <h3 style="margin: 0 0 10px 0; color: #FF9800;">%s</h3>
+                        <p style="margin: 5px 0;"><strong>Budget:</strong> $%s - $%s</p>
+                        <p style="margin: 5px 0;"><strong>Location:</strong> %s</p>
+                        <p style="margin: 5px 0;"><strong>Reason:</strong> Customer cancelled before selecting a provider</p>
+                    </div>
+                    
+                    <p>Your application has been automatically rejected since the job is no longer available.</p>
+                    
+                    <div class="encouragement">
+                        <h3 style="color: #F57C00; margin-top: 0;">💡 Don't Give Up!</h3>
+                        <p style="margin: 0;">
+                            This happens from time to time, and it's not a reflection of your skills or qualifications. 
+                            Keep browsing for other jobs on Elwaseet - the right opportunity is waiting for you!
+                        </p>
+                    </div>
+                    
+                    <center>
+                        <a href="https://elwaseet.com/browse-jobs" class="button">Browse More Jobs</a>
+                    </center>
+                    
+                    <p style="margin-top: 20px; font-size: 14px; color: #666;">
+                        <strong>Keep building your success:</strong><br>
+                        • Stay active and check for new jobs regularly<br>
+                        • Update your portfolio with your best work<br>
+                        • Respond quickly to opportunities<br>
+                        • Maintain competitive quotes and excellent service
+                    </p>
+                </div>
+                <div class="footer">
+                    <p>© 2025 Elwaseet. All rights reserved.</p>
+                    <p>This is an automated message, please do not reply.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """.formatted(providerName, jobTitle, budgetMin, budgetMax, location);
+}
 }
