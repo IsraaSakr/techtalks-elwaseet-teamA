@@ -62,8 +62,9 @@ public class DisputeEvidencePhoto {
      * ============================================================================
      */
 
-    protected DisputeEvidencePhoto() {
-    }
+    public DisputeEvidencePhoto() {
+    // JPA requires a no-args constructor
+}
 
     public DisputeEvidencePhoto(Dispute dispute, User uploadedBy, String photoUrl) {
         this.dispute = dispute;
@@ -107,6 +108,9 @@ public class DisputeEvidencePhoto {
 
     public LocalDateTime getUploadedAt() {
         return uploadedAt;
+    }
+    public void setUploadedAt(LocalDateTime uploadedAt) {
+    this.uploadedAt = uploadedAt;
     }
 
     /*
