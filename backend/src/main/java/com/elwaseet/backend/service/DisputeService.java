@@ -10,12 +10,13 @@ import com.elwaseet.backend.entity.User;
 import com.elwaseet.backend.repository.DisputeRepository;
 import com.elwaseet.backend.repository.DisputeEvidencePhotoRepository;
 import com.elwaseet.backend.repository.TransactionRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
 
 @Service
 public class DisputeService {
@@ -39,21 +40,26 @@ public class DisputeService {
                                   List<MultipartFile> evidenceFiles) {
 
         Transaction tx = transactionRepository.findById(transactionId)
-                .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
 
         // Rule 1: Only COMPLETED transactions
         if (!tx.getStatus().equals(Transaction.TransactionStatus.COMPLETED)) {
-            throw new IllegalStateException("Only completed transactions can be disputed");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only completed transactions can be disputed");
         }
 
         // Rule 2: Must open within 7 days of completion
         if (tx.getCompletedAt().isBefore(LocalDateTime.now().minusDays(7))) {
-            throw new IllegalStateException("Dispute deadline expired");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Dispute deadline expired");
         }
 
         // Rule 3: Max 5 evidence photos
         if (evidenceFiles != null && evidenceFiles.size() > 5) {
-            throw new IllegalStateException("Max 5 evidence photos allowed");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Max 5 evidence photos allowed");
+        }
+
+        // Rule 4: Only one dispute per transaction
+        if (disputeRepository.existsByTransaction(tx)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Transaction already has a dispute");
         }
 
         Job job = tx.getJob();
@@ -74,14 +80,12 @@ public class DisputeService {
                     photo.setDispute(dispute);
                     photo.setPhotoUrl(url);
                     photo.setUploadedAt(LocalDateTime.now());
-                    photo.setUploadedBy(customer); // ✅ FIX: set uploader
+                    photo.setUploadedBy(customer);
                     evidenceRepository.save(photo);
                 }
             }
         }
-if (disputeRepository.existsByTransaction(tx)) {
-    throw new IllegalStateException("Transaction already has a dispute");
-}
+
         // Update transaction + job status
         tx.setStatus(Transaction.TransactionStatus.DISPUTED);
         job.setStatus(Job.JobStatus.IN_REVIEW);
