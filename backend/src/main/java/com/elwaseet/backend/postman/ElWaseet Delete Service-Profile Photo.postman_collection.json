@@ -1,0 +1,86 @@
+{
+	"info": {
+		"_postman_id": "458ebac0-cc28-4a1d-ba39-ecc53dc17936",
+		"name": "ElWaseet Delete Service/Profile Photo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50753645"
+	},
+	"item": [
+		{
+			"name": "Delete a service",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE5OSwiZXhwIjoxNzY3NjI2OTk5fQ.m9l_XNlKrcF-m5kDomaMwgMqNGG6bhUCevX-6jQD_9w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/users/me/services/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users",
+						"me",
+						"services",
+						"5"
+					]
+				},
+				"description": "DELETE [http://localhost:8080/api/users/me/services/{serviceId}](http://localhost:8080/api/users/me/services/{serviceId})  \n**Headers:** Authorization: Bearer {{jwt_token}} (provider token)\n\n**Expected: 204 No Content**  \nResponse should show:\n\n- Empty response body\n    \n- Service deleted successfully\n    \n\n---\n\n**Delete service - invalid ID**  \n**Expected: 404 Not Found**  \nResponse should show:  \n\\- Error message: \"Service not found with id: 99999\"\n\n---\n\n**Delete service - no authentication**  \n**Expected: 401 Unauthorized**  \nResponse should show:  \n\\- Authentication required error"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete portfolio photo",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE5OSwiZXhwIjoxNzY3NjI2OTk5fQ.m9l_XNlKrcF-m5kDomaMwgMqNGG6bhUCevX-6jQD_9w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"photoUrl\": \"uploads/portfolio/f5b50d20-24da-4f06-8b9e-d9e9e1f2c0a0.png\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/users/me/portfolio",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users",
+						"me",
+						"portfolio"
+					]
+				},
+				"description": "DELETE [http://localhost:8080/api/users/me/portfolio](http://localhost:8080/api/users/me/portfolio)  \n**Headers:** Authorization: Bearer {{jwt_token}} (provider token)  \nContent-Type: application/json\n\n**Body (raw JSON):**  \n{  \n\"photoUrl\": \"/uploads/portfolio/photo-123456.jpg\"  \n}\n\nExpected: 204 No Content  \nResponse should show:\n\n- Empty response body\n    \n- Portfolio photo deleted successfully\n    \n- File removed from filesystem\n    \n\n---\n\n**Delete portfolio photo - invalid URL**\n\n**Expected: 404 Not Found**  \nResponse should show:  \n\\- Error message: \"Photo not found\"\n\n---\n\n**Delete portfolio photo - missing photoUrl**  \n**Expected: 400 Bad Request**  \nResponse should show:  \n\\- Error about missing photoUrl parameter"
+			},
+			"response": []
+		}
+	]
+}

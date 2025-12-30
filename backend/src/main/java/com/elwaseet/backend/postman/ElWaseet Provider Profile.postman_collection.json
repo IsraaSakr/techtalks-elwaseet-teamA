@@ -1,0 +1,163 @@
+{
+	"info": {
+		"_postman_id": "476f413b-68ef-4671-b48a-3e91a7508bb6",
+		"name": "ElWaseet Provider Profile",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50753645"
+	},
+	"item": [
+		{
+			"name": "Create/Update Profile",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE5OSwiZXhwIjoxNzY3NjI2OTk5fQ.m9l_XNlKrcF-m5kDomaMwgMqNGG6bhUCevX-6jQD_9w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"bio\": \"Experienced plumber with 10+ years\",\r\n  \"serviceAreas\": \"Beirut, Jounieh, Baabda\",\r\n  \"availabilityDescription\": \"Monday-Friday 8AM-6PM\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/users/me/profile",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users",
+						"me",
+						"profile"
+					]
+				},
+				"description": "**create/update profile:**\n\nPUT [http://localhost:8080/api/users/me/profile](http://localhost:8080/api/users/me/profile?userId=1)  \nAuthorization: Bearer {{jwt_token}} provider  \nContent-Type: application/json\n\n{  \n\"bio\": \"Experienced plumber with 10+ years\",  \n\"serviceAreas\": \"Beirut, Jounieh, Baabda\",  \n\"availabilityDescription\": \"Monday-Friday 8AM-6PM\"  \n}"
+			},
+			"response": []
+		},
+		{
+			"name": "Add Service",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE5OSwiZXhwIjoxNzY3NjI2OTk5fQ.m9l_XNlKrcF-m5kDomaMwgMqNGG6bhUCevX-6jQD_9w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"serviceName\": \"Pipe Repair\",\r\n  \"price\": 50.00,\r\n  \"description\": \"Emergency pipe repair service\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/users/me/services",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users",
+						"me",
+						"services"
+					]
+				},
+				"description": "POST http://localhost:8080/api/users/me/services  \nAuthorization: Bearer {{jwt_token}}  \nContent-Type: application/json  \n  \n{  \n\"serviceName\": \"Pipe Repair\",  \n\"price\": 50.00,  \n\"description\": \"Emergency pipe repair service\"  \n}"
+			},
+			"response": []
+		},
+		{
+			"name": "Upload Portfolio Photos",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE5OSwiZXhwIjoxNzY3NjI2OTk5fQ.m9l_XNlKrcF-m5kDomaMwgMqNGG6bhUCevX-6jQD_9w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "photos",
+							"contentType": "multipart/form-data",
+							"type": "file",
+							"src": "/C:/Users/Israa Sakr/OneDrive/Pictures/Screenshots/Screenshot 2025-12-23 070416.png"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/users/me/portfolio",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users",
+						"me",
+						"portfolio"
+					]
+				},
+				"description": "POST [http://localhost:8080/api/users/me/portfolio?userId=1](http://localhost:8080/api/users/me/portfolio?userId=1)  \nAuthorization: Bearer {{jwt_token}}  \nContent-Type: multipart/form-data\n\nphotos: \\[select 2-3 image files\\]"
+			},
+			"response": []
+		},
+		{
+			"name": "View Public Profile",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/providers/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"providers",
+						"2"
+					]
+				},
+				"description": "GET [http://localhost:8080/api/providers/{provider_profile_id}](http://localhost:8080/api/providers)  \nContent-Type: application/json\n\n(No auth needed - public endpoint)"
+			},
+			"response": []
+		}
+	]
+}

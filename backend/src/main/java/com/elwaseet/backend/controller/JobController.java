@@ -6,6 +6,8 @@ import com.elwaseet.backend.dto.job.UpdateJobRequest;
 import com.elwaseet.backend.entity.Job;
 import com.elwaseet.backend.entity.User;
 import com.elwaseet.backend.service.JobService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -46,14 +48,19 @@ public class JobController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<JobResponseDTO> updateJob(
-            @PathVariable long id,
-            @RequestBody @Valid UpdateJobRequest request,
-            @AuthenticationPrincipal User authenticatedUser) {
+            @PathVariable Long id,
+            @RequestPart("data") String requestJson,  // ← Changed to String
+            @RequestPart(value = "photos", required = false) List<MultipartFile> photos,
+            @AuthenticationPrincipal User authenticatedUser) throws Exception {
+        
+        // Parse JSON manually
+        ObjectMapper mapper = new ObjectMapper();
+        UpdateJobRequest request = mapper.readValue(requestJson, UpdateJobRequest.class);
         
         JobResponseDTO response = jobService.updateJob(
             id, 
             request, 
-            null,
+            photos, 
             authenticatedUser.getUserId()
         );
         
@@ -128,7 +135,7 @@ public class JobController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('HYBRID_PROVIDER')")
     public JobResponseDTO createJob(
-            @RequestPart("data") JobRequestDTO dto,
+            @RequestPart("data") @Valid JobRequestDTO dto,
             @RequestPart(value = "photos", required = false) MultipartFile[] photos,
             @AuthenticationPrincipal User authenticatedUser) {
 

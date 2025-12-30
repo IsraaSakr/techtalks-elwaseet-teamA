@@ -221,7 +221,7 @@ public class JobService {
     public JobResponseDTO createJob(JobRequestDTO dto, MultipartFile[] photos, String customerEmail) {
         // Validation
         if (dto.getBudgetMin() >= dto.getBudgetMax())
-            throw new IllegalArgumentException("budgetMin must be less than budgetMax");
+            throw new BadRequestException("budgetMin must be less than budgetMax");
         if (photos != null && photos.length > 5)
             throw new IllegalArgumentException("Max 5 photos allowed");
 

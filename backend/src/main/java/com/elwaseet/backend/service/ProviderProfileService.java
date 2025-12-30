@@ -18,7 +18,7 @@ import com.elwaseet.backend.dto.user.PortfolioPhotoDTO;
 import com.elwaseet.backend.dto.user.ProviderProfileResponseDTO;
 import com.elwaseet.backend.dto.user.ProviderResponseDTO;
 import com.elwaseet.backend.dto.user.UpdateProfileRequest;
-
+import jakarta.persistence.criteria.Join;
 import java.math.BigDecimal;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -315,9 +315,14 @@ public class ProviderProfileService {
         Specification<ProviderProfile> spec = Specification.where(null);
 
         if (category != null) {
-            spec = spec.and((root, query, cb) ->
-                    cb.equal(root.join("services").get("category").get("id"), category));
+            if (category != null) {
+                spec = spec.and((root, query, cb) -> {
+                    Join<ProviderProfile, ProviderService> servicesJoin = root.join("services");
+                    Join<ProviderService, ServiceCategory> categoriesJoin = servicesJoin.join("categories");
+                    return cb.equal(categoriesJoin.get("categoryId"), category);
+                });
         }
+    }
         if (location != null) {
             spec = spec.and((root, query, cb) -> 
                     cb.equal(root.get("user").get("location"), location));
