@@ -1,0 +1,34 @@
+{
+	"info": {
+		"_postman_id": "acbfc751-ef9c-402b-a446-3842d9f09638",
+		"name": "ElWaseet Category",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50753645"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8080/api/categories",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/categories",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"categories"
+					]
+				},
+				"description": "GET http://localhost:8080/api/categories  \npublic endpoint\n\n**Expected Response (200 OK):**"
+			},
+			"response": []
+		}
+	]
+}
