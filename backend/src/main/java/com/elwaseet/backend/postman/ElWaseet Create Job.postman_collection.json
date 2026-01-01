@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "908ee605-3d90-4550-9bcf-76407312890d",
-		"name": "ElWaseet Create Job",
+		"name": "ElWaseet Create/Cancel Job",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "50753645"
 	},
@@ -50,6 +50,38 @@
 					]
 				},
 				"description": "POST [http://localhost:8080/api/jobs](http://localhost:8080/api/jobs)  \n**Headers:**Authorization: Bearer {{jwt_token}} (customer token)  \n**Content-Type:** multipart/form-data\n\n**Body (form-data):**  \ndata: {  \n\"title\": \"Kitchen Cabinet Installation\",  \n\"description\": \"Need a skilled carpenter to install custom kitchen cabinets\",  \n\"categoryId\": 2,  \n\"budgetMin\": 50.0,\n\n\"budgetMax\": 150.0,\n\n\"location\": \"BEIRUT\",  \n\"urgency\": \"HIGH\"  \n}  \nphotos: \\[optional\\] (image files)\n\n**Expected: 200 OK**  \nResponse should show:\n\n- Job created successfully\n    \n- jobId assigned\n    \n- status = OPEN\n    \n- All fields match the request\n    \n- customerName present\n    \n\n---\n\n**Create job - missing title (validation error)**  \n**Expected: 400 Bad Request**  \nResponse should show:  \n\\- Error message about missing/invalid title\n\n---\n\n**Create job - invalid budget (zero or negative)**  \n**Expected: 400 Bad Request**  \nResponse should show:  \n\\- Error message about invalid budget\n\n---\n\n**Create job - no authentication**  \n**Expected: 401 Unauthorized**  \nResponse should show:  \n\\- Authentication required error"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a Job",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE2MSwiZXhwIjoxNzY3NjI2OTYxfQ.QnGz6Oq9yR8CEYsQHV5c4MasX0bXBiT4bYOB_POrpmg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/jobs/15",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"jobs",
+						"15"
+					]
+				},
+				"description": "DELETE [http://localhost:8080/api/jobs/{jobId}](http://localhost:8080/api/jobs/{jobId})\n\n**Headers:** Authorization: Bearer {{customer_token}} (job owner)\n\n**Expected: 204 No Content**\n\nWhat happens:  \n\\- Job is permanently deleted  \n\\- All pending applications are rejected  \n\\- All job photos are deleted from filesystem  \n\\- Providers who applied get notified"
 			},
 			"response": []
 		}

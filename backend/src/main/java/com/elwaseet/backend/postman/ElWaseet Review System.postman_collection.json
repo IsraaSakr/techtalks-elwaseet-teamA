@@ -7,7 +7,7 @@
 	},
 	"item": [
 		{
-			"name": "http://localhost:8080/api/reviews",
+			"name": "Customer Reviews Provider",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -47,7 +47,7 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8080/api/reviews",
+			"name": "Provider Reviews Customer",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -87,7 +87,7 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8080/api/reviews/1",
+			"name": "Updating a Review",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -128,14 +128,14 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8080/api/reviews/provider/1",
+			"name": "View Provider Reviews",
 			"request": {
 				"auth": {
 					"type": "bearer",
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NjM5NzI1MCwiZXhwIjoxNzY3MDAyMDUwfQ.pYgWxZEo_OGSrxH8wkiGeHQPSqfuPON7n10xEoTfcEI",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE2MSwiZXhwIjoxNzY3NjI2OTYxfQ.QnGz6Oq9yR8CEYsQHV5c4MasX0bXBiT4bYOB_POrpmg",
 							"type": "string"
 						}
 					]
@@ -179,7 +179,7 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8080/api/reviews/transaction/1",
+			"name": "View Transaction Review",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -212,7 +212,7 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8080/api/reviews/my-reviews",
+			"name": "View All Reviews",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -244,7 +244,7 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8080/api/reviews",
+			"name": "Reviewing After Deadline",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -284,7 +284,7 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8080/api/reviews/1",
+			"name": "Delete Review",
 			"request": {
 				"auth": {
 					"type": "bearer",

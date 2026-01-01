@@ -131,6 +131,35 @@
 				"description": "GET [http://localhost:8080/auth/me](http://localhost:8080/auth/me)\n\nAuthorization -> Bearer Token -> **Paste the token**\n\n**Expected Response:**\n\n- Status: **200 OK**\n    \n- Body: Your user object (same as login response)\n    \n\n{  \n\"userId\": 5,  \n\"email\": \"[test@gmail.com](https://mailto:test@gmail.com)\",  \n\"name\": \"Test User\",  \n\"phone\": \"70123456\",  \n\"location\": \"BEIRUT\",  \n\"accountType\": \"HYBRID_PROVIDER\",  \n\"profilePhotoUrl\": null,  \n\"simulatedBalance\": 0.00,  \n\"isEmailVerified\": true,  \n\"isActive\": true,  \n\"isBanned\": false,  \n\"createdAt\": \"2025-12-29T13:26:54.31978\",  \n\"updatedAt\": \"2025-12-29T13:35:35.009326\",  \n\"lastLogin\": \"2025-12-29T13:35:35.006324\",  \n\"active\": true,  \n\"emailVerified\": true,  \n\"banned\": false,  \n\"customer\": false,  \n\"provider\": true  \n}\n\n**What happened?**\n\n- Backend verified your JWT token\n    \n- Extracted user info from token\n    \n- Returned your profile\n    \n\n**If it fails:**\n\n- 401 Unauthorized → Token missing or invalid\n    \n- Make sure you selected \"Bearer Token\" in Authorization tab\n    \n- Make sure token is pasted correctly (no extra spaces)\n    \n\n---\n\n**Try to Access /auth/me WITHOUT Token**\n\n**Expected Response:**\n\n- Status: **401 Unauthorized**"
 			},
 			"response": []
+		},
+		{
+			"name": "Resend OTP",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"test@gmail.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/auth/resend-otp",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"resend-otp"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
