@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,13 +23,16 @@ public class DisputeService {
     private final DisputeRepository disputeRepository;
     private final DisputeEvidencePhotoRepository evidenceRepository;
     private final TransactionRepository transactionRepository;
+    private final FileStorageService fileStorageService;
 
     public DisputeService(DisputeRepository disputeRepository,
                           DisputeEvidencePhotoRepository evidenceRepository,
-                          TransactionRepository transactionRepository) {
+                          TransactionRepository transactionRepository,
+                          FileStorageService fileStorageService) {
         this.disputeRepository = disputeRepository;
         this.evidenceRepository = evidenceRepository;
         this.transactionRepository = transactionRepository;
+        this.fileStorageService = fileStorageService;
     }
 
     public DisputeDTO openDispute(Long transactionId,
@@ -42,24 +44,26 @@ public class DisputeService {
         Transaction tx = transactionRepository.findById(transactionId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
 
-        // Rule 1: Only COMPLETED transactions
-        if (!tx.getStatus().equals(Transaction.TransactionStatus.COMPLETED)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only completed transactions can be disputed");
+        // Rule 1: Only one dispute per transaction
+        if (disputeRepository.existsByTransaction(tx)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Transaction already has a dispute");
         }
 
-        // Rule 2: Must open within 7 days of completion
+        // Rule 2: Only COMPLETED/CONFIRMED/PAID transactions
+        if (!tx.getStatus().equals(Transaction.TransactionStatus.COMPLETED) &&
+            !tx.getStatus().equals(Transaction.TransactionStatus.CONFIRMED) &&
+            !tx.getStatus().equals(Transaction.TransactionStatus.PAID)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only completed, confirmed or paid transactions can be disputed");
+        }
+
+        // Rule 3: Must open within 7 days of completion
         if (tx.getCompletedAt().isBefore(LocalDateTime.now().minusDays(7))) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Dispute deadline expired");
         }
 
-        // Rule 3: Max 5 evidence photos
+        // Rule 4: Max 5 evidence photos
         if (evidenceFiles != null && evidenceFiles.size() > 5) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Max 5 evidence photos allowed");
-        }
-
-        // Rule 4: Only one dispute per transaction
-        if (disputeRepository.existsByTransaction(tx)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Transaction already has a dispute");
         }
 
         Job job = tx.getJob();
@@ -72,23 +76,18 @@ public class DisputeService {
         dispute = disputeRepository.save(dispute);
 
         // Save evidence photos
-        if (evidenceFiles != null) {
-            for (MultipartFile file : evidenceFiles) {
-                if (!file.isEmpty()) {
-                    String url = storeFile(file); // implement storage logic
-                    DisputeEvidencePhoto photo = new DisputeEvidencePhoto();
-                    photo.setDispute(dispute);
-                    photo.setPhotoUrl(url);
-                    photo.setUploadedAt(LocalDateTime.now());
-                    photo.setUploadedBy(customer);
-                    evidenceRepository.save(photo);
-                }
+        if (evidenceFiles != null && !evidenceFiles.isEmpty()) {
+            List<String> photoUrls = fileStorageService.saveMultipleFiles(evidenceFiles, "disputes", 5);
+            
+            for (String url : photoUrls) {
+                DisputeEvidencePhoto photo = new DisputeEvidencePhoto(dispute, customer, url);
+                evidenceRepository.save(photo);
+                dispute.getEvidencePhotos().add(photo);
             }
         }
 
-        // Update transaction + job status
+        // Update transaction
         tx.setStatus(Transaction.TransactionStatus.DISPUTED);
-        job.setStatus(Job.JobStatus.IN_REVIEW);
         transactionRepository.save(tx);
 
         return toDTO(dispute);
@@ -98,7 +97,6 @@ public class DisputeService {
         DisputeDTO dto = new DisputeDTO();
         dto.setDisputeId(dispute.getDisputeId());
         dto.setTransactionId(dispute.getTransaction().getTransactionId());
-        dto.setCustomerId(dispute.getOpenedBy().getUserId());
         dto.setStatus(dispute.getStatus().name());
         dto.setOpenedAt(dispute.getOpenedAt());
         dto.setResolvedAt(dispute.getResolvedAt());
@@ -114,10 +112,5 @@ public class DisputeService {
 
         dto.setEvidencePhotos(photos);
         return dto;
-    }
-
-    private String storeFile(MultipartFile file) {
-        // TODO: implement storage (local FS, S3, etc.)
-        return "/uploads/" + file.getOriginalFilename();
     }
 }

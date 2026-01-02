@@ -65,6 +65,7 @@ public class TransactionController {
         return toResponse(tx);
     }
 
+    @Deprecated // Use POST /api/disputes instead
     @PostMapping("/{id}/dispute")
     @PreAuthorize("hasAnyRole('CUSTOMER', 'HYBRID_PROVIDER')")
     public TransactionResponseDTO openDispute(@PathVariable Long id, @AuthenticationPrincipal User user) {

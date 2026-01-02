@@ -8,7 +8,6 @@ import java.util.List;
 public class DisputeDTO {
     private Long disputeId;
     private Long transactionId;
-    private Long customerId;
     private String status;
     private LocalDateTime openedAt;
     private LocalDateTime resolvedAt;

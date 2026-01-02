@@ -4,14 +4,13 @@ package com.elwaseet.backend.controller;
 import com.elwaseet.backend.dto.dispute.DisputeCreateRequest;
 import com.elwaseet.backend.dto.dispute.DisputeDTO;
 import com.elwaseet.backend.service.DisputeService;
+import jakarta.transaction.Transactional;
 import com.elwaseet.backend.repository.DisputeRepository;
 import com.elwaseet.backend.entity.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-
 import java.util.List;
 
 @RestController
@@ -30,16 +29,12 @@ public class DisputeController {
      * Open a new dispute.
      * Only authenticated customers can open disputes.
      */
-    @PreAuthorize("hasRole('CUSTOMER')")
+    @PreAuthorize("hasRole('CUSTOMER') or hasRole('HYBRID_PROVIDER')")
     @PostMapping
+    @Transactional
     public ResponseEntity<DisputeDTO> openDispute(
             @ModelAttribute DisputeCreateRequest request,
             @AuthenticationPrincipal User authenticatedUser) {
-
-        // enforce ownership: customerId in request must match authenticated user
-        if (!request.getCustomerId().equals(authenticatedUser.getUserId())) {
-            return ResponseEntity.status(403).build();
-        }
 
         DisputeDTO dispute = disputeService.openDispute(
                 request.getTransactionId(),
@@ -55,10 +50,10 @@ public class DisputeController {
     /**
      * Get all disputes opened by the authenticated customer.
      */
-    @PreAuthorize("hasRole('CUSTOMER')")
+    @PreAuthorize("hasRole('CUSTOMER') or hasRole('HYBRID_PROVIDER')")
     @GetMapping("/my-disputes")
     public List<DisputeDTO> myDisputes(@AuthenticationPrincipal User authenticatedUser) {
-        return disputeRepository.findByOpenedBy(authenticatedUser)
+        return disputeRepository.findByOpenedByWithPhotos(authenticatedUser)
                 .stream()
                 .map(disputeService::toDTO)
                 .toList();
@@ -68,7 +63,7 @@ public class DisputeController {
      * Get a specific dispute by ID.
      * Only the owner (openedBy) can view it.
      */
-    @PreAuthorize("hasRole('CUSTOMER')")
+    @PreAuthorize("hasRole('CUSTOMER') or hasRole('HYBRID_PROVIDER')")
     @GetMapping("/{id}")
     public ResponseEntity<DisputeDTO> getDispute(
             @PathVariable Long id,
