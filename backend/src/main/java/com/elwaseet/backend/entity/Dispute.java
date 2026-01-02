@@ -284,7 +284,9 @@ public class Dispute {
     public LocalDateTime getOpenedAt() {
         return openedAt;
     }
-
+    public void setOpenedAt(LocalDateTime openedAt) {
+    this.openedAt = openedAt;
+}
     public LocalDateTime getResolvedAt() {
         return resolvedAt;
     }

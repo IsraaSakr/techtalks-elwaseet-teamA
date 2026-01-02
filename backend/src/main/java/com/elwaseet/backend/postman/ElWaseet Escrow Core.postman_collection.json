@@ -48,7 +48,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE2MSwiZXhwIjoxNzY3NjI2OTYxfQ.QnGz6Oq9yR8CEYsQHV5c4MasX0bXBiT4bYOB_POrpmg",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE5OSwiZXhwIjoxNzY3NjI2OTk5fQ.m9l_XNlKrcF-m5kDomaMwgMqNGG6bhUCevX-6jQD_9w",
 							"type": "string"
 						}
 					]
@@ -65,7 +65,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/transactions/9/start",
+					"raw": "http://localhost:8080/api/transactions/13/start",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -74,7 +74,7 @@
 					"path": [
 						"api",
 						"transactions",
-						"9",
+						"13",
 						"start"
 					]
 				},
@@ -90,7 +90,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NjM5NzI1MCwiZXhwIjoxNzY3MDAyMDUwfQ.pYgWxZEo_OGSrxH8wkiGeHQPSqfuPON7n10xEoTfcEI",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE5OSwiZXhwIjoxNzY3NjI2OTk5fQ.m9l_XNlKrcF-m5kDomaMwgMqNGG6bhUCevX-6jQD_9w",
 							"type": "string"
 						}
 					]
@@ -107,7 +107,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/transactions/9/complete",
+					"raw": "http://localhost:8080/api/transactions/13/complete",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -116,7 +116,7 @@
 					"path": [
 						"api",
 						"transactions",
-						"9",
+						"13",
 						"complete"
 					]
 				},
@@ -246,7 +246,7 @@
 						"dispute"
 					]
 				},
-				"description": "Open Dispute: Test dispute flow instead of confirm  \nPOST [http://localhost:8080/api/transactions/{{transactionId}}/dispute](http://localhost:8080/api/transactions/{{transactionId}}/dispute)  \nAuthorization: Bearer {{customerToken}}\n\n**Expected Response (200 OK):**\n\n{  \n\"transactionId\": 1,  \n\"status\": \"DISPUTED\",  \n\"completedAt\": \"2025-12-22T11:00:00\",  \n...  \n}\n\n---\n\nWrong State Transition: Verify state machine prevents skipping states  \nPOST [http://localhost:8080/api/transactions/{{transactionId}}/confirm](http://localhost:8080/api/transactions/{{transactionId}}/confirm)  \nAuthorization: Bearer {{customerToken}}\n\n**Expected Response (400 or 500): (example)**\n\n{  \n\"error\": \"Invalid transition: COMMITTED → CONFIRMED\"  \n}"
+				"description": "Useless endpoint after creating the Dispute Core System\n\nOpen Dispute: Test dispute flow instead of confirm  \nPOST [http://localhost:8080/api/transactions/{{transactionId}}/dispute](http://localhost:8080/api/transactions/{{transactionId}}/dispute)  \nAuthorization: Bearer {{customerToken}}\n\n**Expected Response (200 OK):**\n\n{  \n\"transactionId\": 1,  \n\"status\": \"DISPUTED\",  \n\"completedAt\": \"2025-12-22T11:00:00\",  \n...  \n}\n\n---\n\nWrong State Transition: Verify state machine prevents skipping states  \nPOST [http://localhost:8080/api/transactions/{{transactionId}}/confirm](http://localhost:8080/api/transactions/{{transactionId}}/confirm)  \nAuthorization: Bearer {{customerToken}}\n\n**Expected Response (400 or 500): (example)**\n\n{  \n\"error\": \"Invalid transition: COMMITTED → CONFIRMED\"  \n}"
 			},
 			"response": []
 		}
