@@ -1,17 +1,20 @@
 package com.elwaseet.backend.controller;
 
-
+import com.elwaseet.backend.dto.dispute.AppealDisputeRequest;
 import com.elwaseet.backend.dto.dispute.DisputeCreateRequest;
 import com.elwaseet.backend.dto.dispute.DisputeDTO;
 import com.elwaseet.backend.service.DisputeService;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import com.elwaseet.backend.repository.DisputeRepository;
+import com.elwaseet.backend.entity.DisputeAppeal;
 import com.elwaseet.backend.entity.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/disputes")
@@ -74,5 +77,40 @@ public class DisputeController {
                 .map(disputeService::toDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.status(403).build());
+    }
+
+    /**
+     * Appeal a dispute resolution
+     * POST /api/disputes/{id}/appeal
+     * 
+     * Can only be called by customer or provider involved in the dispute.
+     * Must be called within 3 days of resolution.
+     * 
+     * Request body:
+     * {
+     *   "appealReason": "I disagree with the admin's decision because..."
+     * }
+     * 
+     * @param id Dispute ID
+     * @param request Appeal request with reason
+     * @param user Authenticated user
+     * @return Created appeal
+     */
+    @PostMapping("/{id}/appeal")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Map<String, Object>> appealDispute( 
+            @PathVariable Long id,
+            @Valid @RequestBody AppealDisputeRequest request,
+            @AuthenticationPrincipal User user) {
+
+        DisputeAppeal appeal = disputeService.appealDispute(id, request, user);
+        
+        // Return a simple response instead of the entity
+        return ResponseEntity.ok(Map.of(
+            "message", "Appeal submitted successfully",
+            "appealId", appeal.getAppealId(),
+            "disputeId", id,
+            "status", "APPEALED"
+        ));
     }
 }

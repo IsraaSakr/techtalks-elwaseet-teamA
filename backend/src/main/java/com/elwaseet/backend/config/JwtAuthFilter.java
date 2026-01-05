@@ -1,8 +1,10 @@
 package com.elwaseet.backend.config;
 
 import org.springframework.lang.NonNull;
-import com.elwaseet.backend.entity.User; // adjust to your actual package
+import com.elwaseet.backend.entity.User;
+import com.elwaseet.backend.entity.AdminUser;
 import com.elwaseet.backend.repository.UserRepository;
+import com.elwaseet.backend.repository.AdminUserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,44 +19,60 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
-@Component  // <-- this makes it a Spring bean
+@Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+    private final AdminUserRepository adminUserRepository;
 
-    public JwtAuthFilter(JwtUtil jwtUtil, UserRepository userRepository) {
+    public JwtAuthFilter(JwtUtil jwtUtil, UserRepository userRepository, AdminUserRepository adminUserRepository) {
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
+        this.adminUserRepository = adminUserRepository;
     }
 
-@Override
-protected void doFilterInternal(
-        @NonNull HttpServletRequest request,
-        @NonNull HttpServletResponse response,
-        @NonNull FilterChain filterChain) throws ServletException, IOException {
+    @Override
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-    String authHeader = request.getHeader("Authorization");
+        String authHeader = request.getHeader("Authorization");
 
-    if (authHeader != null && authHeader.startsWith("Bearer ")) {
-        String token = authHeader.substring(7);
-        try {
-            long userId = jwtUtil.extractUserId(token); // return primitive long to avoid null warnings
-            User user = userRepository.findById(userId).orElse(null);
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            try {
+                String role = jwtUtil.extractRole(token);
 
-            if (user != null && user.isActive() && !user.isBanned()) {
-                var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + user.getAccountType()));
-                var authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                if ("ADMIN".equals(role)) {
+                    // Admin token - subject is email
+                    String email = jwtUtil.extractEmail(token);
+                    AdminUser admin = adminUserRepository.findByEmail(email).orElse(null);
+
+                    if (admin != null && admin.getIsActive()) {
+                        var authorities = List.of(new SimpleGrantedAuthority("ROLE_ADMIN")); 
+                        var authentication = new UsernamePasswordAuthenticationToken(admin, null, authorities);
+                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
+                } else {
+                    // User token - subject is userId
+                    long userId = jwtUtil.extractUserId(token);
+                    User user = userRepository.findById(userId).orElse(null);
+
+                    if (user != null && user.isActive() && !user.isBanned()) {
+                        var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + user.getAccountType()));
+                        var authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
+                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
+                }
+            } catch (Exception e) {
+                // invalid/expired token → leave unauthenticated
             }
-        } catch (Exception e) {
-            // invalid/expired token → leave unauthenticated
         }
+
+        filterChain.doFilter(request, response);
     }
-
-    filterChain.doFilter(request, response);
-}
-
-
 }

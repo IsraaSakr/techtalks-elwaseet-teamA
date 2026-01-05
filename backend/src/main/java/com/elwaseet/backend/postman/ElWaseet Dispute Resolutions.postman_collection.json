@@ -1,0 +1,294 @@
+{
+	"info": {
+		"_postman_id": "d94d2546-7fc0-4fd3-8b94-7dda7d7af621",
+		"name": "ElWaseet Dispute Resolutions",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50753645"
+	},
+	"item": [
+		{
+			"name": "Admin List All Disputes",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlbHdhc2VldC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Njc1NTQ3MTUsImV4cCI6MTc2ODE1OTUxNX0.N8h0EpKd9PmK95NfKIWlKlXlblHLLjOB4a8suYj-pOw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/admin/disputes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"disputes"
+					]
+				},
+				"description": "GET [http://localhost:8080/api/admin/disputes](http://localhost:8080/api/admin/disputes)  \nAuthorization: Bearer (admin)  \nExpected: Returns paginated list of all disputes"
+			},
+			"response": []
+		},
+		{
+			"name": "Admin Lists OPEN Disputes Only",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlbHdhc2VldC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Njc1NTQ3MTUsImV4cCI6MTc2ODE1OTUxNX0.N8h0EpKd9PmK95NfKIWlKlXlblHLLjOB4a8suYj-pOw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/admin/disputes?status=OPEN",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"disputes"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "OPEN"
+						}
+					]
+				},
+				"description": "GET http://localhost:8080/api/admin/disputes?status=OPEN  \nAuthorization: Bearer (admin)  \nExpected: Returns only disputes with status=OPEN"
+			},
+			"response": []
+		},
+		{
+			"name": "Resolve Dispute - PROVIDER_FULL",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlbHdhc2VldC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Njc1NTQ3MTUsImV4cCI6MTc2ODE1OTUxNX0.N8h0EpKd9PmK95NfKIWlKlXlblHLLjOB4a8suYj-pOw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"resolution\": \"PROVIDER_FULL\",\r\n\"resolutionNotes\": \"Provider completed work satisfactorily\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/admin/disputes/4/resolve",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"disputes",
+						"4",
+						"resolve"
+					]
+				},
+				"description": "POST [http://localhost:8080/api/admin/disputes/1/resolve](http://localhost:8080/api/admin/disputes/1/resolve)  \nAuthorization: Bearer (admin)  \nContent-Type: application/json  \n{  \n\"resolution\": \"PROVIDER_FULL\",  \n\"resolutionNotes\": \"Provider completed work satisfactorily\"  \n}  \nExpected:  \n\\- Dispute status → RESOLVED  \n\\- Transaction status → RESOLVED  \n\\- Job status → COMPLETED  \n\\- Provider balance increases by full amount  \n\\- Both parties receive emails  \n\\- Appeal deadline set to 3 days from now  \n{  \n\"disputeId\": 4,  \n\"transactionId\": 7,  \n\"status\": \"RESOLVED\",  \n\"openedAt\": \"2026-01-02T01:08:49.777847\",  \n\"resolvedAt\": \"2026-01-05T03:13:07.8916566\",  \n\"evidencePhotos\": \\[  \n{  \n\"photoId\": 2,  \n\"photoUrl\": \"uploads/disputes/file_0_827dd769-9b34-495a-b384-b192383f295d.jpg\",  \n\"uploadedAt\": \"2026-01-02T01:08:49.787567\"  \n}  \n\\]  \n}\n\n---\n\nPOST [http://localhost:8080/api/admin/disputes/1/resolve](http://localhost:8080/api/admin/disputes/1/resolve)  \n\\# \\*_(dispute status is already RESOLVED)  \n\\*_Expected:  \n\\- 409 Conflict\n\n{  \n\"status\": 409,  \n\"message\": \"Cannot resolve dispute. Dispute must be OPEN or UNDER_REVIEW but is RESOLVED\",  \n\"timestamp\": \"2026-01-05T04:33:32.116209\",  \n\"errors\": null  \n}"
+			},
+			"response": []
+		},
+		{
+			"name": "Resolve Dispute - CUSTOMER_FULL",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlbHdhc2VldC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Njc1NTQ3MTUsImV4cCI6MTc2ODE1OTUxNX0.N8h0EpKd9PmK95NfKIWlKlXlblHLLjOB4a8suYj-pOw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"resolution\": \"CUSTOMER_FULL\",\r\n\"resolutionNotes\": \"Work was not completed as agreed\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/admin/disputes/2/resolve",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"disputes",
+						"2",
+						"resolve"
+					]
+				},
+				"description": "POST http://localhost:8080/api/admin/disputes/2/resolve  \nAuthorization: Bearer (admin token)  \nContent-Type: application/json  \n{  \n\"resolution\": \"CUSTOMER_FULL\",  \n\"resolutionNotes\": \"Work was not completed as agreed\"  \n}  \n**Expected:**  \n\\- Dispute status → RESOLVED  \n\\- Transaction status → RESOLVED  \n\\- Job status → CANCELLED  \n\\- Customer balance increases by full amount  \n\\- Both parties receive emails"
+			},
+			"response": []
+		},
+		{
+			"name": "Resolve Dispute - SPLIT",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlbHdhc2VldC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Njc1NTQ3MTUsImV4cCI6MTc2ODE1OTUxNX0.N8h0EpKd9PmK95NfKIWlKlXlblHLLjOB4a8suYj-pOw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"resolution\": \"SPLIT\",\r\n\"resolutionNotes\": \"Work was partially completed\",\r\n\"providerSplitPercentage\": 60.00,\r\n\"customerSplitPercentage\": 40.00\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/admin/disputes/2/resolve",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"disputes",
+						"2",
+						"resolve"
+					]
+				},
+				"description": "POST [http://localhost:8080/api/admin/disputes/3/resolve](http://localhost:8080/api/admin/disputes/3/resolve)  \nAuthorization: Bearer (admin token)  \nContent-Type: application/json  \n{  \n\"resolution\": \"SPLIT\",  \n\"resolutionNotes\": \"Work was partially completed\",  \n\"providerSplitPercentage\": 60.00,  \n\"customerSplitPercentage\": 40.00  \n}  \nExpected:  \n\\- Dispute status → RESOLVED  \n\\- Transaction status → RESOLVED  \n\\- Job status → COMPLETED  \n\\- Provider gets 60% of amount  \n\\- Customer gets 40% of amount  \n\\- Both balances updated correctly  \n\\- Both parties receive emails\n\n{  \n\"disputeId\": 2,  \n\"transactionId\": 9,  \n\"status\": \"RESOLVED\",  \n\"openedAt\": \"2026-01-02T01:00:43.420619\",  \n\"resolvedAt\": \"2026-01-05T03:25:11.735248\",  \n\"evidencePhotos\": \\[\\]  \n}\n\n---\n\n**SPLIT with Invalid Percentages (Don’t Sum to 100)**  \nPOST http://localhost:8080/api/admin/disputes/3/resolve  \nContent-Type: application/json  \n{  \n\"resolution\": \"SPLIT\",  \n\"providerSplitPercentage\": 50.00,  \n\"customerSplitPercentage\": 60.00 // 50 + 60 = 110, not 100!  \n}  \nExpected:  \n\\- 400 Bad Request  \n\\- Error: \"Split percentages must sum to exactly 100%\""
+			},
+			"response": []
+		},
+		{
+			"name": "Resolve Dispute - FIX_REQUIRED",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlbHdhc2VldC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Njc1NTQ3MTUsImV4cCI6MTc2ODE1OTUxNX0.N8h0EpKd9PmK95NfKIWlKlXlblHLLjOB4a8suYj-pOw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"resolution\": \"FIX_REQUIRED\",\r\n\"resolutionNotes\": \"Provider must fix the electrical outlets that are not working\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/admin/disputes/4/resolve",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"disputes",
+						"4",
+						"resolve"
+					]
+				},
+				"description": "POST http://localhost:8080/api/admin/disputes/4/resolve  \nAuthorization: Bearer (admin token)  \nContent-Type: application/json  \n{  \n\"resolution\": \"FIX_REQUIRED\",  \n\"resolutionNotes\": \"Provider must fix the electrical outlets that are not working\"  \n}  \n**Expected:**  \n\\- Dispute status → RESOLVED  \n\\- Transaction status → DISPUTED (stays in escrow!)  \n\\- Job status → IN_PROGRESS (provider can fix)  \n\\- NO money distribution  \n\\- Both parties receive fix-required emails"
+			},
+			"response": []
+		},
+		{
+			"name": "Appeal a Dispute (Within 3 Days)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzU3ODY0NiwiZXhwIjoxNzY4MTgzNDQ2fQ.JqVHXR-UtntUnTLskCHCRGzwOQbNM1xX6ZKP-MYJIOw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"appealReason\": \"I disagree with this decision because the work was completed fully\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/disputes/5/appeal",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"disputes",
+						"5",
+						"appeal"
+					]
+				},
+				"description": "POST [http://localhost:8080/api/disputes/1/appeal](http://localhost:8080/api/disputes/1/appeal)  \nAuthorization: Bearer (provider/customer token)  \nContent-Type: application/json  \n{  \n\"appealReason\": \"I disagree with this decision because the work was completed fully\"\n\n}  \nExpected:  \n\\- DisputeAppeal created  \n\\- Dispute status → APPEALED  \n\\- Admin receives email notification  \n\\- User is either customer or provider from the dispute\n\n{  \n\"message\": \"Appeal submitted successfully\",  \n\"disputeId\": 4,  \n\"appealId\": 5,  \n\"status\": \"APPEALED\"  \n}\n\n---\n\nTry to Appeal - Access Denied (Wrong User)  \nPOST [http://localhost:8080/api/disputes/1/appeal](http://localhost:8080/api/disputes/1/appeal)  \nAuthorization: Bearer (another user)  \nExpected:  \n\\- 400 Bad Request  \n{  \n\"status\": 400,  \n\"message\": \"You are not authorized to appeal this dispute. Only the customer or provider involved can appeal.\",  \n\"timestamp\": \"2026-01-05T04:24:19.6521607\",  \n\"errors\": null  \n}\n\n---\n\nPOST [http://localhost:8080/api/disputes/1/appeal](http://localhost:8080/api/disputes/1/appeal)  \n\\# (dispute already has an appeal)  \nExpected:  \n\\- 409 Conflict\n\n{  \n\"message\": \"Appeal submitted successfully\",  \n\"disputeId\": 5,  \n\"appealId\": 6,  \n\"status\": \"APPEALED\"  \n}"
+			},
+			"response": []
+		}
+	]
+}

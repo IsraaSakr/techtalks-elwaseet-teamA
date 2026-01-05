@@ -5,18 +5,20 @@ import com.elwaseet.backend.dto.auth.LoginResponse;
 import com.elwaseet.backend.dto.auth.RegisterDTO;
 import com.elwaseet.backend.dto.auth.ResendOtpRequest;
 import com.elwaseet.backend.dto.auth.VerifyDTO;
+import com.elwaseet.backend.entity.AdminUser;
 import com.elwaseet.backend.entity.OtpCode;
 import com.elwaseet.backend.entity.User;
 import com.elwaseet.backend.exception.ConflictException;
 import com.elwaseet.backend.exception.ResourceNotFoundException;
+import com.elwaseet.backend.repository.AdminUserRepository;
 import com.elwaseet.backend.repository.AuthRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import com.elwaseet.backend.config.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -27,6 +29,7 @@ public class AuthService {
     private final OtpService otpService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final AdminUserRepository adminUserRepository;
 
     public void register(RegisterDTO registerDto) {
 
@@ -121,5 +124,23 @@ public class AuthService {
         
         String token = jwtUtil.generateToken(user);
         return new LoginResponse(token, user);
+    }
+
+    public LoginResponse adminLogin(LoginRequest request) {
+        String email = request.getEmail().trim().toLowerCase();
+        
+        AdminUser admin = adminUserRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Admin not found"));
+        
+        if (!passwordEncoder.matches(request.getPassword(), admin.getPasswordHash())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+        }
+        
+        admin.setLastLogin(LocalDateTime.now());
+        adminUserRepository.save(admin);
+        
+        String token = jwtUtil.generateAdminToken(admin);
+        
+        return new LoginResponse(token, null);
     }
 }

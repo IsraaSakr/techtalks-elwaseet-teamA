@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+// Admin Endpoint Related - Uncomment imports for initial setup
+// import com.elwaseet.backend.entity.AdminUser;
+// import com.elwaseet.backend.repository.AdminUserRepository;
+// import org.springframework.security.crypto.password.PasswordEncoder;
 import com.elwaseet.backend.entity.User;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +27,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class AuthController {
     
     private final AuthService authService;
+    // Admin Endpoint Related - Uncomment for initial setup
+    // private final AdminUserRepository adminUserRepository;
+    // private final PasswordEncoder passwordEncoder;
     
     @PostMapping("/register")
     public ResponseEntity<String> register(@Valid @RequestBody RegisterDTO registerDTO) {
@@ -52,5 +58,27 @@ public class AuthController {
     public ResponseEntity<User> me(@AuthenticationPrincipal User user) {
         // Spring automatically injects the authenticated user
         return ResponseEntity.ok(user);
+    }
+
+    // Admin Endpoint Related - Uncomment admin registration endpoint for initial setup
+    // @PostMapping("/register-admin")
+    // public ResponseEntity<?> registerAdmin(@RequestBody RegisterDTO dto) {
+    //     // Hash password
+    //     String hashedPassword = passwordEncoder.encode(dto.getPassword());
+        
+    //     // Create admin user
+    //     AdminUser admin = new AdminUser();
+    //     admin.setEmail(dto.getEmail());
+    //     admin.setPasswordHash(hashedPassword);
+    //     admin.setName(dto.getName());
+        
+    //     adminUserRepository.save(admin);
+        
+    //     return ResponseEntity.ok("Admin created successfully");
+    // }
+
+    @PostMapping("/admin/login")
+    public ResponseEntity<LoginResponse> adminLogin(@Valid @RequestBody LoginRequest request) {
+        return ResponseEntity.ok(authService.adminLogin(request));
     }
 }

@@ -1,5 +1,7 @@
 package com.elwaseet.backend.service;
 
+import com.elwaseet.backend.entity.Dispute;
+import com.elwaseet.backend.entity.User;
 import com.resend.Resend;
 import com.resend.core.exception.ResendException;
 import com.resend.services.emails.model.CreateEmailOptions;
@@ -461,4 +463,402 @@ public class EmailService {
         </html>
         """.formatted(providerName, jobTitle, budgetMin, budgetMax, location);
 }
+
+    /**
+     * Send email when dispute is resolved
+     * Notifies both customer and provider about the admin's decision
+     */
+    @Async
+    public void sendDisputeResolvedEmail(
+            String providerEmail, String providerName,
+            String customerEmail, String customerName,
+            String jobTitle,
+            Dispute.DisputeResolution resolution,
+            BigDecimal providerAmount,
+            BigDecimal customerAmount,
+            String adminNotes) {
+
+        // Email to Provider
+        String providerSubject = "Dispute Resolved - " + jobTitle;
+        String providerHtml = buildDisputeResolvedProviderEmail(
+            providerName, jobTitle, resolution, providerAmount, adminNotes
+        );
+        
+        CreateEmailOptions providerRequest = CreateEmailOptions.builder()
+                .from(from)
+                .to(providerEmail)
+                .subject(providerSubject)
+                .html(providerHtml)
+                .build();
+
+        try {
+            CreateEmailResponse response = resend.emails().send(providerRequest);
+            log.info("Dispute resolved email sent to provider {} with ID: {}", providerEmail, response.getId());
+        } catch (ResendException e) {
+            log.error("Failed to send dispute resolved email to provider {}: {}", providerEmail, e.getMessage());
+        }
+
+        // Email to Customer
+        String customerSubject = "Dispute Resolved - " + jobTitle;
+        String customerHtml = buildDisputeResolvedCustomerEmail(
+            customerName, jobTitle, resolution, customerAmount, adminNotes
+        );
+        
+        CreateEmailOptions customerRequest = CreateEmailOptions.builder()
+                .from(from)
+                .to(customerEmail)
+                .subject(customerSubject)
+                .html(customerHtml)
+                .build();
+
+        try {
+            CreateEmailResponse response = resend.emails().send(customerRequest);
+            log.info("Dispute resolved email sent to customer {} with ID: {}", customerEmail, response.getId());
+        } catch (ResendException e) {
+            log.error("Failed to send dispute resolved email to customer {}: {}", customerEmail, e.getMessage());
+        }
+    }
+
+    /**
+     * Send email for FIX_REQUIRED resolution
+     */
+    @Async
+    public void sendDisputeFixRequiredEmail(
+            String providerEmail, String providerName,
+            String customerEmail, String customerName,
+            String jobTitle,
+            String adminNotes) {
+
+        // Email to Provider
+        String providerHtml = buildFixRequiredProviderEmail(providerName, jobTitle, adminNotes);
+        CreateEmailOptions providerRequest = CreateEmailOptions.builder()
+                .from(from)
+                .to(providerEmail)
+                .subject("Action Required: Fix Work - " + jobTitle)
+                .html(providerHtml)
+                .build();
+
+        try {
+            resend.emails().send(providerRequest);
+            log.info("Fix required email sent to provider {}", providerEmail);
+        } catch (ResendException e) {
+            log.error("Failed to send fix required email to provider: {}", e.getMessage());
+        }
+
+        // Email to Customer
+        String customerHtml = buildFixRequiredCustomerEmail(customerName, jobTitle, adminNotes);
+        CreateEmailOptions customerRequest = CreateEmailOptions.builder()
+                .from(from)
+                .to(customerEmail)
+                .subject("Dispute Update: Provider Will Fix Work - " + jobTitle)
+                .html(customerHtml)
+                .build();
+
+        try {
+            resend.emails().send(customerRequest);
+            log.info("Fix required email sent to customer {}", customerEmail);
+        } catch (ResendException e) {
+            log.error("Failed to send fix required email to customer: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Notify admin when new appeal is submitted
+     */
+    @Async
+    public void sendNewAppealNotificationToAdmin(Dispute dispute, User appealedBy, String appealReason) {
+        String adminEmail = "admin@elwaseet.com"; 
+        
+        String html = buildNewAppealAdminEmail(dispute, appealedBy, appealReason);
+        CreateEmailOptions request = CreateEmailOptions.builder()
+                .from(from)
+                .to(adminEmail)
+                .subject("New Dispute Appeal - " + dispute.getJob().getTitle())
+                .html(html)
+                .build();
+
+        try {
+            resend.emails().send(request);
+            log.info("New appeal notification sent to admin");
+        } catch (ResendException e) {
+            log.error("Failed to send appeal notification to admin: {}", e.getMessage());
+        }
+    }
+
+    // ============================================================================
+    // HTML EMAIL TEMPLATES
+    // ============================================================================
+
+    private String buildDisputeResolvedProviderEmail(
+            String providerName, String jobTitle, 
+            Dispute.DisputeResolution resolution, BigDecimal amount, String adminNotes) {
+        
+        String outcomeText = switch (resolution) {
+            case PROVIDER_FULL -> "You will receive the full payment of $" + amount;
+            case CUSTOMER_FULL -> "The customer will receive a full refund. No payment to you.";
+            case SPLIT -> "You will receive a partial payment of $" + amount;
+            case FIX_REQUIRED -> "You must fix the work to receive payment.";
+        };
+
+        return """
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background-color: #2196F3; color: white; padding: 20px; text-align: center; }
+                        .content { background-color: #f9f9f9; padding: 30px; border-radius: 5px; margin-top: 20px; }
+                        .outcome { background-color: #E3F2FD; padding: 15px; border-radius: 5px; margin: 15px 0; }
+                        .admin-notes { background-color: #FFF9C4; padding: 15px; border-radius: 5px; margin: 15px 0; }
+                        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>Elwaseet</h1>
+                            <p>Dispute Resolved</p>
+                        </div>
+                        <div class="content">
+                            <h2>Hello, %s</h2>
+                            <p>The dispute for job "<strong>%s</strong>" has been resolved by our admin team.</p>
+                            
+                            <div class="outcome">
+                                <h3>Resolution: %s</h3>
+                                <p>%s</p>
+                            </div>
+                            
+                            <div class="admin-notes">
+                                <h3>Admin's Notes:</h3>
+                                <p>%s</p>
+                            </div>
+                            
+                            <p><strong>What happens next:</strong></p>
+                            <p>You have 3 days to appeal this decision if you disagree. After that, the decision is final.</p>
+                            
+                            <p>Thank you for your patience.</p>
+                        </div>
+                        <div class="footer">
+                            <p>© 2025 Elwaseet. All rights reserved.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                """
+                .formatted(providerName, jobTitle, resolution, outcomeText, adminNotes != null ? adminNotes : "No additional notes");
+    }
+
+    private String buildDisputeResolvedCustomerEmail(
+            String customerName, String jobTitle, 
+            Dispute.DisputeResolution resolution, BigDecimal amount, String adminNotes) {
+        
+        String outcomeText = switch (resolution) {
+            case PROVIDER_FULL -> "The provider will receive the full payment. No refund to you.";
+            case CUSTOMER_FULL -> "You will receive a full refund of $" + amount;
+            case SPLIT -> "You will receive a partial refund of $" + amount;
+            case FIX_REQUIRED -> "The provider must fix the work before payment is released.";
+        };
+
+        return """
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background-color: #2196F3; color: white; padding: 20px; text-align: center; }
+                        .content { background-color: #f9f9f9; padding: 30px; border-radius: 5px; margin-top: 20px; }
+                        .outcome { background-color: #E3F2FD; padding: 15px; border-radius: 5px; margin: 15px 0; }
+                        .admin-notes { background-color: #FFF9C4; padding: 15px; border-radius: 5px; margin: 15px 0; }
+                        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>Elwaseet</h1>
+                            <p>Dispute Resolved</p>
+                        </div>
+                        <div class="content">
+                            <h2>Hello, %s</h2>
+                            <p>The dispute for job "<strong>%s</strong>" has been resolved by our admin team.</p>
+                            
+                            <div class="outcome">
+                                <h3>Resolution: %s</h3>
+                                <p>%s</p>
+                            </div>
+                            
+                            <div class="admin-notes">
+                                <h3>Admin's Notes:</h3>
+                                <p>%s</p>
+                            </div>
+                            
+                            <p><strong>What happens next:</strong></p>
+                            <p>You have 3 days to appeal this decision if you disagree. After that, the decision is final.</p>
+                            
+                            <p>Thank you for using Elwaseet.</p>
+                        </div>
+                        <div class="footer">
+                            <p>© 2025 Elwaseet. All rights reserved.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                """
+                .formatted(customerName, jobTitle, resolution, outcomeText, adminNotes != null ? adminNotes : "No additional notes");
+    }
+
+    private String buildFixRequiredProviderEmail(String providerName, String jobTitle, String adminNotes) {
+        return """
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background-color: #FF9800; color: white; padding: 20px; text-align: center; }
+                        .content { background-color: #f9f9f9; padding: 30px; border-radius: 5px; margin-top: 20px; }
+                        .action-required { background-color: #FFECB3; padding: 15px; border-radius: 5px; margin: 15px 0; }
+                        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>⚠️ Action Required</h1>
+                            <p>Dispute Resolution: Fix Required</p>
+                        </div>
+                        <div class="content">
+                            <h2>Hello, %s</h2>
+                            <p>The dispute for job "<strong>%s</strong>" has been reviewed by our admin team.</p>
+                            
+                            <div class="action-required">
+                                <h3>You Must Fix the Work</h3>
+                                <p>The admin has determined that the work needs to be corrected before payment can be released.</p>
+                                <p><strong>Admin's Notes:</strong></p>
+                                <p>%s</p>
+                            </div>
+                            
+                            <p><strong>What you need to do:</strong></p>
+                            <ul>
+                                <li>Review the admin's notes carefully</li>
+                                <li>Complete the required fixes</li>
+                                <li>Mark the job as complete again when done</li>
+                            </ul>
+                            
+                            <p>The payment is still being held in escrow and will be released once the customer confirms the work is satisfactory.</p>
+                        </div>
+                        <div class="footer">
+                            <p>© 2025 Elwaseet. All rights reserved.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                """
+                .formatted(providerName, jobTitle, adminNotes != null ? adminNotes : "No additional notes provided");
+    }
+
+    private String buildFixRequiredCustomerEmail(String customerName, String jobTitle, String adminNotes) {
+        return """
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background-color: #2196F3; color: white; padding: 20px; text-align: center; }
+                        .content { background-color: #f9f9f9; padding: 30px; border-radius: 5px; margin-top: 20px; }
+                        .info-box { background-color: #E3F2FD; padding: 15px; border-radius: 5px; margin: 15px 0; }
+                        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>Elwaseet</h1>
+                            <p>Dispute Update</p>
+                        </div>
+                        <div class="content">
+                            <h2>Hello, %s</h2>
+                            <p>The dispute for job "<strong>%s</strong>" has been reviewed.</p>
+                            
+                            <div class="info-box">
+                                <h3>Provider Will Fix the Work</h3>
+                                <p>The admin has reviewed your dispute and determined that the provider should complete additional work to meet the agreed-upon standards.</p>
+                                <p><strong>Admin's Notes:</strong></p>
+                                <p>%s</p>
+                            </div>
+                            
+                            <p><strong>What happens next:</strong></p>
+                            <ul>
+                                <li>The provider will complete the required fixes</li>
+                                <li>You'll be notified when they mark the work as complete</li>
+                                <li>You can then review and confirm the work</li>
+                                <li>Payment remains secure in escrow until you're satisfied</li>
+                            </ul>
+                            
+                            <p>Thank you for your patience.</p>
+                        </div>
+                        <div class="footer">
+                            <p>© 2025 Elwaseet. All rights reserved.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                """
+                .formatted(customerName, jobTitle, adminNotes != null ? adminNotes : "No additional notes provided");
+    }
+
+    private String buildNewAppealAdminEmail(Dispute dispute, User appealedBy, String appealReason) {
+        return """
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background-color: #F44336; color: white; padding: 20px; text-align: center; }
+                        .content { background-color: #f9f9f9; padding: 30px; border-radius: 5px; margin-top: 20px; }
+                        .appeal-box { background-color: #FFEBEE; padding: 15px; border-radius: 5px; margin: 15px 0; }
+                        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>🚨 New Dispute Appeal</h1>
+                            <p>Requires Admin Review</p>
+                        </div>
+                        <div class="content">
+                            <h2>New Appeal Submitted</h2>
+                            <p>A user has appealed a dispute resolution. Please review and take action.</p>
+                            
+                            <div class="appeal-box">
+                                <p><strong>Dispute ID:</strong> %d</p>
+                                <p><strong>Job:</strong> %s</p>
+                                <p><strong>Appealed By:</strong> %s (%s)</p>
+                                <p><strong>Original Resolution:</strong> %s</p>
+                                <p><strong>Appeal Reason:</strong></p>
+                                <p>%s</p>
+                            </div>
+                            
+                            <p>Please review this appeal in the admin dashboard and make a final decision.</p>
+                        </div>
+                        <div class="footer">
+                            <p>© 2025 Elwaseet Admin System</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                """
+                .formatted(
+                    dispute.getDisputeId(),
+                    dispute.getJob().getTitle(),
+                    appealedBy.getName(),
+                    appealedBy.getEmail(),
+                    dispute.getResolution(),
+                    appealReason
+                );
+    }
 }

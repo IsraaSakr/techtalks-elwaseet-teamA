@@ -97,7 +97,7 @@
 						"login"
 					]
 				},
-				"description": "StartFragment\n\nPOST [http://localhost:8080/auth/login](http://localhost:8080/auth/login)\n\nraw → JSON\n\n{  \n\"email\": \"[test@gmail.com](https://mailto:test@gmail.com)\",  \n\"password\": \"Test1234!\"  \n}\n\n**Expected Response:**\n\n- Status: **200 OK**\n    \n- Body:\n    \n\n{  \n\"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1Iiwicm9sZSI6IkhZQlJJRF9QUk9WSUR...\",  \n\"user\": {  \n\"userId\": 5,  \n\"email\": \"[test@gmail.com](https://mailto:test@gmail.com)\",  \n\"name\": \"Test User\",  \n\"phone\": \"70123456\",  \n\"location\": \"BEIRUT\",  \n\"accountType\": \"HYBRID_PROVIDER\",  \n\"profilePhotoUrl\": null,  \n\"simulatedBalance\": 0.00,  \n\"isEmailVerified\": true,  \n\"isActive\": true,  \n\"isBanned\": false,  \n\"createdAt\": \"2025-12-29T13:26:54.31978\",  \n\"updatedAt\": \"2025-12-29T13:35:35.0093261\",  \n\"lastLogin\": \"2025-12-29T13:35:35.0063244\",  \n\"active\": true,  \n\"emailVerified\": true,  \n\"banned\": false,  \n\"customer\": false,  \n\"provider\": true  \n}  \n}\n\n**What happened?**\n\n- Backend verified your credentials\n    \n- Generated a JWT token (valid for 7 days)\n    \n- Returned your user info\n    \n\n**If it fails:**\n\n- 401 Unauthorized → Wrong password\n    \n- 403 Forbidden → Email not verified\n    \n- 404 Not Found → User doesn't exist\n    \n\n---\n\n**Try to Login Before Email Verification**\n\n**Expected Response:**\n\n- Status: **403 Forbidden**\n    \n- Body: \"Email not verified\"\n    \n\n---\n\n**Try to Login with Wrong Password**\n\n**Expected Response:**\n\n- Status: **401 Unauthorized**\n    \n- Body: \"Invalid credentials\""
+				"description": "POST [http://localhost:8080/auth/login](http://localhost:8080/auth/login)\n\nraw → JSON\n\n{  \n\"email\": \"[test@gmail.com](https://mailto:test@gmail.com)\",  \n\"password\": \"Test1234!\"  \n}\n\n**Expected Response:**\n\n- Status: **200 OK**\n    \n- Body:\n    \n\n{  \n\"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1Iiwicm9sZSI6IkhZQlJJRF9QUk9WSUR...\",  \n\"user\": {  \n\"userId\": 5,  \n\"email\": \"[test@gmail.com](https://mailto:test@gmail.com)\",  \n\"name\": \"Test User\",  \n\"phone\": \"70123456\",  \n\"location\": \"BEIRUT\",  \n\"accountType\": \"HYBRID_PROVIDER\",  \n\"profilePhotoUrl\": null,  \n\"simulatedBalance\": 0.00,  \n\"isEmailVerified\": true,  \n\"isActive\": true,  \n\"isBanned\": false,  \n\"createdAt\": \"2025-12-29T13:26:54.31978\",  \n\"updatedAt\": \"2025-12-29T13:35:35.0093261\",  \n\"lastLogin\": \"2025-12-29T13:35:35.0063244\",  \n\"active\": true,  \n\"emailVerified\": true,  \n\"banned\": false,  \n\"customer\": false,  \n\"provider\": true  \n}  \n}\n\n**What happened?**\n\n- Backend verified your credentials\n    \n- Generated a JWT token (valid for 7 days)\n    \n- Returned your user info\n    \n\n**If it fails:**\n\n- 401 Unauthorized → Wrong password\n    \n- 403 Forbidden → Email not verified\n    \n- 404 Not Found → User doesn't exist\n    \n\n---\n\n**Try to Login Before Email Verification**\n\n**Expected Response:**\n\n- Status: **403 Forbidden**\n    \n- Body: \"Email not verified\"\n    \n\n---\n\n**Try to Login with Wrong Password**\n\n**Expected Response:**\n\n- Status: **401 Unauthorized**\n    \n- Body: \"Invalid credentials\""
 			},
 			"response": []
 		},
@@ -158,6 +158,67 @@
 						"resend-otp"
 					]
 				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register Admin",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"admin@elwaseet.com\",\r\n  \"password\": \"SecurePassword123!\",\r\n  \"name\": \"Admin User\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/auth/register-admin",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"register-admin"
+					]
+				},
+				"description": "Use this endpoint to register endpoint, this is commented out in vs code\n\nPOST [http://localhost:8080/api/auth/register-admin](http://localhost:8080/api/auth/register-admin)  \nContent-Type: application/json\n\n{  \n\"email\": \"[admin@elwaseet.com](https://mailto:admin@elwaseet.com)\",  \n\"password\": \"SecurePassword123!\",  \n\"name\": \"Admin User\"  \n}\n\n**Expected Output: 200 OK**\n\n---\n\nWhat you should do in your IDE step by step:\n\n1. **AuthController:** search \"// Admin Endpoint Related\" uncomment related imports, variables, endpoint, function.\n    \n2. **AdminUser:** search \"// Admin Endpoint Related\" and make that constructor public.\n    \n3. then run this endpoint to ceate your admin user, don't forget to comment them out again after you finish."
+			},
+			"response": []
+		},
+		{
+			"name": "Login Admin",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"admin@elwaseet.com\",\r\n  \"password\": \"SecurePassword123!\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/auth/admin/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"admin",
+						"login"
+					]
+				},
+				"description": "POST [http://localhost:8080/auth/admin/login](http://localhost:8080/auth/login)\n\nraw → JSON\n\n{\n\n\"email\": \"[admin@elwaseet.com](https://mailto:admin@elwaseet.com)\",\n\n\"password\": \"SecurePassword123!\"\n\n}\n\n**Expected Response:**\n\n- Status: **200 OK**\n    \n\n{  \n\"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlbHdhc2VldC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Njc1NTQ3MTUsImV4cCI6MTc2ODE1OTUxNX0.N8h0EpKd9PmK95NfKIWlKlXlblHLLjOB4a8suYj-pOw\",  \n\"user\": null  \n}"
 			},
 			"response": []
 		}
