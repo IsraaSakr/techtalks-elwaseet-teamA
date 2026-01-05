@@ -1,0 +1,266 @@
+{
+	"info": {
+		"_postman_id": "a414e360-231b-487f-9033-9a98476724e2",
+		"name": "ElWaseet Auth API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50753645"
+	},
+	"item": [
+		{
+			"name": "Register",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"test@gmail.com\",\r\n  \"password\": \"Test1234!\",\r\n  \"name\": \"Test User\",\r\n  \"phone\": \"70123456\",\r\n  \"location\": \"BEIRUT\",\r\n  \"accountType\": \"HYBRID_PROVIDER\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"register"
+					]
+				},
+				"description": "POST http://localhost:8080/auth/register\n\nraw JSON:\n\n{  \n\"email\": \"[test@gmail.com](https://mailto:test@gmail.com)\",  \n\"password\": \"Test1234!\",  \n\"name\": \"Test User\",  \n\"phone\": \"70123456\",  \n\"location\": \"BEIRUT\",  \n\"accountType\": \"CUSTOMER\"  \n}\n\n**Expected Response:**\n\n- Status: **200 OK**\n    \n- Body: \"User registered successfully\"\n    \n\n**What happened?**\n\n- User created in database\n    \n- OTP sent to email (check your test email inbox)\n    \n- User is NOT verified yet\n    \n\n**If it fails:**\n\n- 409 Conflict → Email already exists (use different email)\n    \n- 400 Bad Request → Check JSON format"
+			},
+			"response": []
+		},
+		{
+			"name": "Verify OTP",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"test@gmail.com\",\r\n  \"code\": \"985201\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/auth/verify-otp",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"verify-otp"
+					]
+				},
+				"description": "POST: http://localhost:8080/auth/verify-otp\n\nraw JSON\n\nreplace CODE with actual OTP from email\n\n{  \n\"email\": \"[test@gmail.com](https://mailto:test@gmail.com)\",  \n\"code\": \"123456\"  \n}\n\n**Expected Response:**\n\n- Status: **200 OK**\n    \n- Body: \"Email verified successfully\"\n    \n\n**What happened?**\n\n- User account is now ACTIVE\n    \n- Can now login\n    \n\n**If it fails:**\n\n- 404 Not Found → Wrong email\n    \n- 400 Bad Request → Invalid/expired OTP\n    \n\nEndFragment"
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"test@gmail.com\",\r\n  \"password\": \"Test1234!\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"login"
+					]
+				},
+				"description": "POST [http://localhost:8080/auth/login](http://localhost:8080/auth/login)\n\nraw → JSON\n\n{  \n\"email\": \"[test@gmail.com](https://mailto:test@gmail.com)\",  \n\"password\": \"Test1234!\"  \n}\n\n**Expected Response:**\n\n- Status: **200 OK**\n    \n- Body:\n    \n\n{  \n\"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1Iiwicm9sZSI6IkhZQlJJRF9QUk9WSUR...\",  \n\"user\": {  \n\"userId\": 5,  \n\"email\": \"[test@gmail.com](https://mailto:test@gmail.com)\",  \n\"name\": \"Test User\",  \n\"phone\": \"70123456\",  \n\"location\": \"BEIRUT\",  \n\"accountType\": \"HYBRID_PROVIDER\",  \n\"profilePhotoUrl\": null,  \n\"simulatedBalance\": 0.00,  \n\"isEmailVerified\": true,  \n\"isActive\": true,  \n\"isBanned\": false,  \n\"createdAt\": \"2025-12-29T13:26:54.31978\",  \n\"updatedAt\": \"2025-12-29T13:35:35.0093261\",  \n\"lastLogin\": \"2025-12-29T13:35:35.0063244\",  \n\"active\": true,  \n\"emailVerified\": true,  \n\"banned\": false,  \n\"customer\": false,  \n\"provider\": true  \n}  \n}\n\n**What happened?**\n\n- Backend verified your credentials\n    \n- Generated a JWT token (valid for 7 days)\n    \n- Returned your user info\n    \n\n**If it fails:**\n\n- 401 Unauthorized → Wrong password\n    \n- 403 Forbidden → Email not verified\n    \n- 404 Not Found → User doesn't exist\n    \n\n---\n\n**Try to Login Before Email Verification**\n\n**Expected Response:**\n\n- Status: **403 Forbidden**\n    \n- Body: \"Email not verified\"\n    \n\n---\n\n**Try to Login with Wrong Password**\n\n**Expected Response:**\n\n- Status: **401 Unauthorized**\n    \n- Body: \"Invalid credentials\""
+			},
+			"response": []
+		},
+		{
+			"name": "Get Profile",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1Iiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAwODEzNSwiZXhwIjoxNzY3NjEyOTM1fQ.8oooH7F4Laf47Il6kgszkmmDZV4YxDDLsu-VYJmSsWc",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/auth/me",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"me"
+					]
+				},
+				"description": "GET [http://localhost:8080/auth/me](http://localhost:8080/auth/me)\n\nAuthorization -> Bearer Token -> **Paste the token**\n\n**Expected Response:**\n\n- Status: **200 OK**\n    \n- Body: Your user object (same as login response)\n    \n\n{  \n\"userId\": 5,  \n\"email\": \"[test@gmail.com](https://mailto:test@gmail.com)\",  \n\"name\": \"Test User\",  \n\"phone\": \"70123456\",  \n\"location\": \"BEIRUT\",  \n\"accountType\": \"HYBRID_PROVIDER\",  \n\"profilePhotoUrl\": null,  \n\"simulatedBalance\": 0.00,  \n\"isEmailVerified\": true,  \n\"isActive\": true,  \n\"isBanned\": false,  \n\"createdAt\": \"2025-12-29T13:26:54.31978\",  \n\"updatedAt\": \"2025-12-29T13:35:35.009326\",  \n\"lastLogin\": \"2025-12-29T13:35:35.006324\",  \n\"active\": true,  \n\"emailVerified\": true,  \n\"banned\": false,  \n\"customer\": false,  \n\"provider\": true  \n}\n\n**What happened?**\n\n- Backend verified your JWT token\n    \n- Extracted user info from token\n    \n- Returned your profile\n    \n\n**If it fails:**\n\n- 401 Unauthorized → Token missing or invalid\n    \n- Make sure you selected \"Bearer Token\" in Authorization tab\n    \n- Make sure token is pasted correctly (no extra spaces)\n    \n\n---\n\n**Try to Access /auth/me WITHOUT Token**\n\n**Expected Response:**\n\n- Status: **401 Unauthorized**"
+			},
+			"response": []
+		},
+		{
+			"name": "Resend OTP",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"test@gmail.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/auth/resend-otp",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"resend-otp"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register Admin",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"admin@elwaseet.com\",\r\n  \"password\": \"SecurePassword123!\",\r\n  \"name\": \"Admin User\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/auth/register-admin",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"register-admin"
+					]
+				},
+				"description": "Use this endpoint to register endpoint, this is commented out in vs code\n\nPOST [http://localhost:8080/api/auth/register-admin](http://localhost:8080/api/auth/register-admin)  \nContent-Type: application/json\n\n{  \n\"email\": \"[admin@elwaseet.com](https://mailto:admin@elwaseet.com)\",  \n\"password\": \"SecurePassword123!\",  \n\"name\": \"Admin User\"  \n}\n\n**Expected Output: 200 OK**\n\n---\n\nWhat you should do in your IDE step by step:\n\n1. **AuthController:** search \"// Admin Endpoint Related\" uncomment related imports, variables, endpoint, function.\n    \n2. **AdminUser:** search \"// Admin Endpoint Related\" and make that constructor public.\n    \n3. then run this endpoint to ceate your admin user, don't forget to comment them out again after you finish."
+			},
+			"response": []
+		},
+		{
+			"name": "Login Admin",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"admin@elwaseet.com\",\r\n  \"password\": \"SecurePassword123!\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/auth/admin/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"admin",
+						"login"
+					]
+				},
+				"description": "POST [http://localhost:8080/auth/admin/login](http://localhost:8080/auth/login)\n\nraw → JSON\n\n{\n\n\"email\": \"[admin@elwaseet.com](https://mailto:admin@elwaseet.com)\",\n\n\"password\": \"SecurePassword123!\"\n\n}\n\n**Expected Response:**\n\n- Status: **200 OK**\n    \n\n{  \n\"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlbHdhc2VldC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Njc1NTQ3MTUsImV4cCI6MTc2ODE1OTUxNX0.N8h0EpKd9PmK95NfKIWlKlXlblHLLjOB4a8suYj-pOw\",  \n\"user\": null  \n}"
+			},
+			"response": []
+		},
+		{
+			"name": "Logout",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzU3ODcwMiwiZXhwIjoxNzY4MTgzNTAyfQ.U_8pOFxb3y_nQcS7YZwxSwsqzD5R8PB3qr3ZTn8PLVA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/auth/logout",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"logout"
+					]
+				},
+				"description": "POST http://localhost:8080/auth/logout\n\nAuthorization: Bearer Token (the user that wants to logout)\n\n**Expected Response:**"
+			},
+			"response": []
+		}
+	]
+}

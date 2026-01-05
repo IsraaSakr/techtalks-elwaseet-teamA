@@ -48,6 +48,7 @@ public class Transaction {
         IN_PROGRESS,
         COMPLETED,
         CONFIRMED,
+        PAID,
         DISPUTED,
         RESOLVED
     }
@@ -87,7 +88,7 @@ public class Transaction {
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, columnDefinition = "transaction_status")
+    @Column(name = "status", nullable = false)
     private TransactionStatus status = TransactionStatus.COMMITTED;
 
     @Column(name = "committed_at", nullable = false, updatable = false)
@@ -231,7 +232,9 @@ public class Transaction {
     public LocalDateTime getCommittedAt() {
         return committedAt;
     }
-
+    public void setCommittedAt(LocalDateTime committedAt) {
+    this.committedAt = committedAt;
+}
     public LocalDateTime getInProgressAt() {
         return inProgressAt;
     }
@@ -338,8 +341,8 @@ public class Transaction {
     public void moveToCompleted() {
         this.status = TransactionStatus.COMPLETED;
         this.completedAt = LocalDateTime.now();
-        // Schedule auto-confirm for 48 hours later
-        this.autoConfirmScheduledAt = this.completedAt.plusHours(48);
+        // Schedule auto-confirm for 24 hours later
+        this.autoConfirmScheduledAt = this.completedAt.plusHours(24);
     }
 
     public void moveToConfirmed() {

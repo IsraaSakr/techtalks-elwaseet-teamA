@@ -1,0 +1,113 @@
+{
+	"info": {
+		"_postman_id": "9a5c3b13-d280-4bfa-bd03-9891e01b3442",
+		"name": "ElWaseet Accept Application",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50753645"
+	},
+	"item": [
+		{
+			"name": "Accept Application",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NjM5NzA2NywiZXhwIjoxNzY3MDAxODY3fQ.WbRZJmaUKJ-FLtgfRqgxICdO2CJUkaM4Y1yGblTNmYw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/jobs/9/accept/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"jobs",
+						"9",
+						"accept",
+						"2"
+					]
+				},
+				"description": "POST [http://localhost:8080/api/jobs/{jobId}/accept/{providerId}](http://localhost:8080/jobs/{jobId}/accept/{providerId})\n\nHeaders:  \nAuthorization: Bearer {{customer_token}}\n\nExpected Response: 200 OK  \n{  \n\"applicationId\": 123,  \n\"jobId\": 1,  \n\"jobTitle\": \"Fix Kitchen Sink\",  \n\"provider\": {  \n\"userId\": 5,  \n\"name\": \"John Provider\",  \n\"email\": \"[provider@example.com](https://mailto:provider@example.com)\",  \n\"phone\": \"+96170123456\",  \n\"location\": {...},  \n\"profilePhotoUrl\": \"...\",  \n\"averageRating\": 4.5,  \n\"totalReviews\": 10,  \n\"totalJobsCompleted\": 15,  \n\"isVerified\": true  \n},  \n\"quotedPrice\": 85.00,  \n\"availability\": \"Available this weekend\",  \n\"message\": \"I have 10 years experience with plumbing\",  \n\"status\": \"ACCEPTED\",  \n\"appliedAt\": \"2025-12-20T10:30:00\",  \n\"updatedAt\": \"2025-12-21T14:25:00\",  \n\"photoUrls\": \\[\"url1.jpg\", \"url2.jpg\"\\]  \n}\n\n---\n\nPOST [http://localhost:8080/api/jobs/1/accept/999](http://localhost:8080/jobs/1/accept/999)\n\nHeaders:  \nAuthorization: Bearer {{customer_token}}\n\nExpected Response: 400 Bad Request  \n{  \n\"error\": \"Bad Request\",  \n\"message\": \"Application not found for job 1 and provider 999\",  \n\"timestamp\": \"2025-12-21T14:25:00\"  \n}\n\n---\n\nPOST [http://localhost:8080/api/jobs/1/accept/5](http://localhost:8080/jobs/1/accept/5)\n\nHeaders:  \nAuthorization: Bearer {{different_customer_token}}\n\nExpected Response: 400 Bad Request  \n{  \n\"error\": \"Bad Request\",  \n\"message\": \"Only the job owner can accept applications. You do not own job ID 1\",  \n\"timestamp\": \"2025-12-21T14:25:00\"  \n}\n\n---\n\nPOST [http://localhost:8080/api/jobs/1/accept/7](http://localhost:8080/jobs/1/accept/7)\n\nHeaders:  \nAuthorization: Bearer {{customer_token}}\n\nExpected Response: 400 Bad Request  \n{  \n\"error\": \"Bad Request\",  \n\"message\": \"Cannot accept application. Job status is IN_REVIEW but must be OPEN. Job ID: 1\",  \n\"timestamp\": \"2025-12-21T14:25:00\"  \n}\n\n---\n\nPOST [http://localhost:8080/api/jobs/1/accept/5](http://localhost:8080/jobs/1/accept/5)\n\nHeaders:  \nAuthorization: Bearer {{provider_token}}\n\nExpected Response: 403 Forbidden  \n(If you have role-based authorization)  \nOR  \n400 Bad Request with \"Only the job owner can accept applications\"\n\n---"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Applications of a Job",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzY2Mzk3Mzg4LCJleHAiOjE3NjcwMDIxODh9.O0GTCqSfuunaNjiQr4b4D6Q52xV4UkJAOF7gcKIFzQk",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/jobs/5/applications",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"jobs",
+						"5",
+						"applications"
+					]
+				},
+				"description": "GET [http://localhost:8080/api/jobs/{jobId}/applications](http://localhost:8080/jobs/1/applications)\n\nHeaders:  \nAuthorization: Bearer {{customer_token}}\n\nExpected Response: 200 OK  \n\\[  \n{  \n\"applicationId\": 123,  \n\"providerId\": 5,  \n\"status\": \"ACCEPTED\",  \n...  \n},  \n{  \n\"applicationId\": 124,  \n\"providerId\": 7,  \n\"status\": \"REJECTED\", // ← Auto-rejected  \n...  \n}  \n\\]\n\n---"
+			},
+			"response": []
+		},
+		{
+			"name": "Get a Job",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE2MSwiZXhwIjoxNzY3NjI2OTYxfQ.QnGz6Oq9yR8CEYsQHV5c4MasX0bXBiT4bYOB_POrpmg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/jobs/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"jobs",
+						"1"
+					]
+				},
+				"description": "GET http://localhost:8080/api/jobs/{jobId}  \n  \nHeaders:  \nAuthorization: Bearer {{customer_token}}  \n  \nExpected Response: 200 OK  \n{  \n\"jobId\": 1,  \n\"title\": \"Fix Kitchen Sink\",  \n\"status\": \"IN_REVIEW\", // ← Changed from OPEN  \n\"acceptedApplication\": {  \n\"applicationId\": 123,  \n...  \n},  \n\"startedAt\": \"2025-12-21T14:25:00\",  \n...  \n}"
+			},
+			"response": []
+		}
+	]
+}

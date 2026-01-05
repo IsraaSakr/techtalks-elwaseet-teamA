@@ -8,8 +8,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
+
+
 @Entity
 @Table(name = "jobs")
+
 public class Job {
 
     /**
@@ -38,9 +41,10 @@ public class Job {
         HIGH
     }
 
-    // Schema: CREATE TYPE job_status AS ENUM ('OPEN', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED');
+    // Schema: CREATE TYPE job_status AS ENUM ('OPEN', 'IN_REVIEW', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED');
     public enum JobStatus {
         OPEN,
+        IN_REVIEW,
         IN_PROGRESS,
         COMPLETED,
         CANCELLED
@@ -77,7 +81,7 @@ public class Job {
     @Column(name = "budget_max", nullable = false, precision = 10, scale = 2)
     private BigDecimal budgetMax;
 
-    @NotBlank(message = "Location is required")
+    @NotNull(message = "Location is required")
     @Enumerated(EnumType.STRING)
     @Column(name = "location", nullable = false, length = 20)
     private Location location;
@@ -420,5 +424,9 @@ public class Job {
                 ", status=" + status +
                 ", postedAt=" + postedAt +
                 '}';
+    }
+
+    public void setCategory(ServiceCategory category) {
+        throw new UnsupportedOperationException("Unimplemented method 'setCategory'");
     }
 }

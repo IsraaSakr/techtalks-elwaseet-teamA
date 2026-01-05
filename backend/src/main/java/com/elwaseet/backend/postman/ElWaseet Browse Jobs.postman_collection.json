@@ -1,0 +1,328 @@
+{
+	"info": {
+		"_postman_id": "95e8bb93-b556-4806-9b49-a3c5d863e47a",
+		"name": "ElWaseet Browse Jobs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50753645"
+	},
+	"item": [
+		{
+			"name": "Filter by urgency",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzY3MDIyMjM5LCJleHAiOjE3Njc2MjcwMzl9.KqJ6AMP-FzflbAv641tXWKnssBs6FXkS3VMmLArSqy8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/jobs?urgency=HIGH",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"jobs"
+					],
+					"query": [
+						{
+							"key": "urgency",
+							"value": "HIGH"
+						}
+					]
+				},
+				"description": "GET [http://localhost:8080/api/jobs?urgency=URGENT](http://localhost:8080/api/jobs?urgency=URGENT)  \n**Headers:** Authorization: Bearer {{jwt_token}}\n\n**Expected: 200 OK**  \nResponse should show:\n\n- Only jobs with urgency = HIGH"
+			},
+			"response": []
+		},
+		{
+			"name": "Get all available jobs (No Filters)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzY3MDIyMjM5LCJleHAiOjE3Njc2MjcwMzl9.KqJ6AMP-FzflbAv641tXWKnssBs6FXkS3VMmLArSqy8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/jobs",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"jobs"
+					]
+				},
+				"description": "GET http://localhost:8080/api/jobs  \n**Headers:** Authorization: Bearer {{jwt_token}} (botth users)  \n  \n**Expected: 200 OK**  \nResponse should show:  \n\\- Paginated list of jobs  \n\\- Each job has: jobId, title, description, budget, location, urgency, status (OPEN)  \n\\- totalElements, totalPages, number, size fields present"
+			},
+			"response": []
+		},
+		{
+			"name": "Pagination",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE2MSwiZXhwIjoxNzY3NjI2OTYxfQ.QnGz6Oq9yR8CEYsQHV5c4MasX0bXBiT4bYOB_POrpmg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/jobs?page=0&size=5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"jobs"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "5"
+						}
+					]
+				},
+				"description": "GET [http://localhost:8080/api/jobs?page=0&amp;size=5](http://localhost:8080/api/jobs?page=0&size=5)  \n**Headers:** Authorization: Bearer {{jwt_token}}\n\n**Expected: 200 OK**  \nResponse should show:\n\n- Maximum 5 jobs in content array\n    \n- size = 5\n    \n- number = 0 (first page)"
+			},
+			"response": []
+		},
+		{
+			"name": "Sort by date (newest first)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE2MSwiZXhwIjoxNzY3NjI2OTYxfQ.QnGz6Oq9yR8CEYsQHV5c4MasX0bXBiT4bYOB_POrpmg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/jobs?sortBy=postedAt&sortDir=desc",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"jobs"
+					],
+					"query": [
+						{
+							"key": "sortBy",
+							"value": "postedAt"
+						},
+						{
+							"key": "sortDir",
+							"value": "desc"
+						}
+					]
+				},
+				"description": "GET [http://localhost:8080/api/jobs?sortBy=postedAt&amp;sortDir=desc](http://localhost:8080/api/jobs?sortBy=postedAt&sortDir=desc)  \n**Headers:** Authorization: Bearer {{jwt_token}}\n\n**Expected: 200 OK**  \nResponse should show:\n\n- Jobs sorted by postedAt in descending order\n    \n- Newest jobs appear first"
+			},
+			"response": []
+		},
+		{
+			"name": "Multiple filters combined",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzY3MDIyMjM5LCJleHAiOjE3Njc2MjcwMzl9.KqJ6AMP-FzflbAv641tXWKnssBs6FXkS3VMmLArSqy8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/jobs?category=1&location=BEKAA&minBudget=50&maxBudget=200&urgency=HIGH",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"jobs"
+					],
+					"query": [
+						{
+							"key": "category",
+							"value": "1"
+						},
+						{
+							"key": "location",
+							"value": "BEKAA"
+						},
+						{
+							"key": "minBudget",
+							"value": "50"
+						},
+						{
+							"key": "maxBudget",
+							"value": "200"
+						},
+						{
+							"key": "urgency",
+							"value": "HIGH"
+						}
+					]
+				},
+				"description": "GET [http://localhost:8080/api/jobs?category=1&amp;location=BEKAA&amp;minBudget=50&amp;maxBudget=200&amp;urgency=HIGH](http://localhost:8080/api/jobs?category=1&location=Beirut&minBudget=50&maxBudget=200&urgency=URGENT)  \n**Headers:** Authorization: Bearer {{jwt_token}}\n\n**Expected: 200 OK**  \nResponse should show:\n\n- Jobs matching ALL filters\n    \n- category=1, location contains \"Beirut\", budget 50-200, urgency=URGENT"
+			},
+			"response": []
+		},
+		{
+			"name": "Filter by category",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzY3MDIyMjM5LCJleHAiOjE3Njc2MjcwMzl9.KqJ6AMP-FzflbAv641tXWKnssBs6FXkS3VMmLArSqy8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/jobs?category=1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"jobs"
+					],
+					"query": [
+						{
+							"key": "category",
+							"value": "1"
+						}
+					]
+				},
+				"description": "GET [http://localhost:8080/api/jobs?category=1](http://localhost:8080/api/jobs?category=1)  \n**Headers:** Authorization: Bearer {{jwt_token}} (both users)\n\n**Expected: 200 OK**  \nResponse should show:\n\n- Only jobs with categoryId = 1\n    \n- All jobs that have status = OPEN"
+			},
+			"response": []
+		},
+		{
+			"name": "Filter by budget range",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzY3MDIyMjM5LCJleHAiOjE3Njc2MjcwMzl9.KqJ6AMP-FzflbAv641tXWKnssBs6FXkS3VMmLArSqy8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/jobs?minBudget=50&maxBudget=200",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"jobs"
+					],
+					"query": [
+						{
+							"key": "minBudget",
+							"value": "50"
+						},
+						{
+							"key": "maxBudget",
+							"value": "200"
+						}
+					]
+				},
+				"description": "GET [http://localhost:8080/api/jobs?minBudget=50&amp;maxBudget=200](http://localhost:8080/api/jobs?minBudget=50&maxBudget=200)  \n**Headers:** Authorization: Bearer {{jwt_token}} (both users)\n\n**Expected: 200 OK**  \nResponse should show:  \n\\- Only jobs with budget between 50 and 200  \n\\- All budgets >= 50 and <= 200"
+			},
+			"response": []
+		},
+		{
+			"name": "Filter by location",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE2MSwiZXhwIjoxNzY3NjI2OTYxfQ.QnGz6Oq9yR8CEYsQHV5c4MasX0bXBiT4bYOB_POrpmg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/jobs?location=BEKAA",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"jobs"
+					],
+					"query": [
+						{
+							"key": "location",
+							"value": "BEKAA"
+						}
+					]
+				},
+				"description": "GET [http://localhost:8080/api/jobs?location=BEIRUT](http://localhost:8080/api/jobs?location=Beirut)  \n**Headers:** Authorization: Bearer {{jwt_token}} (both users)\n\n**Expected: 200 OK**  \nResponse should show:\n\n- Only jobs with location \"Beirut\"\n    \n- Location search is case-insensitive and needs exact match"
+			},
+			"response": []
+		}
+	]
+}

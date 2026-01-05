@@ -1,0 +1,319 @@
+{
+	"info": {
+		"_postman_id": "246a66f5-609e-4812-8a7a-20cab77c5e44",
+		"name": "ElWaseet Review System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50753645"
+	},
+	"item": [
+		{
+			"name": "Customer Reviews Provider",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzY2Mzk3Mzg4LCJleHAiOjE3NjcwMDIxODh9.O0GTCqSfuunaNjiQr4b4D6Q52xV4UkJAOF7gcKIFzQk",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"transactionId\": 1,\r\n  \"rating\": 5,\r\n  \"comment\": \"Great work! Very professional and on time.\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/reviews",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"reviews"
+					]
+				},
+				"description": "POST /api/reviews  \nAuthorization: customer\n\n{  \n\"transactionId\": 123,  \n\"rating\": 5,  \n\"comment\": \"Great work! Very professional and on time.\"  \n}\n\nExpected:\n\n- 200 OK\n    \n- isPublic: true\n    \n- editDeadline: 48 hours from now\n    \n- canEdit: true\n    \n- Provider's averageRating updated"
+			},
+			"response": []
+		},
+		{
+			"name": "Provider Reviews Customer",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NjM5NzA2NywiZXhwIjoxNzY3MDAxODY3fQ.WbRZJmaUKJ-FLtgfRqgxICdO2CJUkaM4Y1yGblTNmYw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"transactionId\": 1,\r\n  \"rating\": 4,\r\n  \"comment\": \"Customer was clear about requirements.\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/reviews",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"reviews"
+					]
+				},
+				"description": "POST /api/reviews  \nAuthorization:\n\n{  \n\"transactionId\": 123,  \n\"rating\": 4,  \n\"comment\": \"Customer was clear about requirements.\"  \n}\n\nExpected:\n\n- 200 OK\n    \n- isPublic: false\n    \n- editDeadline: 48 hours from now\n    \n\n---\n\nPOST /api/reviews  \nAuthorization:\n\n{  \n\"transactionId\": 123,  \n\"rating\": 3,  \n\"comment\": \"Changed my mind\"  \n}\n\nExpected:\n\n- 409 CONFLICT\n    \n- Error: \"You have already reviewed this transaction\""
+			},
+			"response": []
+		},
+		{
+			"name": "Updating a Review",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzY2Mzk3Mzg4LCJleHAiOjE3NjcwMDIxODh9.O0GTCqSfuunaNjiQr4b4D6Q52xV4UkJAOF7gcKIFzQk",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"rating\": 4,\r\n  \"comment\": \"Actually very good, fixing my review\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/reviews/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"reviews",
+						"1"
+					]
+				},
+				"description": "PUT /api/reviews/{reviewId}  \nAuthorization: review owner\n\n{  \n\"rating\": 4,  \n\"comment\": \"Actually very good, fixing my review\"  \n}\n\nExpected:\n\n- 200 OK\n    \n- isEdited: true\n    \n- rating updated\n    \n- comment updated\n    \n\n---\n\nPUT /api/reviews/{reviewId}  \nAuthorization: review owner\n\n{  \n}\n\nExpected:  \n\\- 400 BAD REQUEST  \n\\- Error: \"At least one field (rating or comment) must be provided for update\""
+			},
+			"response": []
+		},
+		{
+			"name": "View Provider Reviews",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE2MSwiZXhwIjoxNzY3NjI2OTYxfQ.QnGz6Oq9yR8CEYsQHV5c4MasX0bXBiT4bYOB_POrpmg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/reviews/provider/1?page=0&size=10&sortBy=createdAt&direction=DESC",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"reviews",
+						"provider",
+						"1"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						},
+						{
+							"key": "sortBy",
+							"value": "createdAt"
+						},
+						{
+							"key": "direction",
+							"value": "DESC"
+						}
+					]
+				},
+				"description": "GET /api/reviews/provider/{providerId}?page=0&size=10&sortBy=createdAt&direction=DESC\n\nAuthorization: both\n\nExpected:\n\n- 200 OK\n    \n- Page with only PUBLIC reviews (customer reviews)\n    \n- Provider's private review NOT included"
+			},
+			"response": []
+		},
+		{
+			"name": "View Transaction Review",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzY2Mzk3Mzg4LCJleHAiOjE3NjcwMDIxODh9.O0GTCqSfuunaNjiQr4b4D6Q52xV4UkJAOF7gcKIFzQk",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/reviews/transaction/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"reviews",
+						"transaction",
+						"1"
+					]
+				},
+				"description": "GET /api/reviews/transaction/{transactionId}  \nAuthorization: both\n\nExpected:\n\n- 200 OK\n    \n- Array with 2 reviews (customer's public + provider's private)\n    \n- Both visible to transaction participants"
+			},
+			"response": []
+		},
+		{
+			"name": "View All Reviews",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzY2Mzk3Mzg4LCJleHAiOjE3NjcwMDIxODh9.O0GTCqSfuunaNjiQr4b4D6Q52xV4UkJAOF7gcKIFzQk",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/reviews/my-reviews",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"reviews",
+						"my-reviews"
+					]
+				},
+				"description": "GET /api/reviews/my-reviews  \nAuthorization: both\n\nExpected:  \n\\- 200 OK  \n\\- List of all reviews written by this customer"
+			},
+			"response": []
+		},
+		{
+			"name": "Reviewing After Deadline",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzY2Mzk3Mzg4LCJleHAiOjE3NjcwMDIxODh9.O0GTCqSfuunaNjiQr4b4D6Q52xV4UkJAOF7gcKIFzQk",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"transactionId\": 1,\r\n  \"rating\": 5,\r\n  \"comment\": \"Late review\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/reviews",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"reviews"
+					]
+				},
+				"description": "POST /api/reviews  \nAuthorization: Bearer (both)\n\n{  \n\"transactionId\": 123,  \n\"rating\": 5,  \n\"comment\": \"Late review\"  \n}\n\nExpected:\n\n- 400 BAD REQUEST\n    \n- Error: \"Review deadline has passed. Reviews must be submitted within 7 days of transaction confirmation\""
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Review",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzY2Mzk3Mzg4LCJleHAiOjE3NjcwMDIxODh9.O0GTCqSfuunaNjiQr4b4D6Q52xV4UkJAOF7gcKIFzQk",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/reviews/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"reviews",
+						"1"
+					]
+				},
+				"description": "DELETE /api/reviews/{reviewId}  \nAuthorization: Bearer (both)\n\n**Expected: 204 NO CONTENT**\n\nProvider's averageRating recalculated (decreased)"
+			},
+			"response": []
+		}
+	]
+}

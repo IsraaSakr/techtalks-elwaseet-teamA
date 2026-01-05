@@ -12,7 +12,10 @@ import java.util.List;
     uniqueConstraints = @UniqueConstraint(
         name = "unique_review_per_transaction_per_reviewer",
         columnNames = {"transaction_id", "reviewer_id"}
-    )
+    ),
+    indexes = {
+        @Index(name = "idx_reviewee_public", columnList = "reviewee_id, is_public")
+    }
 )
 public class Review {
 
@@ -117,9 +120,9 @@ public class Review {
         if (isEdited == null) {
             isEdited = false;
         }
-        // Set edit deadline to 24 hours after creation
+        
         if (editDeadline == null) {
-            editDeadline = createdAt.plusHours(24);
+            editDeadline = createdAt.plusHours(48);
         }
     }
 
@@ -192,9 +195,6 @@ public class Review {
 
     public void setComment(String comment) {
         this.comment = comment;
-        if (this.reviewId != null) { // If already persisted
-            this.isEdited = true;
-        }
     }
 
     public Boolean getIsPublic() {

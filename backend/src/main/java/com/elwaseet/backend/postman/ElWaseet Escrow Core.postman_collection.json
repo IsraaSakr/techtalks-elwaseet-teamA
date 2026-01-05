@@ -1,0 +1,254 @@
+{
+	"info": {
+		"_postman_id": "172941d8-ae3c-4834-84ec-b79d44026394",
+		"name": "ElWaseet Escrow Core",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50753645"
+	},
+	"item": [
+		{
+			"name": "Create Transaction (Commit)",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"jobId\": 6,\"customerId\": 3,\"providerId\": 1,\"amount\": 75.00}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/transactions/commit",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"transactions",
+						"commit"
+					]
+				},
+				"description": "Verify transaction is created when application is accepted (this was created before Escrow Integration, this step is not longer needed)\n\n**Post** [http://localhost:8080/api/transactions/commit](http://localhost:8080**/api/transactions/commit)  \n**Headers:**\n\nContent-Type: application/json\n\n**Body: raw json**\n\n{  \n\"jobId\": 1,  \n\"customerId\": 2,  \n\"providerId\": 3,  \n\"amount\": 100.00  \n}\n\n**Expected Response (200 OK):**\n\n{  \n\"transactionId\": 1,  \n\"status\": \"COMMITTED\",  \n\"amount\": 100.00,  \n\"committedAt\": \"2024-12-22T10:30:00\",  \n\"inProgressAt\": null,  \n\"completedAt\": null,  \n\"confirmedAt\": null,  \n\"disputedAt\": null,  \n\"resolvedAt\": null  \n}"
+			},
+			"response": []
+		},
+		{
+			"name": "Start a Transaction",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE5OSwiZXhwIjoxNzY3NjI2OTk5fQ.m9l_XNlKrcF-m5kDomaMwgMqNGG6bhUCevX-6jQD_9w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/transactions/13/start",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"transactions",
+						"13",
+						"start"
+					]
+				},
+				"description": "Provider Starts Work: Verify provider can mark work as IN_PROGRESS\n\nPOST [http://localhost:8080/api/transactions/{{transactionId}}/start](http://localhost:8080/api/transactions/{{transactionId}}/start)\n\nAuthorization: Bearer {{providerToken}}\n\n**Expected Response (200 OK):**\n\n{  \n\"transactionId\": 1,  \n\"status\": \"IN_PROGRESS\",  \n\"amount\": 100.00,  \n\"committedAt\": \"2025-12-22T10:30:00\",  \n\"inProgressAt\": \"2025-12-22T10:35:00\",  \n\"completedAt\": null,  \n...  \n}\n\n---\n\nWrong User Tries Action:  \nPOST [http://localhost:8080/api/transactions/{{transactionId}}/start](http://localhost:8080/api/transactions/{{transactionId}}/start)  \nAuthorization: Bearer {{customerToken}}  \n(Using customer token when only provider should start work)  \n**Expected Response (403 Forbidden)**\n\n---\n\nNon-existent Transaction:  \nPOST [http://localhost:8080/api/transactions/99999/start](http://localhost:8080/api/transactions/99999/start)  \nAuthorization: Bearer {{providerToken}}  \n**Expected Response (404)**\n\n{  \n\"error\": \"Transaction not found: 99999\"  \n}"
+			},
+			"response": []
+		},
+		{
+			"name": "Complete a Transaction",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE5OSwiZXhwIjoxNzY3NjI2OTk5fQ.m9l_XNlKrcF-m5kDomaMwgMqNGG6bhUCevX-6jQD_9w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/transactions/13/complete",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"transactions",
+						"13",
+						"complete"
+					]
+				},
+				"description": "Provider Completes Work  \n**Purpose:** Verify provider can mark work as COMPLETED\n\nPOST [http://localhost:8080/api/transactions/{{transactionId}}/complete](http://localhost:8080/api/transactions/{{transactionId}}/complete)  \nAuthorization: Bearer {{providerToken}}\n\n**Expected Response (200 OK):**\n\n{  \n\"transactionId\": 1,  \n\"status\": \"COMPLETED\",  \n\"completedAt\": \"2025-12-22T11:00:00\",  \n...  \n}"
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm a Transaction",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NjM5NzA2NywiZXhwIjoxNzY3MDAxODY3fQ.WbRZJmaUKJ-FLtgfRqgxICdO2CJUkaM4Y1yGblTNmYw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/transactions/9/confirm",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"transactions",
+						"9",
+						"confirm"
+					]
+				},
+				"description": "Customer Confirms Work: Verify customer can confirm and payment moves to CONFIRMED\n\nPOST [http://localhost:8080/api/transactions/{{transactionId}}/confirm](http://localhost:8080/api/transactions/{{transactionId}}/confirm)  \nAuthorization: Bearer {{customerToken}}\n\n**Expected Response (200 OK):**\n\n{  \n\"transactionId\": 1,  \n\"status\": \"CONFIRMED\",  \n\"completedAt\": \"2025-12-22T11:00:00\",  \n...  \n}"
+			},
+			"response": []
+		},
+		{
+			"name": "Release Payment of a Transaction",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NjM5NzA2NywiZXhwIjoxNzY3MDAxODY3fQ.WbRZJmaUKJ-FLtgfRqgxICdO2CJUkaM4Y1yGblTNmYw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/transactions/9/release",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"transactions",
+						"9",
+						"release"
+					]
+				},
+				"description": "Release Payment: Verify payment is released to provider (PAID state)\n\nPOST: [http://localhost:8080/api/transactions/{{transactionId}}/release](http://localhost:8080/api/transactions/{{transactionId}}/release)  \nAuthorization: Bearer {{customerToken}}\n\n**Expected Response (200 OK):**\n\n{  \n\"transactionId\": 1,  \n\"status\": \"PAID\",  \n\"completedAt\": \"2025-12-22T11:00:00\",  \n...  \n}"
+			},
+			"response": []
+		},
+		{
+			"name": "Dispute a Transaction",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzY2Mzk3Mzg4LCJleHAiOjE3NjcwMDIxODh9.O0GTCqSfuunaNjiQr4b4D6Q52xV4UkJAOF7gcKIFzQk",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/transactions/3/dispute",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"transactions",
+						"3",
+						"dispute"
+					]
+				},
+				"description": "Useless endpoint after creating the Dispute Core System\n\nOpen Dispute: Test dispute flow instead of confirm  \nPOST [http://localhost:8080/api/transactions/{{transactionId}}/dispute](http://localhost:8080/api/transactions/{{transactionId}}/dispute)  \nAuthorization: Bearer {{customerToken}}\n\n**Expected Response (200 OK):**\n\n{  \n\"transactionId\": 1,  \n\"status\": \"DISPUTED\",  \n\"completedAt\": \"2025-12-22T11:00:00\",  \n...  \n}\n\n---\n\nWrong State Transition: Verify state machine prevents skipping states  \nPOST [http://localhost:8080/api/transactions/{{transactionId}}/confirm](http://localhost:8080/api/transactions/{{transactionId}}/confirm)  \nAuthorization: Bearer {{customerToken}}\n\n**Expected Response (400 or 500): (example)**\n\n{  \n\"error\": \"Invalid transition: COMMITTED → CONFIRMED\"  \n}"
+			},
+			"response": []
+		}
+	]
+}

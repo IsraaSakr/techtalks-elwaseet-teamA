@@ -1,0 +1,214 @@
+{
+	"info": {
+		"_postman_id": "0ceb3427-ee6b-4dbb-a4a0-59412f41ac1a",
+		"name": "ElWaseet Update Job",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50753645"
+	},
+	"item": [
+		{
+			"name": "Update Budget Range",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE2MSwiZXhwIjoxNzY3NjI2OTYxfQ.QnGz6Oq9yR8CEYsQHV5c4MasX0bXBiT4bYOB_POrpmg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"budgetMin\": 40.00,\r\n    \"budgetMax\": 150.00\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{elwaseet}}/api/jobs/7",
+					"host": [
+						"{{elwaseet}}"
+					],
+					"path": [
+						"api",
+						"jobs",
+						"7"
+					]
+				},
+				"description": "**Automatic Validation:**\n\nPUT [http://localhost:8080/api/jobs/{jobId}](http://localhost:8080/api/jobs/1)  \n**Headers:** Authorization: Bearer {{jwt_token}}\n\n**Body (form-data):**  \ndata: {  \n\"budgetMin\": 60.00,  \n\"budgetMax\": 150.00  \n}\n\n**Expected: 200 OK**  \nResponse should show:  \n\\- New budget range  \n\\- Other fields unchangedEndFragment\n\n---\n\n**Invalid Partial Budget Update (Should FAIL)**  \n**Scenario:** Job has budgetMax = 100, try to update budgetMin to 120  \nPUT [http://localhost:8080/api/jobs/1](http://localhost:8080/api/jobs/1)  \n**Headers:** Authorization: Bearer {{jwt_token}}\n\n**Body (form-data):**  \ndata: {  \n\"budgetMin\": 120.00  \n}\n\n**Expected: 400 BAD REQUEST**  \nError: \"Budget minimum (120.00) must be less than maximum (100.00)\""
+			},
+			"response": []
+		},
+		{
+			"name": "Update Title Only",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE2MSwiZXhwIjoxNzY3NjI2OTYxfQ.QnGz6Oq9yR8CEYsQHV5c4MasX0bXBiT4bYOB_POrpmg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"title\": \"Fix Bathroom Leak - VERY URGENT\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{elwaseet}}/api/jobs/7",
+					"host": [
+						"{{elwaseet}}"
+					],
+					"path": [
+						"api",
+						"jobs",
+						"7"
+					]
+				},
+				"description": "(Partial Update)  \nPUT [http://localhost:8080/api/jobs/{jobId}](http://localhost:8080/api/jobs/1)  \n**Headers:** Authorization: Bearer {{jwt_token}}\n\n_Body (form-data):  \n_data: {  \n\"title\": \"Fix Bathroom Leak - VERY URGENT\"  \n}\n\n**Expected: 200 OK**  \nResponse should show:  \n\\- New title  \n\\- All other fields unchanged  \n\\- Existing photos still thereEndFragment\n\n---\n\nPUT http://localhost:8080/api/jobs/1  \n**Headers:** Authorization: Bearer {{different_user_jwt_token}}  \n  \n**Body (form-data):**  \ndata: {  \n\"title\": \"Hacked title\"  \n}  \n  \n**Expected: 401 UNAUTHORIZED**  \nError: \"You cannot update this job\""
+			},
+			"response": []
+		},
+		{
+			"name": "Update by Deleting a Photo",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE2MSwiZXhwIjoxNzY3NjI2OTYxfQ.QnGz6Oq9yR8CEYsQHV5c4MasX0bXBiT4bYOB_POrpmg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{elwaseet}}/api/jobs/7/photos/4",
+					"host": [
+						"{{elwaseet}}"
+					],
+					"path": [
+						"api",
+						"jobs",
+						"7",
+						"photos",
+						"4"
+					]
+				},
+				"description": "**DELETE** [http://localhost:8080/api/jobs/{jobId}/photos/{photoId}](http://localhost:8080/api/jobs/{jobID}/photos)  \n**Headers:** Authorization: Bearer {{jwt_token}} (job owner)\n\n**Expected: 200 OK**  \n\\- gets the job details with that certain photo deleted"
+			},
+			"response": []
+		},
+		{
+			"name": "Update by Adding Photo",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE2MSwiZXhwIjoxNzY3NjI2OTYxfQ.QnGz6Oq9yR8CEYsQHV5c4MasX0bXBiT4bYOB_POrpmg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "photos",
+							"type": "file",
+							"src": "/C:/Users/Israa Sakr/OneDrive/Pictures/Screenshots/Screenshot 2025-12-23 070416.png"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{elwaseet}}/api/jobs/7/photos",
+					"host": [
+						"{{elwaseet}}"
+					],
+					"path": [
+						"api",
+						"jobs",
+						"7",
+						"photos"
+					]
+				},
+				"description": "POST [http://localhost:8080/api/jobs/{jobID}/photos](http://localhost:8080/api/jobs/{jobID}/photos)  \n**Headers:** Authorization: Bearer {{jwt_token}} (job owner)\n\n**Body (form-data):**  \nphotos: \\[photo1.jpg, photo2.jpg, photo3.jpg\\] type: file\n\n**Expected: 200 OK**  \nResponse should show:  \n\\- All text fields unchanged  \n\\- New Photo added\n\n---\n\nPOST [http://localhost:8080/api/jobs/{jobID}/photos](http://localhost:8080/api/jobs/{jobID}/photos)  \n**Headers:** Authorization: Bearer {{jwt_token}} (job owner)\n\n**Body (form-data):**  \nphotos: \\[photo1.jpg, photo2.jpg, photo3.jpg, photo4.jpg, photo5.jpg, photo6.jpg\\] type: file\n\n**Expected: 400 BAD REQUEST**  \nError: \"Maximum 5 photos allowed\""
+			},
+			"response": []
+		},
+		{
+			"name": "Update All Fields (without photo)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE2MSwiZXhwIjoxNzY3NjI2OTYxfQ.QnGz6Oq9yR8CEYsQHV5c4MasX0bXBiT4bYOB_POrpmg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "data",
+							"value": "{\"title\": \"Meow\",\"description\": \"Complete bathroom renovation needed\",\"budgetMin\": 80.00,\"budgetMax\": 200.00,\"urgency\": \"HIGH\",\"location\": \"BEKAA\"}",
+							"contentType": "application/json",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{elwaseet}}/api/jobs/7",
+					"host": [
+						"{{elwaseet}}"
+					],
+					"path": [
+						"api",
+						"jobs",
+						"7"
+					]
+				},
+				"description": "PUT [http://localhost:8080/api/jobs/{jobId}](http://localhost:8080/api/jobs/{jobId})  \n**Headers:** Authorization: Bearer {{jwt_token}}\n\n**Body (form-data):**  \ndata: {  \n\"title\": \"Urgent Plumbing Repair - Updated\",  \n\"description\": \"Complete bathroom renovation needed\",  \n\"budgetMin\": 80.00,  \n\"budgetMax\": 200.00,  \n\"urgency\": \"HIGH\",  \n\"location\": \"BEIRUT\"  \n}  \n**  \nExpected: 200 OK**  \nResponse should show:  \n\\- All fields updated\n\n---\n\n**Scenario:** Job status is IN_PROGRESS or COMPLETED\n\nPUT [http://localhost:8080/api/jobs/1](http://localhost:8080/api/jobs/1)  \n**Headers:** Authorization: Bearer {{jwt_token}}\n\n**Body (form-data):**  \ndata: {  \n\"title\": \"Try to update\"  \n}\n\n**Expected: 400 BAD REQUEST**  \nError: \"Job must be OPEN to be updated\""
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "elwaseet",
+			"value": "",
+			"type": "default"
+		}
+	]
+}

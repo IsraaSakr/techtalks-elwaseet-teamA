@@ -1,0 +1,49 @@
+{
+	"info": {
+		"_postman_id": "73ed35a8-caaf-44be-9fd6-b4353c6c48e2",
+		"name": "ElWaseet Get job",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50753645"
+	},
+	"item": [
+		{
+			"name": "Get Job Detailed",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE2MSwiZXhwIjoxNzY3NjI2OTYxfQ.QnGz6Oq9yR8CEYsQHV5c4MasX0bXBiT4bYOB_POrpmg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/jobs/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"jobs",
+						"2"
+					]
+				},
+				"description": "**Valid Job ID**\n\nGET [http://localhost:8080/api/jobs/1](http://localhost:8080/api/jobs/1)\n\n**Headers:** Authorization: Bearer job owner token\n\n**Expected**: 200 OK with full job details\n\n---\n\n**Non-existent Job ID**\n\nGET [http://localhost:8080/api/jobs/99999](http://localhost:8080/api/jobs/99999)\n\n**Headers:** Authorization: Bearer job owner token\n\n**Expected**: 404 Not Found with \"Job not found\" message\n\n---\n\n**No Authentication**\n\nGET [http://localhost:8080/api/jobs/1](http://localhost:8080/api/jobs/1)\n\n(No Authorization header)\n\n**Expected**: 401 Unauthorized\n\n---\n\n**Invalid Job ID**\n\nGET [http://localhost:8080/api/jobs/-1](http://localhost:8080/api/jobs/-1)\n\n**Headers:** Authorization: Bearer job owner token\n\n**Expected**: 400 Bad Request (due to @Positive validation)"
+			},
+			"response": []
+		}
+	]
+}

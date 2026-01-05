@@ -8,13 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(
-    name = "applications", 
-    uniqueConstraints = @UniqueConstraint(
-        name = "unique_application_per_provider_per_job", 
-        columnNames = {"provider_id", "job_id"}
-    )
-)
+@Table(name = "applications") 
 public class Application {
     
     /**
@@ -34,7 +28,7 @@ public class Application {
         PENDING,
         ACCEPTED,
         REJECTED,
-        WITHDRAWN
+        CANCELLED
     }
     
     @Id

@@ -1,0 +1,112 @@
+{
+	"info": {
+		"_postman_id": "cc415733-6eb0-4002-8e9d-e709955b0bb3",
+		"name": "Elwaseet Browse provider",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50753645"
+	},
+	"item": [
+		{
+			"name": "Browse Providers with Filters",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzY2Mzk3Mzg4LCJleHAiOjE3NjcwMDIxODh9.O0GTCqSfuunaNjiQr4b4D6Q52xV4UkJAOF7gcKIFzQk",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/providers?categories=1&location=BEIRUT&minRating=3.0&verified=true&page=0&size=5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"providers"
+					],
+					"query": [
+						{
+							"key": "categories",
+							"value": "1"
+						},
+						{
+							"key": "location",
+							"value": "BEIRUT"
+						},
+						{
+							"key": "minRating",
+							"value": "3.0"
+						},
+						{
+							"key": "verified",
+							"value": "true"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "5"
+						}
+					]
+				},
+				"description": "**Testing with filters:**\n\nGET [http://localhost:8080/api/providers?categories=1&amp;location=BEIRUT&amp;minRating=3.0&amp;verified=true&amp;page=0&amp;size=5](http://localhost:8080/api/providers?category=1&location=BEIRUT&minRating=3.0&verified=true&page=0&size=5)\n\n**Test scenarios:**\n\n1. **No filters** - should return all providers with profiles (filters are optional)\n    \n2. **Category filter** - ?category=1\n    \n3. **Location filter** - ?location=BEIRUT\n    \n4. **Rating filter** - ?minRating=4.0\n    \n5. **Verified only** - ?verified=true\n    \n6. **Pagination** - ?page=0&size=5\n    \n7. **Sorting** - ?sort=averageRating,desc or ?sort=totalReviews,desc"
+			},
+			"response": []
+		},
+		{
+			"name": "Browse Providers",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzY2Mzk3Mzg4LCJleHAiOjE3NjcwMDIxODh9.O0GTCqSfuunaNjiQr4b4D6Q52xV4UkJAOF7gcKIFzQk",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/providers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"providers"
+					]
+				},
+				"description": "**GET** http://localhost:8080/api/providers\n\n**Basic test (no filters):**\n\n- Just hit the endpoint to see all providers"
+			},
+			"response": []
+		}
+	]
+}

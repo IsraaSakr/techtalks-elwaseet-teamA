@@ -99,6 +99,7 @@ public class AdminUser {
      * ============================================================================
      */
 
+    // Admin Endpoint Related - Make public for initial setup
     protected AdminUser() {
         // JPA requires no-arg constructor
     }

@@ -1,0 +1,84 @@
+{
+	"info": {
+		"_postman_id": "5df5bfeb-b55f-4ef0-9cf0-8c5e6580feb0",
+		"name": "ElWaseet Escrow Integration",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50753645"
+	},
+	"item": [
+		{
+			"name": "Get Transaction History",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE2MSwiZXhwIjoxNzY3NjI2OTYxfQ.QnGz6Oq9yR8CEYsQHV5c4MasX0bXBiT4bYOB_POrpmg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/transactions/my-history?page=0&size=5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"transactions",
+						"my-history"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "5"
+						}
+					]
+				},
+				"description": "GET /api/transactions/my-history?page=0&size=5  \nAuthorization: Bearer {providerToken}\n\nExpected: 200 OK with paginated list showing:  \n\\- Transactions where user is provider OR customer  \n\\- Sorted by date (newest first)  \n\\- Proper pagination metadata\n\n{  \n\"content\": \\[  \n{  \n\"transactionId\": 9,  \n\"status\": \"PAID\",  \n\"amount\": 75.50,  \n\"committedAt\": \"2025-12-29T11:38:07.52727\",  \n\"inProgressAt\": \"2025-12-29T11:38:23.908202\",  \n\"completedAt\": \"2025-12-29T11:38:34.733899\",  \n\"confirmedAt\": \"2025-12-29T11:38:44.063121\",  \n\"disputedAt\": null,  \n\"resolvedAt\": \"2025-12-29T11:46:12.84667\"  \n},  \n{  \n\"transactionId\": 8,  \n\"status\": \"PAID\",  \n\"amount\": 75.50,  \n\"committedAt\": \"2025-12-29T11:27:39.536813\",  \n\"inProgressAt\": \"2025-12-29T11:27:57.463881\",  \n\"completedAt\": \"2025-12-29T11:28:11.616237\",  \n\"confirmedAt\": \"2025-12-29T11:29:26.706149\",  \n\"disputedAt\": null,  \n\"resolvedAt\": \"2025-12-29T11:29:26.706149\"  \n},  \n{  \n\"transactionId\": 7,  \n\"status\": \"PAID\",  \n\"amount\": 75.50,  \n\"committedAt\": \"2025-12-29T11:23:12.312452\",  \n\"inProgressAt\": \"2025-12-29T11:23:35.442487\",  \n\"completedAt\": \"2025-12-29T11:23:46.052435\",  \n\"confirmedAt\": \"2025-12-29T11:23:55.242468\",  \n\"disputedAt\": null,  \n\"resolvedAt\": \"2025-12-29T11:23:55.243995\"  \n},  \n{  \n\"transactionId\": 6,  \n\"status\": \"PAID\",  \n\"amount\": 75.50,  \n\"committedAt\": \"2025-12-29T10:43:02.427129\",  \n\"inProgressAt\": \"2025-12-29T10:46:49.795976\",  \n\"completedAt\": \"2025-12-29T10:47:30.81083\",  \n\"confirmedAt\": \"2025-12-29T11:02:08.106006\",  \n\"disputedAt\": null,  \n\"resolvedAt\": \"2025-12-29T11:02:08.106006\"  \n},  \n{  \n\"transactionId\": 5,  \n\"status\": \"COMMITTED\",  \n\"amount\": 75.50,  \n\"committedAt\": \"2025-12-29T06:04:15.348288\",  \n\"inProgressAt\": null,  \n\"completedAt\": null,  \n\"confirmedAt\": null,  \n\"disputedAt\": null,  \n\"resolvedAt\": null  \n}  \n\\],  \n\"pageable\": {  \n\"pageNumber\": 0,  \n\"pageSize\": 5,  \n\"sort\": {  \n\"empty\": false,  \n\"sorted\": true,  \n\"unsorted\": false  \n},  \n\"offset\": 0,  \n\"paged\": true,  \n\"unpaged\": false  \n},  \n\"last\": false,  \n\"totalPages\": 2,  \n\"totalElements\": 8,  \n\"first\": true,  \n\"numberOfElements\": 5,  \n\"size\": 5,  \n\"number\": 0,  \n\"sort\": {  \n\"empty\": false,  \n\"sorted\": true,  \n\"unsorted\": false  \n},  \n\"empty\": false  \n}"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Certain Transaction",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzAyMjE2MSwiZXhwIjoxNzY3NjI2OTYxfQ.QnGz6Oq9yR8CEYsQHV5c4MasX0bXBiT4bYOB_POrpmg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/transactions/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"transactions",
+						"1"
+					]
+				},
+				"description": "GET /api/transactions/{id}  \nAuthorization: Bearer {customerToken} (both)  \n  \nExpected: 200 OK with transaction details  \n  \nGET /api/transactions/{id}  \nAuthorization: Bearer {randomUserToken}  \n  \nExpected: 403 Unauthorized"
+			},
+			"response": []
+		}
+	]
+}
