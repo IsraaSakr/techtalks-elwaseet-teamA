@@ -81,4 +81,11 @@ public class AuthController {
     public ResponseEntity<LoginResponse> adminLogin(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.adminLogin(request));
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@AuthenticationPrincipal User user) {
+        // Since JWT is stateless, logout is handled client-side
+        // This endpoint just confirms the action
+        return ResponseEntity.ok("Logged out successfully");
+    }
 }

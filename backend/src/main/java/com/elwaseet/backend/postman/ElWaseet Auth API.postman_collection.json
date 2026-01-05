@@ -221,6 +221,46 @@
 				"description": "POST [http://localhost:8080/auth/admin/login](http://localhost:8080/auth/login)\n\nraw → JSON\n\n{\n\n\"email\": \"[admin@elwaseet.com](https://mailto:admin@elwaseet.com)\",\n\n\"password\": \"SecurePassword123!\"\n\n}\n\n**Expected Response:**\n\n- Status: **200 OK**\n    \n\n{  \n\"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlbHdhc2VldC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Njc1NTQ3MTUsImV4cCI6MTc2ODE1OTUxNX0.N8h0EpKd9PmK95NfKIWlKlXlblHLLjOB4a8suYj-pOw\",  \n\"user\": null  \n}"
 			},
 			"response": []
+		},
+		{
+			"name": "Logout",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzU3ODcwMiwiZXhwIjoxNzY4MTgzNTAyfQ.U_8pOFxb3y_nQcS7YZwxSwsqzD5R8PB3qr3ZTn8PLVA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/auth/logout",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"logout"
+					]
+				},
+				"description": "POST http://localhost:8080/auth/logout\n\nAuthorization: Bearer Token (the user that wants to logout)\n\n**Expected Response:**"
+			},
+			"response": []
 		}
 	]
 }
