@@ -9,6 +9,7 @@ export const ProviderCard = ({ provider, showActions = true, onViewProfile }) =>
     const navigate = useNavigate();
 
     const getInitials = (name) => {
+        if (!name) return '??';
         return name
             .split(' ')
             .map(n => n[0])
@@ -42,10 +43,10 @@ export const ProviderCard = ({ provider, showActions = true, onViewProfile }) =>
                         <div className="flex items-center gap-1 mb-2">
                             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                             <span className="text-sm font-medium text-foreground">
-                                {provider.rating?.toFixed(1) || 'N/A'}
+                                {Number(provider.rating || 0).toFixed(1)}
                             </span>
                             <span className="text-sm text-muted-foreground">
-                                ({provider.reviewCount || 0} reviews)
+                                ({provider.reviewsCount || provider.reviewCount || 0} reviews)
                             </span>
                         </div>
 
@@ -66,7 +67,7 @@ export const ProviderCard = ({ provider, showActions = true, onViewProfile }) =>
                 )}
 
                 <div className="flex flex-wrap gap-2">
-                    {provider.services?.slice(0, 3).map((service, index) => (
+                    {(provider.services || []).slice(0, 3).map((service, index) => (
                         <Badge key={index} variant="outline">
                             {service}
                         </Badge>

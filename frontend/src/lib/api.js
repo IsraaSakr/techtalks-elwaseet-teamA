@@ -104,7 +104,12 @@ export const jobsAPI = {
                 providerId: null,
                 createdAt: new Date().toISOString(),
             };
-            MOCK_JOBS.push(newJob);
+            
+            // PERSISTENCE: Get existing jobs from storage or fallback to initial mock data
+            const existingJobs = storage.get('mock_jobs') || MOCK_JOBS;
+            const updatedJobs = [newJob, ...existingJobs]; // Prepend new job
+            storage.set('mock_jobs', updatedJobs);
+            
             return { job: newJob };
         }
         return api.post('/jobs', data);
@@ -113,7 +118,9 @@ export const jobsAPI = {
     getAll: async (params) => {
         if (USE_MOCK_API) {
             await mockDelay();
-            let jobs = [...MOCK_JOBS];
+            // PERSISTENCE: Read from storage
+            let jobs = storage.get('mock_jobs') || [...MOCK_JOBS];
+            
             if (params?.status) {
                 jobs = jobs.filter(j => j.status === params.status);
             }
@@ -126,7 +133,21 @@ export const jobsAPI = {
         if (USE_MOCK_API) {
             await mockDelay();
             const userId = storage.get('user')?.id;
-            const jobs = MOCK_JOBS.filter(j => j.customerId === userId);
+            
+            // PERSISTENCE FIX: Always use fresh MOCK_JOBS for test accounts to ensure we see the test data
+            // In a real app, we'd sync properly, but for this test workflow, we want the predefined jobs to show up.
+            let allJobs = storage.get('mock_jobs') || [];
+            
+            // Merge in MOCK_JOBS if they aren't already there (deduplicated by ID)
+            const storageIds = new Set(allJobs.map(j => j.id));
+            const freshJobs = MOCK_JOBS.filter(j => !storageIds.has(j.id));
+            allJobs = [...freshJobs, ...allJobs];
+            
+            // Update storage to keep them in sync
+            storage.set('mock_jobs', allJobs);
+
+            const jobs = allJobs.filter(j => j.customerId === userId);
+            
             return { jobs, total: jobs.length };
         }
         return api.get('/jobs/my-jobs', { params });
@@ -135,7 +156,10 @@ export const jobsAPI = {
     getById: async (id) => {
         if (USE_MOCK_API) {
             await mockDelay();
-            const job = MOCK_JOBS.find(j => j.id === id);
+            // PERSISTENCE: Read from storage
+            const allJobs = storage.get('mock_jobs') || MOCK_JOBS;
+            const job = allJobs.find(j => j.id === id);
+            
             if (!job) throw new Error('Job not found');
             return { job };
         }
@@ -146,8 +170,31 @@ export const jobsAPI = {
     deleteJob: (id) => api.delete(`/jobs/${id}`),
     start: (id) => api.put(`/jobs/${id}/start`),
     complete: (id) => api.put(`/jobs/${id}/complete`),
-    confirm: (id) => api.put(`/jobs/${id}/confirm`),
-    dispute: (id, data) => api.post(`/jobs/${id}/dispute`, data),
+    confirm: async (id) => {
+        if (USE_MOCK_API) {
+            await mockDelay();
+            const allJobs = storage.get('mock_jobs') || MOCK_JOBS;
+            const updatedJobs = allJobs.map(job => 
+                job.id === id ? { ...job, status: 'CONFIRMED' } : job
+            );
+            storage.set('mock_jobs', updatedJobs);
+            return { success: true };
+        }
+        return api.put(`/jobs/${id}/confirm`);
+    },
+    dispute: async (id, data) => {
+        if (USE_MOCK_API) {
+            await mockDelay();
+            const allJobs = storage.get('mock_jobs') || MOCK_JOBS;
+            // Assuming 'DISPUTED' is the status for a disputed job
+            const updatedJobs = allJobs.map(job => 
+                job.id === id ? { ...job, status: 'DISPUTED', disputeReason: data.reason, disputeDescription: data.description } : job
+            );
+            storage.set('mock_jobs', updatedJobs);
+            return { success: true };
+        }
+        return api.post(`/jobs/${id}/dispute`, data);
+    },
 };
 
 export const applicationsAPI = {
@@ -194,6 +241,7 @@ export const providersAPI = {
     getAll: async (params) => {
         if (USE_MOCK_API) {
             await mockDelay();
+            // MOCK_USERS is an object, convert to array for filtering
             const providers = Object.values(MOCK_USERS).filter(
                 u => u.role === 'provider' || u.role === 'hybrid'
             );
@@ -205,7 +253,9 @@ export const providersAPI = {
     getById: async (id) => {
         if (USE_MOCK_API) {
             await mockDelay();
-            const provider = Object.values(MOCK_USERS).find(u => u.id === id);
+            // MOCK_USERS is an object (hash map by id)
+            const provider = MOCK_USERS[id];
+            
             if (!provider) throw new Error('Provider not found');
             return { provider };
         }

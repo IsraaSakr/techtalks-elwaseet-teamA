@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { PublicLayout } from './layouts/PublicLayout';
@@ -16,6 +17,8 @@ import { PostJob } from './pages/customer/PostJob';
 import { JobDetails } from './pages/customer/JobDetails';
 import { BrowseProviders } from './pages/customer/BrowseProviders';
 import { ProviderProfile } from './pages/customer/ProviderProfile';
+import { DisputeJob } from './pages/customer/DisputeJob';
+import { RateProvider } from './pages/customer/RateProvider';
 
 // Provider Pages
 import { ProviderDashboard } from './pages/provider/ProviderDashboard';
@@ -28,9 +31,11 @@ import { EditProfile as ProviderEditProfile } from './pages/provider/EditProfile
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { DisputesList } from './pages/admin/DisputesList';
 import { DisputeDetails } from './pages/admin/DisputeDetails';
+import { UsersList } from './pages/admin/UsersList';
+import { AdminJobsList } from './pages/admin/AdminJobsList';
+import { RevenueList } from './pages/admin/RevenueList';
 
 // Shared Pages
-import { Notifications } from './pages/shared/Notifications';
 import { Profile } from './pages/shared/Profile';
 import { Transactions } from './pages/shared/Transactions';
 import { Settings } from './pages/shared/Settings';
@@ -41,6 +46,7 @@ import { ROUTES, USER_ROLES } from './lib/constants';
 function App() {
   return (
     <AuthProvider>
+      <Toaster position="top-center" />
       <BrowserRouter>
           <Routes>
           <Route element={<PublicLayout />}>
@@ -61,6 +67,8 @@ function App() {
             <Route path={ROUTES.CUSTOMER_DASHBOARD} element={<CustomerDashboard />} />
             <Route path={ROUTES.POST_JOB} element={<PostJob />} />
             <Route path={ROUTES.CUSTOMER_JOB_DETAILS(':id')} element={<JobDetails />} />
+            <Route path={ROUTES.CUSTOMER_JOB_DISPUTE(':id')} element={<DisputeJob />} />
+            <Route path={ROUTES.CUSTOMER_RATE_PROVIDER(':id')} element={<RateProvider />} />
             <Route path={ROUTES.BROWSE_PROVIDERS} element={<BrowseProviders />} />
             <Route path={ROUTES.PROVIDER_PROFILE(':id')} element={<ProviderProfile />} />
           </Route>
@@ -89,8 +97,13 @@ function App() {
             }
           >
             <Route path={ROUTES.ADMIN_DASHBOARD} element={<AdminDashboard />} />
+            <Route path={ROUTES.ADMIN_USERS} element={<UsersList />} />
+            <Route path={ROUTES.ADMIN_JOBS} element={<AdminJobsList />} />
+            <Route path={ROUTES.ADMIN_JOB_DETAILS(':id')} element={<JobDetails />} />
+            <Route path={ROUTES.ADMIN_REVENUE} element={<RevenueList />} />
             <Route path={ROUTES.ADMIN_DISPUTES} element={<DisputesList />} />
             <Route path={ROUTES.ADMIN_DISPUTE_DETAILS(':id')} element={<DisputeDetails />} />
+            <Route path={ROUTES.ADMIN_USER_DETAILS(':id')} element={<ProviderProfile />} />
           </Route>
 
           {/* Shared Routes */}
@@ -101,7 +114,7 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route path={ROUTES.NOTIFICATIONS} element={<Notifications />} />
+            {/* <Route path={ROUTES.NOTIFICATIONS} element={<Notifications />} /> */}
             <Route path={ROUTES.PROFILE} element={<Profile />} />
             <Route path={ROUTES.TRANSACTIONS} element={<Transactions />} />
             <Route path={ROUTES.SETTINGS} element={<Settings />} />

@@ -1,13 +1,59 @@
-import { Card, CardContent, CardFooter, CardHeader } from '../ui/card';
+import { Card, CardContent, CardFooter } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
-import { MapPin, Calendar, DollarSign } from 'lucide-react';
+import { 
+    MapPin, 
+    Calendar, 
+    DollarSign, 
+    Sparkles, 
+    Zap, 
+    Droplets, 
+    Paintbrush, 
+    Truck, 
+    Hammer, 
+    Thermometer, 
+    BookOpen, 
+    Shovel, 
+    Briefcase,
+    Wrench,
+    ArrowRight
+} from 'lucide-react';
 import { formatCurrency, formatDate } from '../../lib/utils';
 import { StatusBadge } from './StatusBadge';
-import { useNavigate } from 'react-router-dom';
+const getCategoryConfig = (category) => {
+    const icons = {
+        'Cleaning': Sparkles,
+        'Plumbing': Droplets,
+        'Electrical': Zap,
+        'Painting': Paintbrush,
+        'Moving': Truck,
+        'Carpentry': Hammer,
+        'Handyman': Hammer,
+        'Landscaping': Shovel,
+        'HVAC': Thermometer,
+        'Tutoring': BookOpen,
+        'Other': Briefcase
+    };
 
-export const JobCard = ({ job, showActions = true, onViewDetails }) => {
-    const navigate = useNavigate();
+    return {
+        icon: icons[category] || icons['Other']
+    };
+};
+
+const defaultTheme = {
+    bg: 'bg-white',
+    border: 'border-blue-100',
+    text: 'text-blue-900',
+    subText: 'text-blue-700/80',
+    badge: 'bg-blue-100 text-blue-800 border-blue-200',
+    iconColor: 'text-blue-200',
+    button: 'bg-blue-600 hover:bg-blue-700 text-white',
+};
+
+export const JobCard = ({ job, showActions = true, onViewDetails, className = '' }) => {
+    const config = getCategoryConfig(job.category);
+    const CategoryIcon = config.icon;
+    const theme = defaultTheme;
 
     const handleViewDetails = () => {
         if (onViewDetails) {
@@ -16,75 +62,67 @@ export const JobCard = ({ job, showActions = true, onViewDetails }) => {
     };
 
     return (
-        <Card className="hover:shadow-lg transition-shadow duration-200">
-            <CardHeader>
-                <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-card-foreground mb-1">
-                            {job.title}
-                        </h3>
-                        <Badge variant="outline" className="mb-2">
-                            {job.category}
-                        </Badge>
-                    </div>
-                    <StatusBadge status={job.status} type="job" />
-                </div>
-            </CardHeader>
+        <Card className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-lg ${theme.bg} ${theme.border} h-80 ${className}`}>
+            {/* Background Icon */}
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none z-0">
+                <CategoryIcon 
+                    className={`w-56 h-56 ${theme.iconColor} opacity-20 transform rotate-0`} 
+                    strokeWidth={0.5}
+                />
+            </div>
 
-            <CardContent className="space-y-3">
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                    {job.description}
-                </p>
-
-                <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                        <MapPin className="w-4 h-4" />
-                        <span>{job.location}</span>
+            <div className="relative z-10 flex flex-col h-full">
+                <CardContent className="p-5 flex-grow space-y-4">
+                    {/* Header */}
+                    <div className="flex justify-between items-start gap-4">
+                        <div className="space-y-1">
+                            <Badge variant="outline" className={`${theme.badge} border shadow-sm`}>
+                                {job.category}
+                            </Badge>
+                            <h3 className={`text-xl font-bold ${theme.text} line-clamp-1`}>
+                                {job.title}
+                            </h3>
+                        </div>
+                        <StatusBadge status={job.status} type="job" />
                     </div>
 
-                    <div className="flex items-center gap-1">
-                        <DollarSign className="w-4 h-4" />
-                        <span>
-                            {formatCurrency(job.budgetMin)} - {formatCurrency(job.budgetMax)}
-                        </span>
-                    </div>
+                    {/* Description */}
+                    <p className={`text-sm ${theme.subText} line-clamp-2 leading-relaxed`}>
+                        {job.description}
+                    </p>
 
-                    <div className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        <span>{formatDate(job.createdAt)}</span>
+                    {/* Metadata */}
+                    <div className="flex flex-wrap gap-y-2 gap-x-4 text-sm mt-2">
+                        <div className={`flex items-center gap-1.5 ${theme.subText}`}>
+                            <MapPin className="w-4 h-4" />
+                            <span className="font-medium">{job.location}</span>
+                        </div>
+                        <div className={`flex items-center gap-1.5 ${theme.subText}`}>
+                            <DollarSign className="w-4 h-4" />
+                            <span className="font-medium">
+                                {formatCurrency(job.budgetMin)} - {formatCurrency(job.budgetMax)}
+                            </span>
+                        </div>
+                        <div className={`flex items-center gap-1.5 ${theme.subText}`}>
+                            <Calendar className="w-4 h-4" />
+                            <span className="font-medium">{formatDate(job.createdAt)}</span>
+                        </div>
                     </div>
-                </div>
+                </CardContent>
 
-                {job.photos && job.photos.length > 0 && (
-                    <div className="flex gap-2 overflow-x-auto">
-                        {job.photos.slice(0, 3).map((photo, index) => (
-                            <img
-                                key={index}
-                                src={photo}
-                                alt={`Job photo ${index + 1}`}
-                                className="w-20 h-20 object-cover rounded-md"
-                            />
-                        ))}
-                        {job.photos.length > 3 && (
-                            <div className="w-20 h-20 bg-muted rounded-md flex items-center justify-center text-sm text-muted-foreground">
-                                +{job.photos.length - 3}
-                            </div>
-                        )}
-                    </div>
+                {showActions && (
+                    <CardFooter className="p-4 pt-0">
+                        <Button 
+                            onClick={handleViewDetails}
+                            className={`w-full h-12 whitespace-nowrap font-semibold shadow-sm transition-colors ${theme.button}`}
+                            size="lg"
+                        >
+                            <span>View Details</span>
+                            <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                    </CardFooter>
                 )}
-            </CardContent>
-
-            {showActions && (
-                <CardFooter>
-                    <Button
-                        onClick={handleViewDetails}
-                        className="w-full"
-                        variant="default"
-                    >
-                        View Details
-                    </Button>
-                </CardFooter>
-            )}
+            </div>
         </Card>
     );
 };

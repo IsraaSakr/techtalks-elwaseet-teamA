@@ -7,6 +7,7 @@ export const StatusBadge = ({ status, type = 'job' }) => {
 
     // Format status text
     const formatStatus = (status) => {
+        if (!status) return 'Unknown';
         return status.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
     };
 

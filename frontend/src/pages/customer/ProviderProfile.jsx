@@ -61,14 +61,14 @@ export const ProviderProfile = () => {
     };
 
     const handleMessage = () => {
-        // Navigate to messages or open messaging dialog
-        console.log('Message provider:', id);
+        // Open WhatsApp chat
+        const phoneNumber = provider.phone || '0096170000000'; // Fallback or mock
+        const message = `Hello ${provider.fullName || provider.name}, I found your profile on ElWaseet.`;
+        const whatsappUrl = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
     };
 
-    const handleBookNow = () => {
-        // Navigate to booking page with pre-selected provider
-        navigate(`${ROUTES.POST_JOB}?providerId=${id}`);
-    };
+    // Book Now button removed as requested
 
     if (loading) {
         return <LoadingState />;
@@ -80,138 +80,114 @@ export const ProviderProfile = () => {
 
 
     return (
-        <div className="min-h-screen bg-muted/40 pb-32">
+        <div className="min-h-screen bg-muted/40 pb-6">
             {/* Sticky Header */}
             <ProfileHeader navigate={navigate} />
 
-            {/* Main Content Card */}
-            <div className="mx-auto max-w-md lg:max-w-lg px-4 py-6">
-                <Card className="bg-card border border-border rounded-3xl shadow-lg p-4 sm:p-6">
-                    {/* Profile Section */}
-                    <div className="text-center space-y-4 mb-6">
-                        <Avatar className="w-24 h-24 mx-auto ring-4 ring-background shadow-md">
-                            <AvatarImage src={provider.avatar} alt={provider.fullName} />
-                            <AvatarFallback className="bg-primary/10 text-primary text-2xl font-semibold">
-                                {getInitials(provider.fullName)}
-                            </AvatarFallback>
-                        </Avatar>
-                        
-                        <h1 className="text-2xl font-semibold text-foreground">
-                            {provider.fullName}
-                        </h1>
-                        
-                        {/* Service Badges */}
-                        <div className="flex flex-wrap justify-center gap-2">
-                            {provider.services?.slice(0, 3).map((service, index) => (
-                                <Badge 
-                                    key={index} 
-                                    className="rounded-full bg-primary/10 text-primary hover:bg-primary/20 px-3 py-1 text-xs font-medium border-none"
-                                >
-                                    {service}
-                                </Badge>
-                            ))}
-                        </div>
+            <div className="container mx-auto px-4 py-6 max-w-7xl">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    
+                    {/* Left Column (Sidebar) - Profile Summary */}
+                    <div className="lg:col-span-4 lg:sticky lg:top-20 space-y-6">
+                        <Card className="bg-card border border-border rounded-3xl shadow-lg p-6">
+                            <div className="text-center space-y-4">
+                                <Avatar className="w-32 h-32 mx-auto ring-4 ring-background shadow-md">
+                                    <AvatarImage src={provider.avatar || provider.profilePicture} alt={provider.fullName || provider.name} />
+                                    <AvatarFallback className="bg-primary/10 text-primary text-3xl font-semibold">
+                                        {getInitials(provider.fullName || provider.name || 'Provider')}
+                                    </AvatarFallback>
+                                </Avatar>
+                                
+                                <div className="space-y-2">
+                                    <h1 className="text-2xl font-bold text-foreground">
+                                        {provider.fullName || provider.name}
+                                    </h1>
+                                    <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                                        <MapPin className="w-4 h-4" />
+                                        <span>{provider.location}</span>
+                                    </div>
+                                </div>
+                                
+                                <div className="flex flex-wrap justify-center gap-2">
+                                    {provider.services?.slice(0, 5).map((service, index) => (
+                                        <Badge 
+                                            key={index} 
+                                            className="rounded-full bg-primary/10 text-primary hover:bg-primary/20 px-3 py-1 text-xs font-medium border-none"
+                                        >
+                                            {service}
+                                        </Badge>
+                                    ))}
+                                </div>
 
-                        {/* Rating & Info Row */}
-                        <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground flex-wrap">
-                            <div className="flex items-center gap-1">
-                                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                                <span className="font-semibold text-foreground">
-                                    {provider.rating?.toFixed(1) || 'N/A'}
-                                </span>
-                                <span>({provider.reviewCount || 0})</span>
-                            </div>
-                            <span className="text-muted-foreground/50">•</span>
-                            <div className="flex items-center gap-1">
-                                <MapPin className="w-4 h-4" />
-                                <span>{provider.location}</span>
-                            </div>
-                        </div>
+                                {provider.isVerified && (
+                                    <Badge className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-1.5 border-none mt-4">
+                                        <CheckCircle className="w-4 h-4 mr-1.5" />
+                                        Verified Provider
+                                    </Badge>
+                                )}
 
-                        {provider.isVerified && (
-                            <Badge className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground px-3 py-1 border-none">
-                                <CheckCircle className="w-3 h-3 mr-1" />
-                                Verified Provider
-                            </Badge>
-                        )}
+                                {/* Desktop Actions */}
+                                <div className="pt-6">
+                                    <Button 
+                                        variant="outline" 
+                                        onClick={handleMessage}
+                                        className="w-full rounded-xl 
+                                        border-teal-600 text-teal-600 hover:bg-teal-50"
+                                    >
+                                        <MessageCircle className="w-4 h-4 mr-2" />
+                                        Message via WhatsApp
+                                    </Button>
+                                </div>
+                            </div>
+                        </Card>
+
+                        {/* Desktop Pricing Panel */}
+                        <div className="hidden lg:block">
+                            <Card className="rounded-3xl border border-border shadow-md p-6">
+                                <PricingSection provider={provider} />
+                            </Card>
+                        </div>
                     </div>
 
-                    <Separator className="my-6" />
+                    {/* Right Column (Main Content) */}
+                    <div className="lg:col-span-8 space-y-6">
+                        {/* Stats Grid */}
+                        <StatsGrid provider={provider} />
 
-                    {/* Stats Grid */}
-                    <StatsGrid provider={provider} />
+                        {/* About */}
+                        <Card className="rounded-3xl border border-border shadow-sm p-6">
+                            <AboutSection provider={provider} />
+                        </Card>
 
-                    <Separator className="my-6" />
+                        {/* Services */}
+                        <Card className="rounded-3xl border border-border shadow-sm p-6">
+                            <ServicesSection services={provider.services} />
+                        </Card>
 
-                    {/* Pricing Card */}
-                    <PricingSection provider={provider} />
+                        {/* Portfolio */}
+                        <Card className="rounded-3xl border border-border shadow-sm p-6">
+                            <PortfolioSection portfolio={provider.portfolio} />
+                        </Card>
 
-                    <Separator className="my-6" />
-
-                    {/* About Section */}
-                    <AboutSection provider={provider} />
-
-                    <Separator className="my-6" />
-
-                    {/* Services Section */}
-                    <ServicesSection services={provider.services} />
-
-                    <Separator className="my-6" />
-
-                    {/* Portfolio Section */}
-                    <PortfolioSection portfolio={provider.portfolio} />
-
-                    <Separator className="my-6" />
-
-                    {/* Reviews Section */}
-                    <ReviewsSection provider={provider} />
-                </Card>
+                        {/* Reviews */}
+                        <Card className="rounded-3xl border border-border shadow-sm p-6">
+                            <ReviewsSection provider={provider} />
+                        </Card>
+                    </div>
+                </div>
             </div>
-
-            {/* Sticky Bottom CTA Bar */}
-            <BottomCtaBar 
-                hourlyRate={provider.hourlyRate}
-                onMessage={handleMessage}
-                onBookNow={handleBookNow}
-            />
         </div>
     );
 };
 
 // ===== Sub-Components =====
 
-const ProfileHeader = ({ navigate }) => (
+const ProfileHeader = () => (
     <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border/50">
-        <div className="max-w-md mx-auto px-4 h-14 flex items-center justify-between">
-            <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => navigate(-1)}
-                className="rounded-full hover:bg-teal-100"
-            >
-                <ArrowLeft className="w-5 h-5" />
-            </Button>
-            
+        <div className="max-w-md mx-auto px-4 h-14 flex items-center justify-center">
             <h2 className="text-base font-semibold text-foreground truncate max-w-[180px]">
                 Provider Profile
             </h2>
-            
-            <div className="flex items-center gap-1">
-                <Button 
-                    variant="ghost" 
-                    size="icon"
-                    className="rounded-full hover:bg-teal-100"
-                >
-                    <Share2 className="w-5 h-5" />
-                </Button>
-                <Button 
-                    variant="ghost" 
-                    size="icon"
-                    className="rounded-full hover:bg-teal-100"
-                >
-                    <Heart className="w-5 h-5" />
-                </Button>
-            </div>
         </div>
     </div>
 );
@@ -221,7 +197,7 @@ const StatsGrid = ({ provider }) => {
         {
             icon: Award,
             label: 'Jobs Done',
-            value: provider.reviewCount ? `${provider.reviewCount * 5}+` : '0',
+            value: (provider.reviewsCount || provider.reviewCount) ? `${(provider.reviewsCount || provider.reviewCount) * 5}+` : '0',
         },
         {
             icon: Clock,
@@ -231,7 +207,7 @@ const StatsGrid = ({ provider }) => {
         {
             icon: Star,
             label: 'Rating',
-            value: provider.rating?.toFixed(1) || 'N/A',
+            value: provider.rating ? Number(provider.rating).toFixed(1) : 'N/A',
         },
     ];
 
@@ -286,7 +262,7 @@ const AboutSection = ({ provider }) => (
             <div className="flex items-center gap-2 text-muted-foreground">
                 <Calendar className="w-4 h-4 text-primary" />
                 <span>
-                    Member since {new Date(provider.createdAt).toLocaleDateString('en-US', {
+                    Member since {new Date(provider.createdAt || provider.joinDate || '2024-01-01').toLocaleDateString('en-US', {
                         month: 'long',
                         year: 'numeric'
                     })}
@@ -407,12 +383,13 @@ const ReviewsSection = ({ provider }) => {
         }
     ];
 
-    const reviews = provider.reviewCount > 0 ? mockReviews : [];
+    const reviewCount = provider.reviewsCount || provider.reviewCount || 0;
+    const reviews = reviewCount > 0 ? mockReviews : [];
 
     return (
         <div className="p-4 space-y-4">
             <h3 className="text-sm font-semibold text-foreground">
-                Customer Reviews ({provider.reviewCount || 0})
+                Customer Reviews ({reviewCount})
             </h3>
             
             {reviews.length > 0 ? (
@@ -459,7 +436,7 @@ const ReviewsSection = ({ provider }) => {
     );
 };
 
-const BottomCtaBar = ({ hourlyRate, onMessage, onBookNow }) => (
+const BottomCtaBar = ({ hourlyRate, onMessage }) => (
     <div className="fixed bottom-0 inset-x-0 z-40 bg-background/95 backdrop-blur-md border-t border-border/50 p-4 shadow-lg">
         <div className="max-w-md mx-auto flex items-center gap-3">
             <div className="hidden sm:block flex-1">
@@ -475,13 +452,7 @@ const BottomCtaBar = ({ hourlyRate, onMessage, onBookNow }) => (
                     className="flex-1 rounded-full border-teal-600 text-teal-600 hover:bg-teal-50"
                 >
                     <MessageCircle className="w-4 h-4 mr-2" />
-                    Message
-                </Button>
-                <Button 
-                    onClick={onBookNow}
-                    className="flex-1 rounded-full bg-teal-600 hover:bg-teal-700 text-white shadow-md"
-                >
-                    Book Now
+                    Message via WhatsApp
                 </Button>
             </div>
         </div>

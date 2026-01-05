@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { Badge } from '../../components/ui/badge';
-import { DollarSign, Calendar, MapPin } from 'lucide-react';
+import { DollarSign, Calendar, MapPin, Search, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { LoadingSpinner } from '../../components/shared/LoadingSpinner';
 import { EmptyState } from '../../components/shared/EmptyState';
 import { applicationsAPI } from '../../lib/api';
 import { formatCurrency, formatDate } from '../../lib/utils';
+import ScrollReveal from '../../components/ui/ScrollReveal';
 
 export const MyApplications = () => {
     const [applications, setApplications] = useState([]);
@@ -38,130 +39,123 @@ export const MyApplications = () => {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8 max-w-7xl mx-auto">
             {/* Header */}
-            <div>
-                <h1 className="text-3xl font-bold text-gray-900">My Applications</h1>
-                <p className="text-gray-600 mt-1">Track your job applications and their status</p>
-            </div>
+            <ScrollReveal>
+                <div className="flex flex-col items-center justify-center gap-2 text-center py-8">
+                    <h1 className="text-4xl font-bold text-gray-900 tracking-tight sm:text-5xl">My Applications</h1>
+                    <p className="text-lg text-gray-600 max-w-2xl">Track and manage your job applications</p>
+                </div>
+            </ScrollReveal>
 
             {/* Applications List */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Applications</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <Tabs defaultValue="all" className="w-full">
-                        <TabsList className="grid w-full grid-cols-4">
-                            <TabsTrigger value="all">All</TabsTrigger>
-                            <TabsTrigger value="PENDING">Pending</TabsTrigger>
-                            <TabsTrigger value="ACCEPTED">Accepted</TabsTrigger>
-                            <TabsTrigger value="REJECTED">Rejected</TabsTrigger>
-                        </TabsList>
+            <ScrollReveal delay={0.1}>
+                <Card className="border-2 shadow-sm bg-white/50 backdrop-blur-sm">
+                    <CardHeader>
+                        <CardTitle className="hidden">Applications</CardTitle>
+                        <Tabs defaultValue="all" className="w-full">
+                            <TabsList className="grid w-full grid-cols-4 p-1 bg-gray-100/80 rounded-xl mb-6">
+                                <TabsTrigger value="all" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all duration-200">
+                                    All Applications
+                                </TabsTrigger>
+                                <TabsTrigger value="PENDING" className="rounded-lg data-[state=active]:bg-yellow-50 data-[state=active]:text-yellow-700 data-[state=active]:shadow-sm transition-all duration-200">
+                                    Pending
+                                </TabsTrigger>
+                                <TabsTrigger value="ACCEPTED" className="rounded-lg data-[state=active]:bg-green-50 data-[state=active]:text-green-700 data-[state=active]:shadow-sm transition-all duration-200">
+                                    Accepted
+                                </TabsTrigger>
+                                <TabsTrigger value="REJECTED" className="rounded-lg data-[state=active]:bg-red-50 data-[state=active]:text-red-700 data-[state=active]:shadow-sm transition-all duration-200">
+                                    Rejected
+                                </TabsTrigger>
+                            </TabsList>
 
-                        <TabsContent value="all" className="mt-6">
-                            {applications.length === 0 ? (
-                                <EmptyState
-                                    title="No applications yet"
-                                    description="Browse available jobs and submit your first application"
-                                />
-                            ) : (
-                                <div className="space-y-4">
-                                    {applications.map(app => (
-                                        <ApplicationCard key={app.id} application={app} />
-                                    ))}
-                                </div>
-                            )}
-                        </TabsContent>
+                            {/* Content Sections */}
+                            <TabsContent value="all" className="space-y-4">
+                                {applications.length === 0 ? (
+                                    <EmptyState title="No applications yet" description="Browse available jobs and submit your first application" />
+                                ) : (
+                                    applications.map(app => <ApplicationCard key={app.id} application={app} />)
+                                )}
+                            </TabsContent>
 
-                        <TabsContent value="PENDING" className="mt-6">
-                            {filterApplications('PENDING').length === 0 ? (
-                                <EmptyState
-                                    title="No pending applications"
-                                    description="You don't have any pending applications at the moment"
-                                />
-                            ) : (
-                                <div className="space-y-4">
-                                    {filterApplications('PENDING').map(app => (
-                                        <ApplicationCard key={app.id} application={app} />
-                                    ))}
-                                </div>
-                            )}
-                        </TabsContent>
+                            <TabsContent value="PENDING" className="space-y-4">
+                                {filterApplications('PENDING').length === 0 ? (
+                                    <EmptyState title="No pending applications" description="You don't have any pending applications" />
+                                ) : (
+                                    filterApplications('PENDING').map(app => <ApplicationCard key={app.id} application={app} />)
+                                )}
+                            </TabsContent>
 
-                        <TabsContent value="ACCEPTED" className="mt-6">
-                            {filterApplications('ACCEPTED').length === 0 ? (
-                                <EmptyState
-                                    title="No accepted applications"
-                                    description="Your accepted applications will appear here"
-                                />
-                            ) : (
-                                <div className="space-y-4">
-                                    {filterApplications('ACCEPTED').map(app => (
-                                        <ApplicationCard key={app.id} application={app} />
-                                    ))}
-                                </div>
-                            )}
-                        </TabsContent>
+                            <TabsContent value="ACCEPTED" className="space-y-4">
+                                {filterApplications('ACCEPTED').length === 0 ? (
+                                    <EmptyState title="No accepted applications" description="Your accepted applications will appear here" />
+                                ) : (
+                                    filterApplications('ACCEPTED').map(app => <ApplicationCard key={app.id} application={app} />)
+                                )}
+                            </TabsContent>
 
-                        <TabsContent value="REJECTED" className="mt-6">
-                            {filterApplications('REJECTED').length === 0 ? (
-                                <EmptyState
-                                    title="No rejected applications"
-                                    description="Your rejected applications will appear here"
-                                />
-                            ) : (
-                                <div className="space-y-4">
-                                    {filterApplications('REJECTED').map(app => (
-                                        <ApplicationCard key={app.id} application={app} />
-                                    ))}
-                                </div>
-                            )}
-                        </TabsContent>
-                    </Tabs>
-                </CardContent>
-            </Card>
+                            <TabsContent value="REJECTED" className="space-y-4">
+                                {filterApplications('REJECTED').length === 0 ? (
+                                    <EmptyState title="No rejected applications" description="Your rejected applications will appear here" />
+                                ) : (
+                                    filterApplications('REJECTED').map(app => <ApplicationCard key={app.id} application={app} />)
+                                )}
+                            </TabsContent>
+                        </Tabs>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                        {/* Empty logic handled in TabsContent */}
+                    </CardContent>
+                </Card>
+            </ScrollReveal>
         </div>
     );
 };
 
 const ApplicationCard = ({ application }) => {
-    const getStatusColor = (status) => {
+    const getStatusConfig = (status) => {
         switch (status) {
             case 'PENDING':
-                return 'bg-yellow-100 text-yellow-800';
+                return { color: 'bg-yellow-100 text-yellow-800 border-yellow-200', icon: Clock };
             case 'ACCEPTED':
-                return 'bg-green-100 text-green-800';
+                return { color: 'bg-green-100 text-green-800 border-green-200', icon: CheckCircle };
             case 'REJECTED':
-                return 'bg-red-100 text-red-800';
+                return { color: 'bg-red-100 text-red-800 border-red-200', icon: XCircle };
             default:
-                return 'bg-gray-100 text-gray-800';
+                return { color: 'bg-gray-100 text-gray-800', icon: Clock };
         }
     };
 
+    const statusConfig = getStatusConfig(application.status);
+    const StatusIcon = statusConfig.icon;
+
     return (
-        <div className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
-            <div className="flex justify-between items-start">
-                <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-semibold text-gray-900">Job #{application.jobId}</h3>
-                        <Badge className={getStatusColor(application.status)}>
+        <div className="group border border-gray-200 rounded-xl p-5 hover:shadow-md hover:border-blue-200 transition-all duration-300 bg-white">
+            <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                <div className="flex-1 space-y-3">
+                    <div className="flex items-center justify-between sm:justify-start gap-3">
+                        <h3 className="font-bold text-gray-900 text-lg">Job #{application.jobId}</h3>
+                        <Badge className={`${statusConfig.color} border px-3 py-1 flex items-center gap-1.5`}>
+                            <StatusIcon className="w-3.5 h-3.5" />
                             {application.status}
                         </Badge>
                     </div>
 
-                    <p className="text-sm text-gray-600 mb-3">{application.message}</p>
+                    <p className="text-gray-600 leading-relaxed bg-gray-50/50 p-3 rounded-lg border border-gray-100">
+                        "{application.message}"
+                    </p>
 
-                    <div className="flex flex-wrap gap-4 text-sm text-gray-700">
-                        <div className="flex items-center gap-1">
+                    <div className="flex flex-wrap gap-4 pt-2">
+                        <div className="flex items-center gap-1.5 text-sm font-medium text-gray-700 bg-blue-50 px-3 py-1.5 rounded-full text-blue-700">
                             <DollarSign className="w-4 h-4" />
-                            <span className="font-semibold">{formatCurrency(application.quote)}</span>
+                            <span>Quote: {formatCurrency(application.quote)}</span>
                         </div>
-                        <div className="flex items-center gap-1">
-                            <Calendar className="w-4 h-4" />
-                            <span>{application.availability}</span>
+                        <div className="flex items-center gap-1.5 text-sm text-gray-600 px-2">
+                            <Calendar className="w-4 h-4 text-gray-400" />
+                            <span>Available: {application.availability}</span>
                         </div>
-                        <div className="flex items-center gap-1 text-gray-500">
+                        <div className="flex items-center gap-1.5 text-sm text-gray-500 px-2 ml-auto sm:ml-0">
+                            <Clock className="w-4 h-4 text-gray-400" />
                             <span>Applied {formatDate(application.createdAt)}</span>
                         </div>
                     </div>

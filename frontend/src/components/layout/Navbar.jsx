@@ -2,27 +2,25 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Badge } from '../ui/badge';
 import {
     Sheet,
     SheetContent,
     SheetTrigger,
 } from '../ui/sheet';
 import {
-    Bell,
     Menu,
     LogOut,
     User,
     Settings,
     Briefcase,
 } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
-import { useNotifications } from '../../hooks/useNotifications';
+import { useAuth } from '../../hooks/useAuth'; 
+import { useNavigation } from '../../hooks/useNavigation';
 import { ROUTES } from '../../lib/constants';
 
 export const Navbar = () => {
     const { user, logout, isProvider, isCustomer, isAdmin } = useAuth();
-    const { unreadCount } = useNotifications();
+    const { navItems } = useNavigation();
     const navigate = useNavigate();
     const [showUserMenu, setShowUserMenu] = useState(false);
 
@@ -62,19 +60,6 @@ export const Navbar = () => {
 
                     {/* Right side */}
                     <div className="flex items-center gap-4">
-                        {/* Notifications */}
-                        <Link to={ROUTES.NOTIFICATIONS} className="relative">
-                            <Button variant="ghost" size="icon" className="relative">
-                                <Bell className="w-5 h-5" />
-                                {unreadCount > 0 && (
-                                    <Badge
-                                        className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-red-500"
-                                    >
-                                        {unreadCount > 9 ? '9+' : unreadCount}
-                                    </Badge>
-                                )}
-                            </Button>
-                        </Link>
 
                         {/* User Menu - Desktop */}
                         <div className="hidden md:block relative">
@@ -138,6 +123,7 @@ export const Navbar = () => {
                             </SheetTrigger>
                             <SheetContent side="right" className="w-64">
                                 <div className="flex flex-col gap-4 mt-8">
+                                    {/* User Info */}
                                     <div className="flex items-center gap-3 pb-4 border-b">
                                         <Avatar className="w-12 h-12">
                                             <AvatarImage src={user?.avatar} alt={user?.fullName} />
@@ -150,6 +136,25 @@ export const Navbar = () => {
                                             <p className="text-sm text-gray-500 capitalize">{user?.role}</p>
                                         </div>
                                     </div>
+
+                                    {/* Navigation Links */}
+                                    <div className="space-y-1">
+                                        {navItems.map((item) => {
+                                            const Icon = item.icon;
+                                            return (
+                                                <Link
+                                                    key={item.path}
+                                                    to={item.path}
+                                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
+                                                >
+                                                    <Icon className="w-4 h-4" />
+                                                    {item.label}
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+
+                                    <hr className="my-2" />
 
                                     <Link
                                         to={ROUTES.PROFILE}

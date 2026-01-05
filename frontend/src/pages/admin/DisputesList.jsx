@@ -1,64 +1,21 @@
 import { useState } from 'react';
+import { mockDisputes } from '../../lib/mockData';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
-import { AlertCircle, Calendar, DollarSign, Eye } from 'lucide-react';
+import { AlertCircle, Calendar, DollarSign, Eye, Search, Filter } from 'lucide-react';
 import { EmptyState } from '../../components/shared/EmptyState';
 import { formatCurrency, formatDate } from '../../lib/utils';
 import { ROUTES } from '../../lib/constants';
+import ScrollReveal from '../../components/ui/ScrollReveal';
 
 export const DisputesList = () => {
     const navigate = useNavigate();
 
-    // Mock disputes data
-    const [disputes] = useState([
-        {
-            id: 'dispute-001',
-            jobId: 'job-002',
-            jobTitle: 'House cleaning service',
-            customerId: 'cust-001',
-            customerName: 'John Customer',
-            providerId: 'prov-001',
-            providerName: 'Sarah Provider',
-            amount: 200,
-            reason: 'Work not completed as agreed',
-            description: 'The provider did not clean the bathrooms as specified in the job description.',
-            status: 'PENDING',
-            createdAt: '2024-12-03T10:00:00Z',
-        },
-        {
-            id: 'dispute-002',
-            jobId: 'job-003',
-            jobTitle: 'Install ceiling fan',
-            customerId: 'cust-001',
-            customerName: 'John Customer',
-            providerId: 'prov-001',
-            providerName: 'Sarah Provider',
-            amount: 120,
-            reason: 'Quality issues',
-            description: 'The ceiling fan is making noise and not working properly.',
-            status: 'UNDER_REVIEW',
-            createdAt: '2024-12-02T14:30:00Z',
-        },
-        {
-            id: 'dispute-003',
-            jobId: 'job-001',
-            jobTitle: 'Fix leaking kitchen sink',
-            customerId: 'cust-001',
-            customerName: 'John Customer',
-            providerId: 'prov-001',
-            providerName: 'Sarah Provider',
-            amount: 75,
-            reason: 'Payment issue',
-            description: 'Customer refusing to pay after job completion.',
-            status: 'RESOLVED',
-            resolution: 'Payment released to provider',
-            createdAt: '2024-11-28T09:15:00Z',
-            resolvedAt: '2024-11-30T16:00:00Z',
-        },
-    ]);
+    // Mock disputes data - using centralized mock data
+    const [disputes] = useState(mockDisputes);
 
     const filterDisputes = (status) => {
         if (!status) return disputes;
@@ -68,13 +25,15 @@ export const DisputesList = () => {
     const getStatusColor = (status) => {
         switch (status) {
             case 'PENDING':
-                return 'bg-yellow-100 text-yellow-800';
+                return 'bg-yellow-100 text-yellow-800 border-yellow-200';
             case 'UNDER_REVIEW':
-                return 'bg-blue-100 text-blue-800';
+                return 'bg-blue-100 text-blue-800 border-blue-200';
             case 'RESOLVED':
-                return 'bg-green-100 text-green-800';
+                return 'bg-green-100 text-green-800 border-green-200';
+            case 'CLOSED':
+                return 'bg-gray-100 text-gray-800 border-gray-200';
             default:
-                return 'bg-gray-100 text-gray-800';
+                return 'bg-gray-50 text-gray-600 border-gray-200';
         }
     };
 
@@ -83,154 +42,122 @@ export const DisputesList = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="max-w-7xl mx-auto space-y-8 pb-12">
             {/* Header */}
-            <div>
-                <h1 className="text-3xl font-bold text-gray-900">Disputes Management</h1>
-                <p className="text-gray-600 mt-1">Review and resolve disputes between customers and providers</p>
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Disputes Management</h1>
+                    <p className="text-gray-600 mt-1">Review and resolve disputes between customers and providers</p>
+                </div>
+                <Button variant="outline" className="shadow-sm">
+                    <Filter className="w-4 h-4 mr-2" />
+                    Filter View
+                </Button>
             </div>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-gray-600">
-                            Pending Disputes
-                        </CardTitle>
-                        <AlertCircle className="w-5 h-5 text-yellow-600" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-3xl font-bold text-gray-900">
-                            {filterDisputes('PENDING').length}
-                        </div>
-                        <p className="text-sm text-gray-500 mt-1">Require attention</p>
-                    </CardContent>
-                </Card>
+                <ScrollReveal delay={0.1}>
+                    <Card className="border-l-4 border-l-yellow-500 shadow-sm hover:shadow-md transition-shadow">
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                            <CardTitle className="text-sm font-medium text-gray-600">
+                                Pending Disputes
+                            </CardTitle>
+                            <AlertCircle className="w-5 h-5 text-yellow-600" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-3xl font-bold text-gray-900">
+                                {filterDisputes('PENDING').length}
+                            </div>
+                            <p className="text-sm text-gray-500 mt-1">Require attention</p>
+                        </CardContent>
+                    </Card>
+                </ScrollReveal>
 
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-gray-600">
-                            Under Review
-                        </CardTitle>
-                        <Eye className="w-5 h-5 text-blue-600" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-3xl font-bold text-gray-900">
-                            {filterDisputes('UNDER_REVIEW').length}
-                        </div>
-                        <p className="text-sm text-gray-500 mt-1">Being investigated</p>
-                    </CardContent>
-                </Card>
+                <ScrollReveal delay={0.2}>
+                    <Card className="border-l-4 border-l-blue-500 shadow-sm hover:shadow-md transition-shadow">
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                            <CardTitle className="text-sm font-medium text-gray-600">
+                                Under Review
+                            </CardTitle>
+                            <Eye className="w-5 h-5 text-blue-600" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-3xl font-bold text-gray-900">
+                                {filterDisputes('UNDER_REVIEW').length}
+                            </div>
+                            <p className="text-sm text-gray-500 mt-1">Being investigated</p>
+                        </CardContent>
+                    </Card>
+                </ScrollReveal>
 
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-gray-600">
-                            Resolved
-                        </CardTitle>
-                        <AlertCircle className="w-5 h-5 text-green-600" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-3xl font-bold text-gray-900">
-                            {filterDisputes('RESOLVED').length}
-                        </div>
-                        <p className="text-sm text-gray-500 mt-1">All time</p>
-                    </CardContent>
-                </Card>
+                <ScrollReveal delay={0.3}>
+                    <Card className="border-l-4 border-l-green-500 shadow-sm hover:shadow-md transition-shadow">
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                            <CardTitle className="text-sm font-medium text-gray-600">
+                                Resolved
+                            </CardTitle>
+                            <AlertCircle className="w-5 h-5 text-green-600" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-3xl font-bold text-gray-900">
+                                {filterDisputes('RESOLVED').length}
+                            </div>
+                            <p className="text-sm text-gray-500 mt-1">All time</p>
+                        </CardContent>
+                    </Card>
+                </ScrollReveal>
             </div>
 
             {/* Disputes List */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>All Disputes</CardTitle>
+            {/* Disputes List */}
+            <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
+                <CardHeader className="border-b bg-gray-50/50">
+                    <div className="flex items-center justify-between">
+                        <CardTitle>All Disputes</CardTitle>
+                        <div className="relative w-64 hidden md:block">
+                            <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+                            <input
+                                placeholder="Search disputes..."
+                                className="w-full pl-8 pr-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-white"
+                            />
+                        </div>
+                    </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-6">
                     <Tabs defaultValue="all" className="w-full">
-                        <TabsList className="grid w-full grid-cols-4">
-                            <TabsTrigger value="all">All</TabsTrigger>
-                            <TabsTrigger value="PENDING">Pending</TabsTrigger>
-                            <TabsTrigger value="UNDER_REVIEW">Under Review</TabsTrigger>
-                            <TabsTrigger value="RESOLVED">Resolved</TabsTrigger>
+                        <TabsList className="bg-gray-100 p-1 rounded-full w-full md:w-auto inline-flex mb-6">
+                            <TabsTrigger value="all" className="rounded-full px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm">All</TabsTrigger>
+                            <TabsTrigger value="PENDING" className="rounded-full px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm">Pending</TabsTrigger>
+                            <TabsTrigger value="UNDER_REVIEW" className="rounded-full px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm">Reviewing</TabsTrigger>
+                            <TabsTrigger value="RESOLVED" className="rounded-full px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm">Resolved</TabsTrigger>
+                            <TabsTrigger value="CLOSED" className="rounded-full px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm">Closed</TabsTrigger>
                         </TabsList>
 
-                        <TabsContent value="all" className="mt-6">
-                            {disputes.length === 0 ? (
-                                <EmptyState
-                                    title="No disputes"
-                                    description="All disputes will appear here"
-                                />
-                            ) : (
-                                <div className="space-y-4">
-                                    {disputes.map(dispute => (
-                                        <DisputeCard
-                                            key={dispute.id}
-                                            dispute={dispute}
-                                            onView={handleViewDispute}
-                                            getStatusColor={getStatusColor}
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                        </TabsContent>
-
-                        <TabsContent value="PENDING" className="mt-6">
-                            {filterDisputes('PENDING').length === 0 ? (
-                                <EmptyState
-                                    title="No pending disputes"
-                                    description="Pending disputes will appear here"
-                                />
-                            ) : (
-                                <div className="space-y-4">
-                                    {filterDisputes('PENDING').map(dispute => (
-                                        <DisputeCard
-                                            key={dispute.id}
-                                            dispute={dispute}
-                                            onView={handleViewDispute}
-                                            getStatusColor={getStatusColor}
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                        </TabsContent>
-
-                        <TabsContent value="UNDER_REVIEW" className="mt-6">
-                            {filterDisputes('UNDER_REVIEW').length === 0 ? (
-                                <EmptyState
-                                    title="No disputes under review"
-                                    description="Disputes being reviewed will appear here"
-                                />
-                            ) : (
-                                <div className="space-y-4">
-                                    {filterDisputes('UNDER_REVIEW').map(dispute => (
-                                        <DisputeCard
-                                            key={dispute.id}
-                                            dispute={dispute}
-                                            onView={handleViewDispute}
-                                            getStatusColor={getStatusColor}
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                        </TabsContent>
-
-                        <TabsContent value="RESOLVED" className="mt-6">
-                            {filterDisputes('RESOLVED').length === 0 ? (
-                                <EmptyState
-                                    title="No resolved disputes"
-                                    description="Resolved disputes will appear here"
-                                />
-                            ) : (
-                                <div className="space-y-4">
-                                    {filterDisputes('RESOLVED').map(dispute => (
-                                        <DisputeCard
-                                            key={dispute.id}
-                                            dispute={dispute}
-                                            onView={handleViewDispute}
-                                            getStatusColor={getStatusColor}
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                        </TabsContent>
+                        {['all', 'PENDING', 'UNDER_REVIEW', 'RESOLVED', 'CLOSED'].map((tabValue) => (
+                            <TabsContent key={tabValue} value={tabValue} className="mt-0 focus-visible:outline-none">
+                                {filterDisputes(tabValue === 'all' ? null : tabValue).length === 0 ? (
+                                    <EmptyState
+                                        title="No disputes found"
+                                        description="There are no disputes in this category."
+                                        className="py-12"
+                                    />
+                                ) : (
+                                    <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+                                        {filterDisputes(tabValue === 'all' ? null : tabValue).map((dispute) => (
+                                            <div key={dispute.id} className="w-full">
+                                                <DisputeCard
+                                                    dispute={dispute}
+                                                    onView={handleViewDispute}
+                                                    getStatusColor={getStatusColor}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </TabsContent>
+                        ))}
                     </Tabs>
                 </CardContent>
             </Card>
@@ -240,43 +167,56 @@ export const DisputesList = () => {
 
 const DisputeCard = ({ dispute, onView, getStatusColor }) => {
     return (
-        <div className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
-            <div className="flex justify-between items-start">
-                <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-semibold text-gray-900">{dispute.jobTitle}</h3>
-                        <Badge className={getStatusColor(dispute.status)}>
+        <div className="group border rounded-xl p-5 hover:bg-white hover:shadow-lg transition-all duration-300 bg-white/60 border-gray-100">
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                <div className="flex-1 space-y-3">
+                    <div className="flex items-center gap-3">
+                        <Badge className={`${getStatusColor(dispute.status)} px-3 py-1`}>
                             {dispute.status.replace('_', ' ')}
                         </Badge>
+                        <span className="text-xs text-gray-400 font-medium flex items-center gap-1">
+                             <Calendar className="w-3 h-3" />
+                             {formatDate(dispute.createdAt)}
+                        </span>
                     </div>
 
-                    <p className="text-sm text-gray-600 mb-3">
-                        <span className="font-medium">Reason:</span> {dispute.reason}
-                    </p>
+                    <div>
+                        <h3 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                            {dispute.jobTitle}
+                        </h3>
+                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                            <span className="font-semibold text-gray-700">Reason:</span> {dispute.reason}
+                        </p>
+                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm text-gray-700">
-                        <div>
-                            <span className="text-gray-500">Customer:</span> {dispute.customerName}
-                        </div>
-                        <div>
-                            <span className="text-gray-500">Provider:</span> {dispute.providerName}
-                        </div>
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 pt-2 border-t border-gray-100/50">
                         <div className="flex items-center gap-1">
-                            <DollarSign className="w-3 h-3" />
-                            <span className="font-semibold">{formatCurrency(dispute.amount)}</span>
+                            <span className="font-medium text-gray-400">Customer:</span>
+                            <span className="text-gray-700">{dispute.customerName}</span>
                         </div>
-                    </div>
-
-                    <div className="flex items-center gap-1 text-sm text-gray-500 mt-2">
-                        <Calendar className="w-3 h-3" />
-                        <span>Filed {formatDate(dispute.createdAt)}</span>
+                        <div className="w-1 h-1 rounded-full bg-gray-300 hidden md:block" />
+                        <div className="flex items-center gap-1">
+                            <span className="font-medium text-gray-400">Provider:</span>
+                            <span className="text-gray-700">{dispute.providerName}</span>
+                        </div>
+                        <div className="w-1 h-1 rounded-full bg-gray-300 hidden md:block" />
+                        <div className="flex items-center gap-1 font-semibold text-gray-900">
+                            <DollarSign className="w-3.5 h-3.5 text-green-600" />
+                            {formatCurrency(dispute.amount)}
+                        </div>
                     </div>
                 </div>
 
-                <Button onClick={() => onView(dispute.id)} size="sm">
-                    <Eye className="w-4 h-4 mr-2" />
-                    View Details
-                </Button>
+                <div className="flex md:flex-col items-center justify-end gap-2 md:pl-4 md:border-l md:border-gray-100">
+                    <Button 
+                        onClick={() => onView(dispute.id)} 
+                        size="sm"
+                        className="w-full md:w-auto bg-white text-gray-700 border hover:bg-gray-50 hover:text-blue-600 shadow-sm"
+                    >
+                        <Eye className="w-4 h-4 mr-2" />
+                        View Details
+                    </Button>
+                </div>
             </div>
         </div>
     );

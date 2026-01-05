@@ -36,7 +36,9 @@ export const TRANSACTION_STATUS = {
 // Dispute Statuses
 export const DISPUTE_STATUS = {
     PENDING: 'PENDING',
+    UNDER_REVIEW: 'UNDER_REVIEW',
     RESOLVED: 'RESOLVED',
+    CLOSED: 'CLOSED',
 };
 
 // Dispute Decisions
@@ -156,6 +158,8 @@ export const ROUTES = {
     CUSTOMER_DASHBOARD: '/customer/dashboard',
     POST_JOB: '/customer/post-job',
     CUSTOMER_JOB_DETAILS: (id) => `/customer/jobs/${id}`,
+    CUSTOMER_JOB_DISPUTE: (id) => `/customer/jobs/${id}/dispute`,
+    CUSTOMER_RATE_PROVIDER: (id) => `/customer/jobs/${id}/rate`,
     JOB_APPLICATIONS_VIEW: (id) => `/customer/jobs/${id}/applications`,
     BROWSE_PROVIDERS: '/customer/browse-providers',
     PROVIDER_PROFILE: (id) => `/customer/providers/${id}`,
@@ -169,8 +173,13 @@ export const ROUTES = {
 
     // Admin
     ADMIN_DASHBOARD: '/admin/dashboard',
+    ADMIN_USERS: '/admin/users',
+    ADMIN_JOBS: '/admin/jobs',
+    ADMIN_JOB_DETAILS: (id) => `/admin/jobs/${id}`,
+    ADMIN_REVENUE: '/admin/revenue',
     ADMIN_DISPUTES: '/admin/disputes',
     ADMIN_DISPUTE_DETAILS: (id) => `/admin/disputes/${id}`,
+    ADMIN_USER_DETAILS: (id) => `/admin/users/${id}`,
 
     // Shared
     PROFILE: '/profile',

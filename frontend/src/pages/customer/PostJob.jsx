@@ -11,6 +11,7 @@ import { AlertCircle, Loader2, Upload, X } from 'lucide-react';
 import { jobsAPI } from '../../lib/api';
 import { SERVICE_CATEGORIES, ROUTES, VALIDATION } from '../../lib/constants';
 import { validators } from '../../lib/utils';
+import ScrollReveal from '../../components/ui/ScrollReveal';
 
 export const PostJob = () => {
     const navigate = useNavigate();
@@ -155,15 +156,18 @@ export const PostJob = () => {
 
     return (
         <div className="max-w-3xl mx-auto">
-            <div className="mb-6">
-                <h1 className="text-3xl font-bold text-gray-900">Post a New Job</h1>
-                <p className="text-gray-600 mt-1">Fill in the details to find the right service provider</p>
-            </div>
+            <ScrollReveal>
+                <div className="flex flex-col items-center justify-center gap-2 text-center py-8">
+                    <h1 className="text-4xl font-bold text-gray-900 tracking-tight sm:text-5xl">Post a New Job</h1>
+                    <p className="text-lg text-gray-600 max-w-2xl">Fill in the details to find the right service provider</p>
+                </div>
+            </ScrollReveal>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Job Details</CardTitle>
-                    <CardDescription>
+            <ScrollReveal delay={0.2}>
+                <Card>
+                    <CardHeader>
+                    <CardTitle className="text-2xl font-bold text-center border-b border-gray-200 border-b-2 pb-2">Job Details</CardTitle>
+                    <CardDescription className="text-center pt-2">
                         Provide clear information to attract qualified providers
                     </CardDescription>
                 </CardHeader>
@@ -296,18 +300,21 @@ export const PostJob = () => {
                                 </p>
                                 <input
                                     type="file"
-                                    accept="image/*"
+                                    accept=".jpg,.jpeg,.png,.webp"
                                     multiple
                                     onChange={handlePhotoUpload}
                                     className="hidden"
                                     id="photo-upload"
                                     disabled={loading || photos.length >= VALIDATION.MAX_JOB_PHOTOS}
                                 />
-                                <Label htmlFor="photo-upload" className="cursor-pointer">
-                                    <Button type="button" variant="outline" disabled={loading || photos.length >= VALIDATION.MAX_JOB_PHOTOS}>
-                                        Choose Files
-                                    </Button>
-                                </Label>
+                                <Button 
+                                    type="button" 
+                                    variant="outline" 
+                                    disabled={loading || photos.length >= VALIDATION.MAX_JOB_PHOTOS}
+                                    onClick={() => document.getElementById('photo-upload').click()}
+                                >
+                                    Choose Files
+                                </Button>
                             </div>
 
                             {photos.length > 0 && (
@@ -356,6 +363,7 @@ export const PostJob = () => {
                     </form>
                 </CardContent>
             </Card>
+            </ScrollReveal>
         </div>
     );
 };

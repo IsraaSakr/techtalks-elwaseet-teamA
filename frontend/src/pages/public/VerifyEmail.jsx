@@ -79,14 +79,13 @@ export const VerifyEmail = () => {
     const handleResend = async () => {
         if (resendCooldown > 0) return;
 
-        setError('');
         setVerificationStatus('idle'); 
         setResendCooldown(60); 
 
         try {
             console.log('Resending OTP to:', email);
         } catch (error) {
-            setError('Failed to resend code. Please try again.');
+            toast.error('Failed to resend code. Please try again.');
             setResendCooldown(0);
             console.log(error)
         }
