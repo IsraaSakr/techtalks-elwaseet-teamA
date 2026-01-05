@@ -5,6 +5,7 @@ import com.elwaseet.backend.dto.job.JobResponseDTO;
 import com.elwaseet.backend.dto.job.UpdateJobRequest;
 import com.elwaseet.backend.entity.Job;
 import com.elwaseet.backend.entity.User;
+import com.elwaseet.backend.repository.JobRepository;
 import com.elwaseet.backend.service.JobService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -31,6 +32,7 @@ import org.springframework.data.domain.Sort;
 public class JobController {
 
     private final JobService jobService;
+    private final JobRepository jobRepository;
 
     /**
      * Update an existing job (text fields only)
@@ -198,5 +200,25 @@ public class JobController {
         
         jobService.cancelJob(id, authenticatedUser.getUserId());
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Get all jobs posted by current user
+     * GET /api/jobs/my-jobs
+     */
+    @GetMapping("/my-jobs")
+    @PreAuthorize("hasRole('CUSTOMER') or hasRole('HYBRID_PROVIDER')")
+    public ResponseEntity<Page<JobResponseDTO>> getMyJobs(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal User user) {
+        
+        Pageable pageable = PageRequest.of(page, size, Sort.by("postedAt").descending());
+        Page<Job> jobs = jobRepository.findByCustomer_UserId(user.getUserId(), pageable);
+        
+        // Use the existing fromEntity static method
+        Page<JobResponseDTO> response = jobs.map(JobResponseDTO::fromEntity);
+        
+        return ResponseEntity.ok(response);
     }
 }

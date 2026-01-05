@@ -2,6 +2,8 @@ package com.elwaseet.backend.repository;
 
 import com.elwaseet.backend.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -51,4 +53,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * Count users by account type (CUSTOMER / HYBRID_PROVIDER).
      */
     long countByAccountType(User.AccountType accountType);
+
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.providerProfile WHERE u.userId = :userId")
+    Optional<User> findByIdWithProfile(@Param("userId") Long userId);
 }

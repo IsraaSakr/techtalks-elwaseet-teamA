@@ -1,0 +1,129 @@
+{
+	"info": {
+		"_postman_id": "552e556b-10ef-453d-961d-050a5695dce9",
+		"name": "ElWaseet User Management",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50753645"
+	},
+	"item": [
+		{
+			"name": "Update User Profile",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzU3ODcwMiwiZXhwIjoxNzY4MTgzNTAyfQ.U_8pOFxb3y_nQcS7YZwxSwsqzD5R8PB3qr3ZTn8PLVA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Final\",\r\n  \"phone\": \"+96111111111\",\r\n  \"location\": \"BEIRUT\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/users/me",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users",
+						"me"
+					]
+				},
+				"description": "PUT [http://localhost:8080/api/users/me](http://localhost:8080/api/users/me)\n\nAuthorization: user token\n\nBody: raw json\n\n**Update Name:**\n\n{  \n\"name\": \"lalalala\"  \n}\n\n**Expected Response: ok**\n\n{  \n\"userId\": 3,  \n\"email\": \"[test@gmail.com](https://mailto:israasakr.1204@gmail.com)\",  \n\"name\": \"lalalala\",  \n\"phone\": \"70123456\",  \n\"location\": \"BEIRUT\",  \n\"accountType\": \"CUSTOMER\",  \n\"profilePhotoUrl\": null,  \n\"isEmailVerified\": true,  \n\"createdAt\": \"2025-12-22T11:55:26.436275\"  \n}\n\n---\n\n**Update Phone Number:**\n\nBody:\n\n{\n\n\"phone\": \"+96198765432\"\n\n}  \n**Expected Response: 200 ok**\n\n{  \n\"userId\": 3,  \n\"email\": \"[test@gmail.com](https://mailto:israasakr.1204@gmail.com)\",  \n\"name\": \"lalalala\",  \n\"phone\": \"+96198765432\",  \n\"location\": \"BEIRUT\",  \n\"accountType\": \"CUSTOMER\",  \n\"profilePhotoUrl\": null,  \n\"isEmailVerified\": true,  \n\"createdAt\": \"2025-12-22T11:55:26.436275\"  \n}\n\n---\n\n**Update Location:**\n\n{\n\n\"location\": \"BEKAA\"\n\n}\n\n**Expected Response: 200 OK**\n\n{  \n\"userId\": 3,  \n\"email\": \"test[@gmail.com](https://mailto:israasakr.1204@gmail.com)\",  \n\"name\": \"lalalala\",  \n\"phone\": \"+96198765432\",  \n\"location\": \"BEKAA\",  \n\"accountType\": \"CUSTOMER\",  \n\"profilePhotoUrl\": null,  \n\"isEmailVerified\": true,  \n\"createdAt\": \"2025-12-22T11:55:26.436275\"  \n}\n\n---\n\n**Update Multiple Fields:**\n\n{  \n\"name\": \"John Final\",  \n\"phone\": \"+96111111111\",  \n\"location\": \"BEIRUT\"  \n}\n\n**Expected Response: 200 ok**\n\n{  \n\"userId\": 3,  \n\"email\": \"test[@gmail.com](https://mailto:israasakr.1204@gmail.com)\",  \n\"name\": \"Final\",  \n\"phone\": \"+96111111111\",  \n\"location\": \"BEIRUT\",  \n\"accountType\": \"CUSTOMER\",  \n\"profilePhotoUrl\": null,  \n\"isEmailVerified\": true,  \n\"createdAt\": \"2025-12-22T11:55:26.436275\"  \n}\n\n---\n\n**Inavlid Phone format:**\n\nExpected Response:\n\n{  \n\"status\": 400,  \n\"message\": \"Validation failed\",  \n\"timestamp\": \"2026-01-05T17:52:19.4162762\",  \n\"errors\": \\[  \n\"phone: Invalid phone number. Use format: +9611234567\"  \n\\]  \n}\n\n---\n\n**Using an already in use phone number:**\n\nExpected Response:\n\n{  \n\"status\": 400,  \n\"message\": \"Phone number already in use\",  \n\"timestamp\": \"2026-01-05T17:54:26.5631667\",  \n\"errors\": null  \n}\n\n---"
+			},
+			"response": []
+		},
+		{
+			"name": "Password Change",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkhZQlJJRF9QUk9WSURFUiIsImlhdCI6MTc2NzU3ODY0NiwiZXhwIjoxNzY4MTgzNDQ2fQ.JqVHXR-UtntUnTLskCHCRGzwOQbNM1xX6ZKP-MYJIOw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"currentPassword\": \"Test123!\",\r\n  \"newPassword\": \"NewPass123!\"\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/auth/password",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"password"
+					]
+				},
+				"description": "PUT [http://localhost:8080/auth/password](http://localhost:8080/auth/password)\n\nAuthorization: Bearer user token\n\nBody: raw json\n\nContent-Type: application/json\n\n{\n\n\"currentPassword\": \"Test1234!\",\n\n\"newPassword\": \"NewPass123!\"\n\n}\n\n**Expected Response:**\n\n200 Ok\n\nPassword changed successfully\n\n---\n\n**Wrong current password:**\n\n{  \n\"status\": 400,  \n\"message\": \"Current password is incorrect\",  \n\"timestamp\": \"2026-01-05T18:24:02.4128413\",  \n\"errors\": null  \n}\n\n---\n\n**Same Password:**\n\n{  \n\"status\": 400,  \n\"message\": \"New password must be different from current password\",  \n\"timestamp\": \"2026-01-05T18:27:30.2457899\",  \n\"errors\": null  \n}\n\n---\n\n**Weak Password:**\n\n{  \n\"status\": 400,  \n\"message\": \"Validation failed\",  \n\"timestamp\": \"2026-01-05T18:28:41.5058844\",  \n\"errors\": \\[  \n\"newPassword: Password must be at least 8 characters\",  \n\"newPassword: Password must contain uppercase, lowercase, number, and special character\"  \n\\]  \n}"
+			},
+			"response": []
+		},
+		{
+			"name": "Get My Jobs",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzY3NTc4NzM2LCJleHAiOjE3NjgxODM1MzZ9.mjU35GX6WyFkw7NwfNhGtgIApotx1PQuw4obx7zjJSA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/jobs/my-jobs",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"jobs",
+						"my-jobs"
+					]
+				},
+				"description": "GET [http://localhost:8080/api/jobs/my-jobs](http://localhost:8080/api/jobs/my-jobs)\n\nAuthorization: Bearer user Token\n\n**Expected Response:**\n\n200 OK\n\na list of all the jobs thiss user created.\n\n---\n\nAdding pagination:\n\nGET [http://localhost:8080/api/jobs/my-jobs?page=0&amp;size=5](http://localhost:8080/api/jobs/my-jobs?page=0&size=5)\n\n---\n\nUnauthorized:\n\n{  \n\"timestamp\": \"2026-01-05T17:11:59.265+00:00\",  \n\"status\": 401,  \n\"error\": \"Unauthorized\",  \n\"path\": \"/api/jobs/my-jobs\"  \n}"
+			},
+			"response": []
+		}
+	]
+}

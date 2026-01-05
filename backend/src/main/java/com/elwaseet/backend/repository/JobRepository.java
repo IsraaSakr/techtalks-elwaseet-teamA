@@ -1,6 +1,9 @@
 package com.elwaseet.backend.repository;
 
 import com.elwaseet.backend.entity.Job;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
@@ -25,4 +28,6 @@ public interface JobRepository
     long countByCategories_CategoryId(Integer categoryId);
 
     long countByStatus(JobStatus status);
+
+    Page<Job> findByCustomer_UserId(Long customerId, Pageable pageable);
 }

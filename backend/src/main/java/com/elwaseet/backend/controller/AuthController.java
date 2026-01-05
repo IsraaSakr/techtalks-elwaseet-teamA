@@ -5,11 +5,14 @@ import com.elwaseet.backend.dto.auth.LoginResponse;
 import com.elwaseet.backend.dto.auth.RegisterDTO;
 import com.elwaseet.backend.dto.auth.ResendOtpRequest;
 import com.elwaseet.backend.dto.auth.VerifyDTO;
+import com.elwaseet.backend.dto.user.ChangePasswordRequest;
 import com.elwaseet.backend.service.AuthService;
+import com.elwaseet.backend.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 // import com.elwaseet.backend.repository.AdminUserRepository;
 // import org.springframework.security.crypto.password.PasswordEncoder;
 import com.elwaseet.backend.entity.User;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -27,6 +31,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class AuthController {
     
     private final AuthService authService;
+    private final UserService userService;
     // Admin Endpoint Related - Uncomment for initial setup
     // private final AdminUserRepository adminUserRepository;
     // private final PasswordEncoder passwordEncoder;
@@ -87,5 +92,19 @@ public class AuthController {
         // Since JWT is stateless, logout is handled client-side
         // This endpoint just confirms the action
         return ResponseEntity.ok("Logged out successfully");
+    }
+
+    /**
+     * Change password
+     * PUT /api/auth/password
+     */
+    @PutMapping("/password")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<String> changePassword(
+            @Valid @RequestBody ChangePasswordRequest request,
+            @AuthenticationPrincipal User user) {
+        
+        userService.changePassword(user.getUserId(), request);
+        return ResponseEntity.ok("Password changed successfully");
     }
 }
