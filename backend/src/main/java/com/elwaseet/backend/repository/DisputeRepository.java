@@ -16,6 +16,7 @@ public interface DisputeRepository extends JpaRepository<Dispute, Long> {
 
     // Find all disputes opened by a specific user
     List<Dispute> findByOpenedBy(User openedBy);
+    long countByStatus(DisputeStatus status);
     
     // Optimized query with JOIN FETCH
     @Query("SELECT d FROM Dispute d " +

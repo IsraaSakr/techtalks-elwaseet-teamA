@@ -1,0 +1,401 @@
+{
+	"info": {
+		"_postman_id": "a9c1c1e2-8d73-47d6-8317-df51188946c1",
+		"name": "ElWaseet Admin Dashboard",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50753645"
+	},
+	"item": [
+		{
+			"name": "Get Platform Stats",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlbHdhc2VldC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Njc1NTQ3MTUsImV4cCI6MTc2ODE1OTUxNX0.N8h0EpKd9PmK95NfKIWlKlXlblHLLjOB4a8suYj-pOw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/admin/stats",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"stats"
+					]
+				},
+				"description": "GET [http://localhost:8080/api/admin/stats](http://localhost:8080/api/admin/stats)  \nAuthorization: bearer admin token  \n**Expected Response: 200 Ok**\n\n{  \n\"totalUsers\": 4,  \n\"totalCustomers\": 1,  \n\"totalProviders\": 3,  \n\"verifiedProviders\": 3,  \n\"totalJobs\": 18,  \n\"activeJobs\": 6,  \n\"completedJobs\": 5,  \n\"totalTransactions\": 12,  \n\"totalRevenue\": 0,  \n\"platformEarnings\": 0.0,  \n\"pendingDisputes\": 6,  \n\"resolvedDisputes\": 0,  \n\"jobsByCategory\": {  \n\"Nails\": 0,  \n\"DJ\": 0,  \n\"Pet Sitting\": 0,  \n\"Tech\": 0,  \n\"HVAC\": 0,  \n\"Carpentry\": 0,  \n\"Education\": 0,  \n\"Computer Repair\": 0,  \n\"Videography\": 0,  \n\"Math Tutoring\": 0,  \n\"Network Setup\": 0,  \n\"Plumbing\": 0,  \n\"House Cleaning\": 0,  \n\"Home Services\": 18,  \n\"Moving Services\": 0,  \n\"Grooming\": 0,  \n\"Car Wash\": 0,  \n\"Arabic Lessons\": 0,  \n\"Pet Care\": 0,  \n\"Massage\": 0,  \n\"Beauty\": 0,  \n\"Event Planning\": 0,  \n\"Phone Repair\": 0,  \n\"French Lessons\": 0,  \n\"Package Delivery\": 0,  \n\"Transportation\": 0,  \n\"Makeup\": 0,  \n\"Food Delivery\": 0,  \n\"Office Cleaning\": 0,  \n\"SAT Prep\": 0,  \n\"Events\": 0,  \n\"Gardening\": 0,  \n\"Software Installation\": 0,  \n\"Move-in/out Cleaning\": 0,  \n\"Electrical\": 0,  \n\"Hairdressing\": 0,  \n\"English Lessons\": 0,  \n\"Grocery Shopping\": 0,  \n\"Cleaning\": 0,  \n\"Deep Cleaning\": 0,  \n\"Driver Services\": 0,  \n\"Painting\": 0,  \n\"Photography\": 0,  \n\"Delivery\": 0,  \n\"Dog Walking\": 0,  \n\"Catering\": 0,  \n\"Laundry\": 0,  \n\"Tailoring\": 0,  \n\"Other\": 0  \n}  \n}\n\n---\n\nGet Stats - Unauthorized\n\nno authentication:\n\n{  \n\"timestamp\": \"2026-01-05T12:45:37.331+00:00\",  \n\"status\": 401,  \n\"error\": \"Unauthorized\",  \n\"path\": \"/api/admin/stats\"  \n}\n\nnot an admin:\n\n{  \n\"status\": 403,  \n\"message\": \"Access is denied\",  \n\"timestamp\": \"2026-01-05T14:52:39.8380173\",  \n\"errors\": null  \n}"
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Users (No Filters)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlbHdhc2VldC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Njc1NTQ3MTUsImV4cCI6MTc2ODE1OTUxNX0.N8h0EpKd9PmK95NfKIWlKlXlblHLLjOB4a8suYj-pOw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/admin/users?page=0&size=20",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"users"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "20"
+						}
+					]
+				},
+				"description": "GET http://localhost:8080/api/admin/users?page=0&size=20\n\nAuthorization: Bearer Admin Token\n\n**Expected Response 200 Ok**\n\n{  \n\"content\": \\[  \n{  \n\"userId\": 5,  \n\"email\": \"[test@gmail.com](https://mailto:test@gmail.com)\",  \n\"name\": \"Test User\",  \n\"accountType\": \"HYBRID_PROVIDER\",  \n\"isVerified\": true,  \n\"isBanned\": false,  \n\"createdAt\": \"2025-12-29T13:26:54.31978\"  \n},  \n{  \n\"userId\": 1,  \n\"email\": \"[elwaseettest@gmail.com](https://mailto:elwaseettest@gmail.com)\",  \n\"name\": \"Test User\",  \n\"accountType\": \"HYBRID_PROVIDER\",  \n\"isVerified\": true,  \n\"isBanned\": false,  \n\"createdAt\": \"2025-12-22T11:46:45.097028\"  \n},  \n{  \n\"userId\": 3,  \n\"email\": \"[israasakr.1204@gmail.com](https://mailto:israasakr.1204@gmail.com)\",  \n\"name\": \"Test User\",  \n\"accountType\": \"CUSTOMER\",  \n\"isVerified\": true,  \n\"isBanned\": false,  \n\"createdAt\": \"2025-12-22T11:55:26.436275\"  \n},  \n{  \n\"userId\": 2,  \n\"email\": \"[holydwarf4@gmail.com](https://mailto:holydwarf4@gmail.com)\",  \n\"name\": \"Test User\",  \n\"accountType\": \"HYBRID_PROVIDER\",  \n\"isVerified\": true,  \n\"isBanned\": false,  \n\"createdAt\": \"2025-12-22T11:53:04.919926\"  \n}  \n\\],  \n\"pageable\": {  \n\"pageNumber\": 0,  \n\"pageSize\": 20,  \n\"sort\": {  \n\"empty\": true,  \n\"sorted\": false,  \n\"unsorted\": true  \n},  \n\"offset\": 0,  \n\"paged\": true,  \n\"unpaged\": false  \n},  \n\"last\": true,  \n\"totalElements\": 4,  \n\"totalPages\": 1,  \n\"first\": true,  \n\"size\": 20,  \n\"number\": 0,  \n\"sort\": {  \n\"empty\": true,  \n\"sorted\": false,  \n\"unsorted\": true  \n},  \n\"numberOfElements\": 4,  \n\"empty\": false  \n}"
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Users (Filter by Account Type)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlbHdhc2VldC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Njc1NTQ3MTUsImV4cCI6MTc2ODE1OTUxNX0.N8h0EpKd9PmK95NfKIWlKlXlblHLLjOB4a8suYj-pOw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/admin/users?accountType=CUSTOMER&page=0&size=20",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"users"
+					],
+					"query": [
+						{
+							"key": "accountType",
+							"value": "CUSTOMER"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "20"
+						}
+					]
+				},
+				"description": "GET http://localhost:8080/api/admin/users?accountType=CUSTOMER&page=0&size=20\n\nAuthorization: bearer admin token\n\n**Expected Response 200 Ok**"
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Users (Filter Verified Only)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlbHdhc2VldC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Njc1NTQ3MTUsImV4cCI6MTc2ODE1OTUxNX0.N8h0EpKd9PmK95NfKIWlKlXlblHLLjOB4a8suYj-pOw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/admin/users?isVerified=true&page=0&size=20",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"users"
+					],
+					"query": [
+						{
+							"key": "isVerified",
+							"value": "true"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "20"
+						}
+					]
+				},
+				"description": "GET http://localhost:8080/api/admin/users?isVerified=true&page=0&size=20\n\nAuthorization: bearer admin token\n\nExpected Response 200 Ok"
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Users (Filter Banned Only)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlbHdhc2VldC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Njc1NTQ3MTUsImV4cCI6MTc2ODE1OTUxNX0.N8h0EpKd9PmK95NfKIWlKlXlblHLLjOB4a8suYj-pOw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/admin/users?isBanned=true&page=0&size=20",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"users"
+					],
+					"query": [
+						{
+							"key": "isBanned",
+							"value": "true"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "20"
+						}
+					]
+				},
+				"description": "GET [http://localhost:8080](http://localhost:8080/api/admin/users?isVerified=true&page=0&size=20)/api/admin/users?isBanned=true&page=0&size=20\n\nAuthorization: bearer admin token\n\nExpected Response 200 Ok"
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Users (Multiple Filters)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlbHdhc2VldC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Njc1NTQ3MTUsImV4cCI6MTc2ODE1OTUxNX0.N8h0EpKd9PmK95NfKIWlKlXlblHLLjOB4a8suYj-pOw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/admin/users?accountType=HYBRID_PROVIDER&isVerified=true&page=0&size=20",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"users"
+					],
+					"query": [
+						{
+							"key": "accountType",
+							"value": "HYBRID_PROVIDER"
+						},
+						{
+							"key": "isVerified",
+							"value": "true"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "20"
+						}
+					]
+				},
+				"description": "GET [http://localhost:8080/api/admin/users?accountType=HYBRID_PROVIDER&amp;isVerified=true&amp;page=0&amp;size=20](http://localhost:8080/api/admin/users?accountType=HYBRID_PROVIDER&isVerified=false&page=0&size=20)\n\nAuthorization: bearer admin token\n\nExpected Response 200 Ok"
+			},
+			"response": []
+		},
+		{
+			"name": "Provider Verification",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlbHdhc2VldC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Njc1NTQ3MTUsImV4cCI6MTc2ODE1OTUxNX0.N8h0EpKd9PmK95NfKIWlKlXlblHLLjOB4a8suYj-pOw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/admin/users/1/verify",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"users",
+						"1",
+						"verify"
+					]
+				},
+				"description": "PUT [http://localhost:8080/api/admin/users/{{test_user_id}}/verify](http://localhost:8080/api/admin/users/{{test_user_id}}/verify)\n\nAuthorization: bearer admin token\n\nExpected Response 200 Ok\n\n{  \n\"userId\": 1,  \n\"email\": \"[elwaseettest@gmail.com](https://mailto:elwaseettest@gmail.com)\",  \n\"name\": \"Test User\",  \n\"accountType\": \"HYBRID_PROVIDER\",  \n\"isVerified\": true,  \n\"isBanned\": false,  \n\"createdAt\": \"2025-12-22T11:46:45.097028\"  \n}\n\n---\n\nif the provider is already verified\n\n{  \n\"status\": 400,  \n\"message\": \"Provider is already verified\",  \n\"timestamp\": \"2026-01-05T13:48:32.3174538\",  \n\"errors\": null  \n}\n\n---\n\ntrying to verify a customer:\n\n{  \n\"status\": 400,  \n\"message\": \"Only providers can be verified\",  \n\"timestamp\": \"2026-01-05T14:15:37.6742155\",  \n\"errors\": null  \n}\n\n---\n\ntrying to verify a non-existent user:\n\n{  \n\"status\": 404,  \n\"message\": \"User not found with id: 13\",  \n\"timestamp\": \"2026-01-05T14:16:23.4707901\",  \n\"errors\": null  \n}"
+			},
+			"response": []
+		},
+		{
+			"name": "Ban User",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlbHdhc2VldC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Njc1NTQ3MTUsImV4cCI6MTc2ODE1OTUxNX0.N8h0EpKd9PmK95NfKIWlKlXlblHLLjOB4a8suYj-pOw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"reason\": \"Violation of terms of service\" \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/admin/users/5/ban",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"users",
+						"5",
+						"ban"
+					]
+				},
+				"description": "PUT [http://localhost:8080/api/admin/users/{{test_user_id}}/ban](http://localhost:8080/api/admin/users/{{test_user_id}}/ban)  \nAuthorization: Bearer admin token\n\nBody: raw json\n\n{\n\n\"reason\": \"Violation of terms of service\"\n\n}\n\n// you can also ban a user without a reason.  \n**Expected Response:**\n\n{  \n\"userId\": 5,  \n\"email\": \"[test@gmail.com](https://mailto:test@gmail.com)\",  \n\"name\": \"Test User\",  \n\"accountType\": \"HYBRID_PROVIDER\",  \n\"isVerified\": false,  \n\"isBanned\": true,  \n\"createdAt\": \"2025-12-29T13:26:54.31978\"  \n}\n\n---\n\nBan an already Banned User\n\n{  \n\"status\": 400,  \n\"message\": \"User is already banned\",  \n\"timestamp\": \"2026-01-05T14:37:19.8461924\",  \n\"errors\": null  \n}\n\n---\n\nBan a non existent User\n\n{  \n\"status\": 404,  \n\"message\": \"User not found with id: 15\",  \n\"timestamp\": \"2026-01-05T14:37:50.6162929\",  \n\"errors\": null  \n}"
+			},
+			"response": []
+		},
+		{
+			"name": "Unban User",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlbHdhc2VldC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Njc1NTQ3MTUsImV4cCI6MTc2ODE1OTUxNX0.N8h0EpKd9PmK95NfKIWlKlXlblHLLjOB4a8suYj-pOw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/admin/users/5/unban",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"users",
+						"5",
+						"unban"
+					]
+				},
+				"description": "PUT http://localhost:8080/api/admin/users/5/unban\n\nAuthorization: Bearer Admin Token\n\nExpected Response: 200 Ok\n\n{  \n\"userId\": 5,  \n\"email\": \"[test@gmail.com](https://mailto:test@gmail.com)\",  \n\"name\": \"Test User\",  \n\"accountType\": \"HYBRID_PROVIDER\",  \n\"isVerified\": false,  \n\"isBanned\": false,  \n\"createdAt\": \"2025-12-29T13:26:54.31978\"  \n}\n\n---\n\nUnbanning unabnned user:\n\n{  \n\"status\": 400,  \n\"message\": \"User is not banned\",  \n\"timestamp\": \"2026-01-05T14:41:30.7582602\",  \n\"errors\": null  \n}\n\n---\n\nUnbanning non existent user"
+			},
+			"response": []
+		}
+	]
+}

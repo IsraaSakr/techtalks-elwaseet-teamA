@@ -14,4 +14,6 @@ public interface ProviderProfileRepository
     Optional<ProviderProfile> findByUser_UserId(Long userId);
 
     boolean existsByUser_UserId(Long userId);
+
+    long countByIsVerifiedTrue();
 }

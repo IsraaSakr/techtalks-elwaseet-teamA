@@ -169,4 +169,19 @@ public class GlobalExceptionHandler {
         
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
         }
+
+        // -------------------------------------------------------------------------
+        // 400 - IllegalStateException (State Validation)
+        // -------------------------------------------------------------------------
+        @ExceptionHandler(IllegalStateException.class)
+        public ResponseEntity<ErrorResponse> handleIllegalState(IllegalStateException ex) {
+                
+                ErrorResponse error = new ErrorResponse(
+                        HttpStatus.BAD_REQUEST.value(),
+                        ex.getMessage(),
+                        LocalDateTime.now()
+                );
+                
+                return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
 }
