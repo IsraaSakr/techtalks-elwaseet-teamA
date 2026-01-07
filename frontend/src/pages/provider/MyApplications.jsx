@@ -146,7 +146,7 @@ const ApplicationCard = ({ application }) => {
                     </p>
 
                     <div className="flex flex-wrap gap-4 pt-2">
-                        <div className="flex items-center gap-1.5 text-sm font-medium text-gray-700 bg-blue-50 px-3 py-1.5 rounded-full text-blue-700">
+                        <div className="flex items-center gap-1.5 text-sm font-medium bg-blue-50 px-3 py-1.5 rounded-full text-blue-700">
                             <DollarSign className="w-4 h-4" />
                             <span>Quote: {formatCurrency(application.quote)}</span>
                         </div>

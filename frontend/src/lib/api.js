@@ -3,11 +3,11 @@ import { storage } from './utils';
 import { MOCK_USERS, MOCK_JOBS, MOCK_APPLICATIONS, MOCK_NOTIFICATIONS, mockDelay, mockLogin, mockVerifyOTP } from './mockData';
 
 // Enable mock mode for development (set to false when backend is ready)
-const USE_MOCK_API = true;
+const USE_MOCK_API = false;
 
 // Create axios instance with base configuration
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',
+    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
