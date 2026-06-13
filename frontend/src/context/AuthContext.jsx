@@ -36,7 +36,9 @@ export const AuthProvider = ({ children }) => {
             const { token, user: userData } = response;
 
             storage.set('authToken', token);
-            storage.set('user', userData);
+            if (userData) {                    // ← add this guard
+                storage.set('user', userData);
+            }
             setUser(userData);
             setIsAuthenticated(true);
 
@@ -57,15 +59,8 @@ export const AuthProvider = ({ children }) => {
 
     const verifyOTP = async (email, otp) => {
         try {
-            const response = await authAPI.verifyOTP({ email, otp });
-            const { token, user: userData } = response;
-
-            storage.set('authToken', token);
-            storage.set('user', userData);
-            setUser(userData);
-            setIsAuthenticated(true);
-
-            return { success: true, user: userData };
+            await authAPI.verifyOTP({ email, code: otp });
+            return { success: true };
         } catch (error) {
             return { success: false, error: error.message || 'OTP verification failed' };
         }
@@ -89,26 +84,10 @@ export const AuthProvider = ({ children }) => {
         setUser(userData);
     };
 
-    // Role-based access helpers
+    // Role-based access
     const hasRole = (role) => {
         if (!user) return false;
-        return user.role === role;
-    };
-
-    const isCustomer = () => {
-        return hasRole(USER_ROLES.CUSTOMER) || hasRole(USER_ROLES.HYBRID);
-    };
-
-    const isProvider = () => {
-        return hasRole(USER_ROLES.PROVIDER) || hasRole(USER_ROLES.HYBRID);
-    };
-
-    const isAdmin = () => {
-        return hasRole(USER_ROLES.ADMIN);
-    };
-
-    const isHybrid = () => {
-        return hasRole(USER_ROLES.HYBRID);
+        return user.accountType === role;
     };
 
     const value = {
@@ -120,11 +99,7 @@ export const AuthProvider = ({ children }) => {
         verifyOTP,
         logout,
         updateUser,
-        hasRole,
-        isCustomer,
-        isProvider,
-        isAdmin,
-        isHybrid,
+        hasRole
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

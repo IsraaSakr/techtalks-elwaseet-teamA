@@ -61,64 +61,44 @@ export const Register = () => {
         setFormData(prev => ({ ...prev, role: value }));
     };
 
-    const detectLocation = () => {
-        if (!navigator.geolocation) {
-            setErrors(prev => ({ ...prev, location: 'Geolocation is not supported by your browser' }));
-            return;
-        }
+    const mapCoordsToLocation = (latitude, longitude) => {
+    // Lebanon governorate bounding boxes (approximate)
+    if (latitude >= 33.85 && latitude <= 33.95 && longitude >= 35.45 && longitude <= 35.65) return 'BEIRUT';
+    if (latitude >= 33.55 && latitude <= 34.0 && longitude >= 35.45 && longitude <= 36.0) return 'MOUNT_LEBANON';
+    if (latitude >= 34.0 && latitude <= 34.7 && longitude >= 35.5 && longitude <= 36.6) return 'NORTH_LEBANON';
+    if (latitude >= 33.2 && latitude <= 33.6 && longitude >= 35.2 && longitude <= 35.7) return 'SOUTH_LEBANON';
+    if (latitude >= 33.4 && latitude <= 34.1 && longitude >= 35.7 && longitude <= 36.6) return 'BEKAA';
+    if (latitude >= 33.3 && latitude <= 33.55 && longitude >= 35.4 && longitude <= 35.7) return 'NABATIEH';
+    return null;
+};
 
-        setLocationLoading(true);
-        setErrors(prev => ({ ...prev, location: '' }));
+const detectLocation = () => {
+    if (!navigator.geolocation) {
+        setErrors(prev => ({ ...prev, location: 'Geolocation is not supported by your browser' }));
+        return;
+    }
 
-        const options = {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
-        };
+    setLocationLoading(true);
+    setErrors(prev => ({ ...prev, location: '' }));
 
-        navigator.geolocation.getCurrentPosition(
-            async (position) => {
-                try {
-                    const { latitude, longitude } = position.coords;
-                    const response = await fetch(
-                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-                    );
-                    const data = await response.json();
-                    
-                    const city = data.address.city || data.address.town || data.address.village || data.address.county || '';
-                    
-                    if (city) {
-                        setFormData(prev => ({ ...prev, location: city }));
-                    } else {
-                        setErrors(prev => ({ ...prev, location: 'Could not detect city name' }));
-                    }
-                } catch (error) {
-                    console.error("Location fetch error:", error);
-                    setErrors(prev => ({ ...prev, location: 'Failed to fetch location data' }));
-                } finally {
-                    setLocationLoading(false);
-                }
-            },
-            (error) => {
-                setLocationLoading(false);
-                console.error("Geolocation error:", error);
-                switch(error.code) {
-                    case error.PERMISSION_DENIED:
-                        setErrors(prev => ({ ...prev, location: 'Location permission denied. Please allow access.' }));
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        setErrors(prev => ({ ...prev, location: 'Location unavailable. Check OS location settings.' }));
-                        break;
-                    case error.TIMEOUT:
-                        setErrors(prev => ({ ...prev, location: 'Location request timed out. Try again.' }));
-                        break;
-                    default:
-                        setErrors(prev => ({ ...prev, location: 'An unknown error occurred' }));
-                }
-            },
-            options
-        );
-    };
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const { latitude, longitude } = position.coords;
+            const mapped = mapCoordsToLocation(latitude, longitude);
+            if (mapped) {
+                setFormData(prev => ({ ...prev, location: mapped }));
+            } else {
+                setErrors(prev => ({ ...prev, location: 'Could not detect your governorate. Please select manually.' }));
+            }
+            setLocationLoading(false);
+        },
+        (error) => {
+            setLocationLoading(false);
+            setErrors(prev => ({ ...prev, location: 'Location access denied. Please select manually.' }));
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+    );
+};
 
     const validate = () => {
         const newErrors = {};
@@ -163,8 +143,14 @@ export const Register = () => {
         setLoading(true);
 
         try {
-            const registrationData = { ...formData };
-            delete registrationData.confirmPassword;
+            const registrationData = {
+                name: formData.fullName,
+                email: formData.email,
+                phone: formData.phone,
+                password: formData.password,
+                location: formData.location,
+                accountType: formData.role,
+            };
             const result = await register(registrationData);
 
             if (result.success) {
@@ -392,20 +378,23 @@ export const Register = () => {
                                             Location
                                         </Label>
                                         <div className="relative">
-                                            <Input
-                                                id="location"
-                                                name="location"
-                                                type="text"
-                                                value={formData.location}
-                                                onChange={handleChange}
-                                                placeholder="Beirut"
+                                            <Select 
+                                                value={formData.location} 
+                                                onValueChange={(value) => setFormData(prev => ({ ...prev, location: value }))}
                                                 disabled={loading || locationLoading}
-                                                className={`h-11 pr-11 transition-all ${
-                                                    errors.location 
-                                                        ? 'border-red-500 focus-visible:ring-red-500' 
-                                                        : 'focus-visible:ring-[#125e3b]'
-                                                }`}
-                                            />
+                                            >
+                                                <SelectTrigger className={`h-11 ${errors.location ? 'border-red-500' : ''}`}>
+                                                    <SelectValue placeholder="Select governorate" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="BEIRUT">Beirut</SelectItem>
+                                                    <SelectItem value="MOUNT_LEBANON">Mount Lebanon</SelectItem>
+                                                    <SelectItem value="NORTH_LEBANON">North Lebanon</SelectItem>
+                                                    <SelectItem value="SOUTH_LEBANON">South Lebanon</SelectItem>
+                                                    <SelectItem value="BEKAA">Bekaa</SelectItem>
+                                                    <SelectItem value="NABATIEH">Nabatieh</SelectItem>
+                                                </SelectContent>
+                                            </Select>
                                             <button
                                                 type="button"
                                                 onClick={detectLocation}
@@ -438,7 +427,7 @@ export const Register = () => {
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value={USER_ROLES.PROVIDER}>Offer my services</SelectItem>
+                                                <SelectItem value={USER_ROLES.CUSTOMER}>Hire services only</SelectItem>
                                                 <SelectItem value={USER_ROLES.HYBRID}>Hire & offer services (Both)</SelectItem>
                                             </SelectContent>
                                         </Select>

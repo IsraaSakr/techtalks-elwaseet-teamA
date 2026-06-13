@@ -52,20 +52,10 @@ export const VerifyEmail = () => {
 
             if (result.success) {
                 setVerificationStatus('success');
-                toast.success('Email verified successfully!');
+                toast.success('Email verified! Please log in.');
                 setTimeout(() => {
-                    const user = result.user;
-                    if (user.role === 'admin') {
-                        navigate(ROUTES.ADMIN_DASHBOARD);
-                    } else if (user.role === 'provider' || user.role === 'hybrid') {
-                        navigate(ROUTES.PROVIDER_DASHBOARD);
-                    } else {
-                        navigate(ROUTES.CUSTOMER_DASHBOARD);
-                    }
-                }, 1000);
-            } else {
-                setVerificationStatus('error');
-                toast.error(result.error || 'Verification failed');
+                    navigate(ROUTES.LOGIN);
+                }, 1500);
             }
         } catch (error) {
             setVerificationStatus('error');

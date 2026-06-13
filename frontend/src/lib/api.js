@@ -180,7 +180,7 @@ export const jobsAPI = {
             storage.set('mock_jobs', updatedJobs);
             return { success: true };
         }
-        return api.put(`/jobs/${id}/confirm`);
+        return api.post(`/jobs/${id}/confirm`);
     },
     dispute: async (id, data) => {
         if (USE_MOCK_API) {
@@ -233,7 +233,7 @@ export const applicationsAPI = {
             const applications = MOCK_APPLICATIONS.filter(a => a.providerId === userId);
             return { applications };
         }
-        return api.get('/applications/my', { params });
+        return api.get('/applications/my-applications', { params });
     },
 };
 

@@ -71,9 +71,9 @@ export const Login = () => {
                     duration: 2000,
                 });
                 const user = result.user;
-                if (user.role === 'admin') {
+                if (user.accountType === 'ADMIN') {
                     navigate(ROUTES.ADMIN_DASHBOARD);
-                } else if (user.role === 'provider' || user.role === 'hybrid') {
+                } else if (user.accountType === 'HYBRID_PROVIDER') {
                     navigate(ROUTES.PROVIDER_DASHBOARD);
                 } else {
                     navigate(ROUTES.CUSTOMER_DASHBOARD);

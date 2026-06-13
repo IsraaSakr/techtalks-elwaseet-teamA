@@ -88,18 +88,19 @@ export const CustomerDashboard = () => {
         try {
             setLoading(true);
             const data = await jobsAPI.getMyJobs();
-            setJobs(data.jobs || []);
+            // Backend might return array or { jobs: [] }
+            const jobList = Array.isArray(data) ? data : (data.jobs || []);
+            setJobs(jobList);
 
-            // Calculate stats
-            const active = data.jobs?.filter(j =>
+            const active = jobList.filter(j =>
                 j.status === JOB_STATUS.IN_PROGRESS || j.status === JOB_STATUS.OPEN
-            ).length || 0;
-            const completed = data.jobs?.filter(j =>
+            ).length;
+            const completed = jobList.filter(j =>
                 j.status === JOB_STATUS.CONFIRMED
-            ).length || 0;
-            const pending = data.jobs?.filter(j =>
+            ).length;
+            const pending = jobList.filter(j =>
                 j.status === JOB_STATUS.COMPLETED
-            ).length || 0;
+            ).length;
 
             setStats({ active, completed, pending });
         } catch (error) {

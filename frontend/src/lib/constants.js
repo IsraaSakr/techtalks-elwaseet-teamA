@@ -2,10 +2,9 @@
 
 // User Roles
 export const USER_ROLES = {
-    CUSTOMER: 'customer',
-    PROVIDER: 'provider',
-    HYBRID: 'hybrid',
-    ADMIN: 'admin',
+    CUSTOMER: 'CUSTOMER',
+    HYBRID: 'HYBRID_PROVIDER',
+    ADMIN: 'ADMIN',
 };
 
 // Job Statuses
