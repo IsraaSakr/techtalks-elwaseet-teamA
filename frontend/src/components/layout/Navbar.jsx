@@ -68,13 +68,13 @@ export const Navbar = () => {
                                 className="flex items-center gap-2 hover:bg-gray-50 rounded-lg p-2 transition-colors"
                             >
                                 <Avatar className="w-8 h-8">
-                                    <AvatarImage src={user?.avatar} alt={user?.fullName} />
+                                    <AvatarImage src={user?.avatar} alt={user?.name} />
                                     <AvatarFallback className="bg-blue-100 text-blue-600">
-                                        {getInitials(user?.fullName)}
+                                        {getInitials(user?.name)}
                                     </AvatarFallback>
                                 </Avatar>
                                 <span className="text-sm font-medium text-gray-700">
-                                    {user?.fullName}
+                                    {user?.name}
                                 </span>
                             </button>
 
@@ -126,13 +126,13 @@ export const Navbar = () => {
                                     {/* User Info */}
                                     <div className="flex items-center gap-3 pb-4 border-b">
                                         <Avatar className="w-12 h-12">
-                                            <AvatarImage src={user?.avatar} alt={user?.fullName} />
+                                            <AvatarImage src={user?.avatar} alt={user?.name} />
                                             <AvatarFallback className="bg-blue-100 text-blue-600">
-                                                {getInitials(user?.fullName)}
+                                                {getInitials(user?.name)}
                                             </AvatarFallback>
                                         </Avatar>
                                         <div>
-                                            <p className="font-medium text-gray-900">{user?.fullName}</p>
+                                            <p className="font-medium text-gray-900">{user?.name}</p>
                                             <p className="text-sm text-gray-500 capitalize">{user?.role}</p>
                                         </div>
                                     </div>

@@ -272,18 +272,8 @@ public class JobService {
             }
         }
 
-        // Build response DTO
-        return JobResponseDTO.builder()
-                .jobId(job.getJobId())
-                .title(job.getTitle())
-                .description(job.getDescription())
-                .location(job.getLocation())
-                .urgency(job.getUrgency())
-                .budgetMin(job.getBudgetMin())
-                .budgetMax(job.getBudgetMax())
-                .status(job.getStatus())
-                .photoUrls(photoUrls)
-                .build();
+        // response DTO
+        return JobResponseDTO.fromEntity(job);
     }
 
     @Transactional

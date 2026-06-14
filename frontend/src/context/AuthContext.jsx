@@ -14,6 +14,9 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
+    const isCustomer = () => user?.accountType === 'CUSTOMER';
+    const isProvider = () => user?.accountType === 'HYBRID_PROVIDER';
+    const isAdmin = () => user?.accountType === 'ADMIN';
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -99,7 +102,10 @@ export const AuthProvider = ({ children }) => {
         verifyOTP,
         logout,
         updateUser,
-        hasRole
+        hasRole,
+        isCustomer,
+        isProvider,
+        isAdmin
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,3 +1,4 @@
+import { useAuth } from '../../hooks/useAuth';
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
@@ -6,7 +7,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/ta
 import { useRef } from 'react';
 import { PlusCircle, Briefcase, Clock, CheckCircle, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { JobCard } from '../../components/shared/JobCard';
-import AnimatedList from '../../components/ui/AnimatedList';
 import SpotlightCard from '../../components/ui/SpotlightCard';
 import CountUp from '../../components/ui/CountUp';
 import { LoadingSpinner } from '../../components/shared/LoadingSpinner';
@@ -71,6 +71,7 @@ const JobList = ({ jobs }) => {
 };
 
 export const CustomerDashboard = () => {
+    const { user } = useAuth();
     const [activeTab, setActiveTab] = useState('all');
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -82,25 +83,23 @@ export const CustomerDashboard = () => {
 
     useEffect(() => {
         fetchJobs();
-    }, []);
+    }, [user]);
 
     const fetchJobs = async () => {
         try {
             setLoading(true);
             const data = await jobsAPI.getMyJobs();
-            // Backend might return array or { jobs: [] }
-            const jobList = Array.isArray(data) ? data : (data.jobs || []);
-            setJobs(jobList);
+            const allJobs = data.content || [];
+            
+            // Filter to only this user's jobs
+            const myJobs = allJobs.filter(job => job.customer?.id === user?.userId);
+            setJobs(myJobs);
 
-            const active = jobList.filter(j =>
+            const active = myJobs.filter(j =>
                 j.status === JOB_STATUS.IN_PROGRESS || j.status === JOB_STATUS.OPEN
             ).length;
-            const completed = jobList.filter(j =>
-                j.status === JOB_STATUS.CONFIRMED
-            ).length;
-            const pending = jobList.filter(j =>
-                j.status === JOB_STATUS.COMPLETED
-            ).length;
+            const completed = myJobs.filter(j => j.status === JOB_STATUS.CONFIRMED).length;
+            const pending = myJobs.filter(j => j.status === JOB_STATUS.COMPLETED).length;
 
             setStats({ active, completed, pending });
         } catch (error) {
@@ -133,7 +132,6 @@ export const CustomerDashboard = () => {
     if (loading) {
         return <LoadingSpinner />;
     }
-
     return (
         <div className="space-y-6" >
             {/* Header */}
