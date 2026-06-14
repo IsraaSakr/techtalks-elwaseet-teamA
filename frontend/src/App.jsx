@@ -43,6 +43,9 @@ import { Settings } from './pages/shared/Settings';
 // Import constants
 import { ROUTES, USER_ROLES } from './lib/constants';
 
+import { BrowseJobsPage } from './pages/shared/BrowseJobsPage';
+import { BrowseJobDetailPage } from './pages/shared/BrowseJobDetailPage';
+
 function App() {
   return (
     <AuthProvider>
@@ -70,6 +73,8 @@ function App() {
             <Route path={ROUTES.CUSTOMER_JOB_DISPUTE(':id')} element={<DisputeJob />} />
             <Route path={ROUTES.CUSTOMER_RATE_PROVIDER(':id')} element={<RateProvider />} />
             <Route path={ROUTES.BROWSE_PROVIDERS} element={<BrowseProviders />} />
+            <Route path={ROUTES.BROWSE_JOBS} element={<BrowseJobsPage />} />
+            <Route path={ROUTES.BROWSE_JOB_DETAILS(':id')} element={<BrowseJobDetailPage />} />
             <Route path={ROUTES.PROVIDER_PROFILE(':id')} element={<ProviderProfile />} />
           </Route>
 

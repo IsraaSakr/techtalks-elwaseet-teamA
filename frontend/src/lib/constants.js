@@ -111,7 +111,7 @@ export const API_ENDPOINTS = {
     COMPLETE_JOB: (id) => `/jobs/${id}/complete`,
     CONFIRM_JOB: (id) => `/jobs/${id}/confirm`,
     DISPUTE_JOB: (id) => `/jobs/${id}/dispute`,
-    APPLY_TO_JOB: (id) => `/jobs/${id}/apply`,
+    APPLY_TO_JOB: (id) => `/jobs/${id}/apply`, 
 
     // Providers
     PROVIDERS: '/providers',
@@ -181,8 +181,11 @@ export const ROUTES = {
     ADMIN_USER_DETAILS: (id) => `/admin/users/${id}`,
 
     // Shared
+    BROWSE_JOBS: '/browse-jobs',
+    BROWSE_JOB_DETAILS: (id) => `/browse-jobs/${id}`,
     PROFILE: '/profile',
     NOTIFICATIONS: '/notifications',
     TRANSACTIONS: '/transactions',
     SETTINGS: '/settings',
+    
 };

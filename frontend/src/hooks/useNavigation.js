@@ -10,6 +10,7 @@ import {
     AlertCircle,
     DollarSign,
     UserCircle,
+    Search,
 } from 'lucide-react';
 
 export const useNavigation = () => {
@@ -17,6 +18,7 @@ export const useNavigation = () => {
 
     const customerNavItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: ROUTES.CUSTOMER_DASHBOARD },
+        { icon: Search, label: 'Browse Jobs', path: ROUTES.BROWSE_JOBS },
         { icon: PlusCircle, label: 'Post Job', path: ROUTES.POST_JOB },
         { icon: Users, label: 'Browse Providers', path: ROUTES.BROWSE_PROVIDERS },
         { icon: DollarSign, label: 'Transactions', path: ROUTES.TRANSACTIONS },

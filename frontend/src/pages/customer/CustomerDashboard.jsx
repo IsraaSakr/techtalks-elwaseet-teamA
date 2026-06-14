@@ -49,7 +49,7 @@ const JobList = ({ jobs }) => {
             >
                 {jobs.map((job) => (
                     <JobCard
-                        key={job.id}
+                        key={job.Id}
                         job={job}
                         onViewDetails={(id) => navigate(ROUTES.CUSTOMER_JOB_DETAILS(id))}
                         className="w-full md:w-[calc(33.33%-11px)] md:min-w-[calc(33.33%-11px)] md:flex-shrink-0 md:snap-start"
