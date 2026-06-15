@@ -10,14 +10,20 @@ import { jobsAPI } from '../../lib/api';
 import { formatRelativeTime } from '../../lib/utils';
 import { ROUTES } from '../../lib/constants';
 
-const LOCATIONS = ['BEIRUT', 'TRIPOLI', 'SIDON', 'TYRE', 'JOUNIEH', 'ZAHLE', 'BAALBEK'];
-const URGENCY_LEVELS = ['LOW', 'MEDIUM', 'HIGH', 'IMMEDIATE'];
+const LOCATIONS = [
+    { value: 'BEIRUT', label: 'Beirut' },
+    { value: 'MOUNT_LEBANON', label: 'Mount Lebanon' },
+    { value: 'NORTH_LEBANON', label: 'North Lebanon' },
+    { value: 'SOUTH_LEBANON', label: 'South Lebanon' },
+    { value: 'BEKAA', label: 'Bekaa' },
+    { value: 'NABATIEH', label: 'Nabatieh' },
+];
+const URGENCY_LEVELS = ['LOW', 'MEDIUM', 'HIGH'];
 
 const URGENCY_COLORS = {
     LOW: 'bg-gray-100 text-gray-700',
     MEDIUM: 'bg-blue-100 text-blue-700',
     HIGH: 'bg-orange-100 text-orange-700',
-    IMMEDIATE: 'bg-red-100 text-red-700',
 };
 
 const JobBrowseCard = ({ job, onClick }) => {
@@ -198,7 +204,7 @@ export const BrowseJobsPage = () => {
                             >
                                 <option value="">All Locations</option>
                                 {LOCATIONS.map(l => (
-                                    <option key={l} value={l}>{l}</option>
+                                    <option key={l.value} value={l.value}>{l.label}</option>
                                 ))}
                             </select>
                         </div>

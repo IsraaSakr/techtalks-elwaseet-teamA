@@ -116,17 +116,7 @@ export const jobsAPI = {
     },
 
     getAll: async (params) => {
-        if (USE_MOCK_API) {
-            await mockDelay();
-            // PERSISTENCE: Read from storage
-            let jobs = storage.get('mock_jobs') || [...MOCK_JOBS];
-            
-            if (params?.status) {
-                jobs = jobs.filter(j => j.status === params.status);
-            }
-            return { jobs, total: jobs.length };
-        }
-        return api.get('/jobs', { params });
+        return api.get('/api/jobs', { params });
     },
 
     getMyJobs: async (params) => {
